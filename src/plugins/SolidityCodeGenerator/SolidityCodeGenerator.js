@@ -12,7 +12,8 @@ define([
     'text!./metadata.json',
     'plugin/PluginBase',
     'q',
-    'common/util/ejs'
+    'common/util/ejs',
+    'scsrc/util/utils'
 ], function (
     PluginConfig,
     pluginMetadata,
