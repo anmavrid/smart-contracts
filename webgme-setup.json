@@ -4,9 +4,16 @@
       "SC": {
         "src": "src/seeds/SC"
       }
+    },
+    "plugins": {
+      "SolidityCodeGenerator": {
+        "src": "src/plugins/SolidityCodeGenerator",
+        "test": "test/plugins/SolidityCodeGenerator"
+      }
     }
   },
   "dependencies": {
-    "seeds": {}
+    "seeds": {},
+    "plugins": {}
   }
 }
