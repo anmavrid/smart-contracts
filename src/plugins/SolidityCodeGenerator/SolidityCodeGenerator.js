@@ -10,11 +10,15 @@
 define([
     'plugin/PluginConfig',
     'text!./metadata.json',
-    'plugin/PluginBase'
+    'plugin/PluginBase',
+    'q',
+    'common/util/ejs'
 ], function (
     PluginConfig,
     pluginMetadata,
-    PluginBase) {
+    PluginBase,
+    Q,
+    ejs) {
     'use strict';
 
     pluginMetadata = JSON.parse(pluginMetadata);
@@ -56,36 +60,56 @@ define([
         // Use self to access core, project, result, logger etc from PluginBase.
         // These are all instantiated at this point.
         var self = this,
-            nodeObject;
+          nodes,
+          artifact;
 
+        self.loadNodeMap(self.activeNode)
+           .then(function (nodes_) {
+            nodes = nodes_;
 
-        // Using the logger.
-        self.logger.debug('This is a debug message.');
-        self.logger.info('This is an info message.');
-        self.logger.warn('This is a warning message.');
-        self.logger.error('This is an error message.');
+            return SolidityCodeGenerator.getGeneratedFile(self, nodes);
+        })
+        .then(function (result) {
+            if (result.violations.length > 0) {
+                result.violations.forEach(function (violation) {
+                    self.createMessage(violation.node, violation.message, 'error');
+                });
+                throw new Error('Model has ' + result.violations.length + ' violation(s). ' +
+                'See messages for details.');
+            }
 
-        // Using the coreAPI to make changes.
+            artifact = self.blobClient.createArtifact('SolidityContract');
+            return artifact.addFiles(result.fileContent);
+        })
+        .then(function (fileHash) {
+            self.result.addArtifact(fileHash);
+            return artifact.save();
+        })
+        .then(function () {
+            self.result.setSuccess(true);
+            callback(null, self.result);
+        })
+        .catch(function (err) {
+            self.logger.error(err.stack);
+            // Result success is false at invocation.
+            callback(err, self.result);
+        });
+    };
 
-        nodeObject = self.activeNode;
+    /**
+     *
+     * @param {PluginBase} self - An initialized and configured plugin.
+     * @param {Object<string, Object>} nodes - all nodes loaded from the projectNode.
+     * @param {object} activeNode - the projectNode.
+     *
+     * @returns {fileContent: string, violations: Objects[]}
+     */
+    SolidityCodeGenerator.getGeneratedFile = function (self, nodes, callback) {
 
-        self.core.setAttribute(nodeObject, 'name', 'My new obj');
-        self.core.setRegistry(nodeObject, 'position', {x: 70, y: 70});
-
-
-        // This will save the changes. If you don't want to save;
-        // exclude self.save and call callback directly from this scope.
-        self.save('SolidityCodeGenerator updated model.')
-            .then(function () {
-                self.result.setSuccess(true);
-                callback(null, self.result);
-            })
-            .catch(function (err) {
-                // Result success is false at invocation.
-                callback(err, self.result);
-            });
 
     };
+
+
 
     return SolidityCodeGenerator;
 });
