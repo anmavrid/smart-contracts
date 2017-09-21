@@ -1,4 +1,12 @@
 {
-  "components": {},
-  "dependencies": {}
+  "components": {
+    "seeds": {
+      "SC": {
+        "src": "src/seeds/SC"
+      }
+    }
+  },
+  "dependencies": {
+    "seeds": {}
+  }
 }
