@@ -78,14 +78,18 @@ define([
                 'See messages for details.');
             }
 
-            artifact = self.blobClient.createArtifact('SolidityContract');
-            return artifact.addFiles(result.fileContent);
+            artifact = self.blobClient.createArtifact('SolidityContracts');
+            return artifact.addFiles(result.files);
         })
-        .then(function (fileHash) {
-            self.result.addArtifact(fileHash);
+        .then(function (fileHashes) {
+            fileHashes.forEach(function (fileHash) {
+                self.result.addArtifact(fileHash);
+            });
+
             return artifact.save();
         })
-        .then(function () {
+        .then(function (artifactHash) {
+            self.result.addArtifact(artifactHash);
             self.result.setSuccess(true);
             callback(null, self.result);
         })
@@ -105,8 +109,161 @@ define([
      * @returns {fileContent: string, violations: Objects[]}
      */
     SolidityCodeGenerator.getGeneratedFile = function (self, nodes, callback) {
+        var contractPaths = SolidityCodeGenerator.prototype.getContractPaths.call(self, nodes),
+            violations = SolidityCodeGenerator.prototype.getViolations (self, contractPaths, nodes),
+            fileNames = [],
+            fileName,
+            promises, type;
 
+        for (type of contractPaths) {
+            fileName = self.core.getAttribute(nodes[type], 'name') + '.sol';
+            fileNames.push(fileName);
+            promises.push(SolidityCodeGenerator.prototype.getContractFile.call(self, nodes[type], violations));
+        }
 
+        return Q.all(promises)
+            .then(function (result) {
+                var i,
+                    files = {};
+
+                for (i = 0; i < fileNames.length; i += 1) {
+                    files[fileNames[i]] = result[i];
+                }
+
+                return {
+                    files: files,
+                    violations: violations
+                };
+            })
+            .nodeify(callback);
+    };
+
+    SolidityCodeGenerator.prototype.getContractPaths = function (nodes) {
+        var self = this,
+            path,
+            node,
+            //Using an array for the multiple contracts extention
+            contracts = [];
+
+        for (path in nodes) {
+            node = nodes[path];
+            if (self.isMetaTypeOf(node, self.META.Contract)) {
+                contracts.push(path);
+            }
+        }
+        return componentTypes;
+    };
+
+    SolidityCodeGenerator.prototype.getContractFile = function (contractNode, violations, callback) {
+        var self = this,
+            fileContent,
+            i;
+
+        return utils.getModelOfContract(self.core, contractNode)
+            .then(function (contractModel) {
+                fileContent = ejs.render(ejsCache.contractType.complete, contractModel);
+                //Need to change this for a Javascript file.
+                //var parseResult = javaParser.checkWholeFile(fileContent);
+                //if (parseResult) {
+                    //self.logger.debug(parseResult.line);
+                    //self.logger.debug(parseResult.message);
+                    //parseResult.node = componentTypeNode;
+                    //violations.push(parseResult);
+                //}
+                return fileContent;
+            })
+            .nodeify(callback);
+    };
+
+    SolidityCodeGenerator.prototype.getViolations = function (contracts, nodes) {
+        var contractNames = {},
+            name, type, node,
+            child, childPath, childName,
+            self = this,
+            noInitialState,
+            nameAndViolations = {
+                violations: [],
+                totalStateNames: {},
+                transitionNames: {},
+                guardNames: {}
+            };
+
+        for (type of contracts) {
+            //nameAndViolations.guardNames = {};
+            nameAndViolations.totalStateNames = {};
+            nameAndViolations.transitionNames = {};
+            noInitialState = true;
+            node = nodes[type];
+            name = self.core.getAttribute(node, 'name');
+            if (contractNames.hasOwnProperty(name)) {
+                nameAndViolations.violations.push({
+                    node: node,
+                    message: 'Name [' + name + '] of contract [' + type + '] is not unique. Please rename. ' +
+                    'Contracts must have unique names. '
+                });
+            }
+            contractNames[name] = self.core.getPath(node);
+            for (childPath of self.core.getChildrenPaths(node)) {
+                child = nodes[childPath];
+                childName = self.core.getAttribute(child, 'name');
+                if ((self.isMetaTypeOf(child, self.META.InitialState))) {
+                    noInitialState = false;
+                }
+                nameAndViolations = SolidityCodeGenerator.prototype.hasChildViolations.call(self, child, childName, nameAndViolations);
+            }
+            if (noInitialState) {
+                nameAndViolations.violations.push({
+                    node: node,
+                    message: 'Contract type [' + name + '] does not have an initial state. ' +
+                    'Please define an initial state.'
+                });
+            }
+        }
+        return nameAndViolations.violations;
+    };
+
+    SolidityCodeGenerator.prototype.hasChildViolations = function (child, childName, nameAndViolations) {
+        var self = this;
+
+        if ((self.isMetaTypeOf(child, self.META.State)) || (self.isMetaTypeOf(child, self.META.InitialState))) {
+            if (nameAndViolations.totalStateNames.hasOwnProperty(childName)) {
+                nameAndViolations.violations.push({
+                    node: child,
+                    message: 'Name [' + childName + '] of state [' + child + '] is not unique. ' +
+                    'Please rename. States that belong to the same contract must have unique names.'
+                });
+            }
+            nameAndViolations.totalStateNames[childName] = self.core.getPath(child);
+        }
+        if (self.isMetaTypeOf(child, self.META.Transition)) {
+
+            if (this.core.getPointerPath(child, 'dst') === null) {
+                nameAndViolations.violations.push({
+                    node: child,
+                    message: 'Transition [' + childName + '] with no destination encountered. ' +
+                    'Please connect or remove it.'
+                });
+            }
+            if (this.core.getPointerPath(child, 'src') === null) {
+                nameAndViolations.violations.push({
+                    node: child,
+                    message: 'Transition [' + childName + '] with no source encountered. Please connect or remove it.'
+                });
+            }
+        }
+        if (self.isMetaTypeOf(child, self.META.Transition)) {
+
+            if (nameAndViolations.transitionNames.hasOwnProperty(childName)) {
+                nameAndViolations.violations.push({
+                    node: child,
+                    message: 'Name [' + childName + '] of transition is not unique. ' +
+                    'Please rename. Transitions of the same contract ' +
+                    'type must have unique names.'
+                });
+            }
+            nameAndViolations.transitionNames[childName] = self.core.getPath(child);
+        }
+        return nameAndViolations;
     };
 
 
