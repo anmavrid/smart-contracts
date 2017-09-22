@@ -163,8 +163,9 @@ define([
                 //addSegment('userImports', model.path, model);
                 //addSegment('portsAnnotations', model.path, model, true);
                 addSegment('classStart', model.path, model, true);
-                addSegment('userDefinitions', model.path, model);
+
                 addSegment('states', model.path, model, true);
+                    addSegment('userDefinitions', model.path, model);
                 //addSegment('classInitializations', model.path, model, true);
                 //addSegment('userConstructors', model.path, model);
 
