@@ -78,6 +78,6 @@ define(['q'], function (Q) {
     }
 
     return {
-        getModelOfComponentType: getModelOfComponentType
+        getModelOfContract: getModelOfContract
     };
 });

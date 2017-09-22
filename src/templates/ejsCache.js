@@ -11,12 +11,11 @@ define([
              classEnd,
              states,
              userDefinitions,
-             singleTransition,
              transitions,
              complete) {
 
     return {
-        componentType: {
+        contractType: {
             classStart: classStart,
             classEnd: classEnd,
             states: states,
@@ -27,7 +26,7 @@ define([
                 classEnd: classEnd,
                 states: states,
                 transitions: transitions,
-                userDefinitions: userDefinitions,
+                userDefinitions: userDefinitions
             })
         }
     };

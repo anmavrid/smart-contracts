@@ -71,7 +71,7 @@ define([
            .then(function (nodes_) {
             nodes = nodes_;
 
-            return SolidityCodeGenerator.getGeneratedFile(self, nodes);
+            return SolidityCodeGenerator.getGeneratedFiles(self, nodes, self.activeNode);
         })
         .then(function (result) {
             if (result.violations.length > 0) {
@@ -112,12 +112,13 @@ define([
      *
      * @returns {fileContent: string, violations: Objects[]}
      */
-    SolidityCodeGenerator.getGeneratedFile = function (self, nodes, callback) {
+    SolidityCodeGenerator.getGeneratedFiles = function (self, nodes, activeNode, callback) {
         var contractPaths = SolidityCodeGenerator.prototype.getContractPaths.call(self, nodes),
-            violations = SolidityCodeGenerator.prototype.getViolations (self, contractPaths, nodes),
+            violations = SolidityCodeGenerator.prototype.getViolations.call(self, contractPaths, nodes),
             fileNames = [],
             fileName,
-            promises, type;
+            promises = [],
+            type;
 
         for (type of contractPaths) {
             fileName = self.core.getAttribute(nodes[type], 'name') + '.sol';
@@ -155,7 +156,7 @@ define([
                 contracts.push(path);
             }
         }
-        return componentTypes;
+        return contracts;
     };
 
     SolidityCodeGenerator.prototype.getContractFile = function (contractNode, violations, callback) {
@@ -191,7 +192,6 @@ define([
                 transitionNames: {},
                 guardNames: {}
             };
-
         for (type of contracts) {
             //nameAndViolations.guardNames = {};
             nameAndViolations.totalStateNames = {};
