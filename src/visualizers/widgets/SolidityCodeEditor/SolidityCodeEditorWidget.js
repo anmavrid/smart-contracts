@@ -58,7 +58,7 @@ define(['scsrc/bower_components/codemirror/lib/codemirror',
             lint: false,
             path: './bower_components/codemirror/lib/',
             theme: 'monokai',
-            //TODO: update
+            //TODO: update MIME type
             mode: 'text/x-java',
             autofocus: true,
             dragDrop: false,
@@ -296,10 +296,10 @@ define(['scsrc/bower_components/codemirror/lib/codemirror',
     };
 
     SolidityCodeEditorWidget.prototype.onDeactivate = function () {
-        this._logger.debug('SolidityCodeEditorWidget has been deactivated');
-        if (this._autoSaveTimer) {
-            this._autoSave();
-        }
+      this._logger.debug('SolidityCodeEditorWidget has been deactivated');
+      if (this._autoSaveTimer) {
+          this._autoSave();
+      }
     };
     return SolidityCodeEditorWidget;
 });
