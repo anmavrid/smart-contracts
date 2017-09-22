@@ -179,128 +179,127 @@ define(['scsrc/bower_components/codemirror/lib/codemirror',
             }
         };
 
-      SolidityCodeEditorWidget.prototype.getChangedSegments = function () {
-      var segments = {},
+    SolidityCodeEditorWidget.prototype.getChangedSegments = function () {
+        var segments = {},
           segment, doc;
 
-      for (segment in this._segmentedDocument.segments) {
-          doc = this._segmentedDocument.segments[segment].doc.getValue();
-          if (doc !== this._segmentedDocument.segments[segment].value) {
-              segments[segment] = doc;
-          }
-      }
+        for (segment in this._segmentedDocument.segments) {
+            doc = this._segmentedDocument.segments[segment].doc.getValue();
+            if (doc !== this._segmentedDocument.segments[segment].value) {
+                segments[segment] = doc;
+            }
+        }
+        return segments;
+    };
 
-      return segments;
-      };
+    SolidityCodeEditorWidget.prototype._getNumberOfLinesOfSegment = function (segmentName) {
+                //TODO: check if this is enough or we need some more sophisticated thing
+                return this._segmentedDocument.segments[segmentName].value.split('\n').length;
+            };
 
-      SolidityCodeEditorWidget.prototype._getNumberOfLinesOfSegment = function (segmentName) {
-      //TODO: check if this is enough or we need some more sophisticated thing
-      return this._segmentedDocument.segments[segmentName].value.split('\n').length;
-      };
-
-      SolidityCodeEditorWidget.prototype._rebuildCompleteDocument = function () {
-      var i, segment, wholeDocument = '',
+    SolidityCodeEditorWidget.prototype._rebuildCompleteDocument = function () {
+            var i, segment, wholeDocument = '',
           oldCursorPosition = this._wholeDocument.getCursor(),
           oldScrollInfo = this.editor.getScrollInfo(),
           lineIndex, segmentLines;
 
-      this.editor.clearGutter(SYNTAX_GUTTER);
-      for (i = 0; i < this._segmentedDocument.composition.length; i += 1) {
-          segment = this._segmentedDocument.segments[this._segmentedDocument.composition[i]];
-          if (segment.doc) {
-              this._wholeDocument.unlinkDoc(segment.doc);
-              delete segment.doc;
-              if (segment.readOnlyMarker) {
-                  segment.readOnlyMarker.clear();
-                  delete segment.readOnlyMarker;
-              }
-          }
-          wholeDocument += segment.value + '\n';
-      }
-      this._wholeDocument.setValue(wholeDocument);
-      lineIndex = 0;
-      for (i = 0; i < this._segmentedDocument.composition.length; i += 1) {
-          segment = this._segmentedDocument.segments[this._segmentedDocument.composition[i]];
-          segmentLines = this._getNumberOfLinesOfSegment(this._segmentedDocument.composition[i]);
-          segment.doc = this._wholeDocument.linkedDoc({
-              sharedHist: true,
-              from: lineIndex,
-              to: lineIndex + segmentLines
-          });
-          lineIndex += segmentLines;
-          if (segment.options.readonly === true) {
-              this._setSegmentReadOnly(this._segmentedDocument.composition[i], true);
-          }
-      }
+            this.editor.clearGutter(SYNTAX_GUTTER);
+            for (i = 0; i < this._segmentedDocument.composition.length; i += 1) {
+                segment = this._segmentedDocument.segments[this._segmentedDocument.composition[i]];
+                if (segment.doc) {
+                    this._wholeDocument.unlinkDoc(segment.doc);
+                    delete segment.doc;
+                    if (segment.readOnlyMarker) {
+                        segment.readOnlyMarker.clear();
+                        delete segment.readOnlyMarker;
+                    }
+                }
+                wholeDocument += segment.value + '\n';
+            }
+            this._wholeDocument.setValue(wholeDocument);
+            lineIndex = 0;
+            for (i = 0; i < this._segmentedDocument.composition.length; i += 1) {
+                segment = this._segmentedDocument.segments[this._segmentedDocument.composition[i]];
+                segmentLines = this._getNumberOfLinesOfSegment(this._segmentedDocument.composition[i]);
+                segment.doc = this._wholeDocument.linkedDoc({
+                    sharedHist: true,
+                    from: lineIndex,
+                    to: lineIndex + segmentLines
+                });
+                lineIndex += segmentLines;
+                if (segment.options.readonly === true) {
+                    this._setSegmentReadOnly(this._segmentedDocument.composition[i], true);
+                }
+            }
 
-      this.editor.focus();
-      this.editor.refresh();
-      this._wholeDocument.setCursor(oldCursorPosition);
-      this.editor.scrollTo(oldScrollInfo.left, oldScrollInfo.top);
-      };
+            this.editor.focus();
+            this.editor.refresh();
+            this._wholeDocument.setCursor(oldCursorPosition);
+            this.editor.scrollTo(oldScrollInfo.left, oldScrollInfo.top);
+        };
 
-      SolidityCodeEditorWidget.prototype._setSegmentReadOnly = function (segmentName, readOnly) {
-      var segmentInfo,
+    SolidityCodeEditorWidget.prototype._setSegmentReadOnly = function (segmentName, readOnly) {
+            var segmentInfo,
           fromLine,
           toLine;
-      if (this._segmentedDocument.segments[segmentName]) {
-          segmentInfo = this._segmentedDocument.segments[segmentName];
-          if (segmentInfo.readOnlyMarker) {
-              segmentInfo.readOnlyMarker.clear();
-              delete segmentInfo.readOnlyMarker;
-          }
+            if (this._segmentedDocument.segments[segmentName]) {
+                segmentInfo = this._segmentedDocument.segments[segmentName];
+                if (segmentInfo.readOnlyMarker) {
+                    segmentInfo.readOnlyMarker.clear();
+                    delete segmentInfo.readOnlyMarker;
+                }
 
-          if (readOnly) {
-              fromLine = segmentInfo.doc.firstLine();
-              toLine = segmentInfo.doc.lastLine() + 1;
+                if (readOnly) {
+                    fromLine = segmentInfo.doc.firstLine();
+                    toLine = segmentInfo.doc.lastLine() + 1;
 
-              segmentInfo.readOnlyMarker = this._wholeDocument.markText(
+                    segmentInfo.readOnlyMarker = this._wholeDocument.markText(
                   {line: fromLine, ch: 0},
                   {line: toLine, ch: 0},
                   {
-                      readonly: true,
-                      atomic: true,
-                      inclusiveLeft: true,
-                      inclusiveRight: false,
-                      className: 'read-only-code'
-                  }
+                        readonly: true,
+                        atomic: true,
+                        inclusiveLeft: true,
+                        inclusiveRight: false,
+                        className: 'read-only-code'
+                    }
               );
-          }
-      } else {
-          this._logger.error('unknown segment [' + segmentName + '] cannot be changed');
-      }
-      };
+                }
+            } else {
+                this._logger.error('unknown segment [' + segmentName + '] cannot be changed');
+            }
+        };
 
-      SolidityCodeEditorWidget.prototype._autoSave = function () {
-      var changedSegments = this.getChangedSegments(),
+    SolidityCodeEditorWidget.prototype._autoSave = function () {
+        var changedSegments = this.getChangedSegments(),
           segment;
 
-      this._autoSaveTimer = null;
-      if (Object.keys(changedSegments).length > 0) {
-          for (segment in changedSegments) {
-              this._segmentedDocument.segments[segment].value = changedSegments[segment];
-          }
+        this._autoSaveTimer = null;
+        if (Object.keys(changedSegments).length > 0) {
+            for (segment in changedSegments) {
+                this._segmentedDocument.segments[segment].value = changedSegments[segment];
+            }
 
-          this.onSave(changedSegments);
-      }
-      };
+            this.onSave(changedSegments);
+        }
+    };
 
-      /* * * * * * * * Visualizer life cycle callbacks * * * * * * * */
-      SolidityCodeEditorWidget.prototype.destroy = function () {
-      if (this._autoSaveTimer) {
-          this._autoSave();
-      }
-      };
+    /* * * * * * * * Visualizer life cycle callbacks * * * * * * * */
+    SolidityCodeEditorWidget.prototype.destroy = function () {
+        if (this._autoSaveTimer) {
+            this._autoSave();
+        }
+    };
 
-      SolidityCodeEditorWidget.prototype.onActivate = function () {
-      this._logger.debug('SolidityCodeEditorWidget has been activated');
-      };
+    SolidityCodeEditorWidget.prototype.onActivate = function () {
+        this._logger.debug('SolidityCodeEditorWidget has been activated');
+    };
 
-      SolidityCodeEditorWidget.prototype.onDeactivate = function () {
-      this._logger.debug('SolidityCodeEditorWidget has been deactivated');
-      if (this._autoSaveTimer) {
-          this._autoSave();
-      }
-      };
+    SolidityCodeEditorWidget.prototype.onDeactivate = function () {
+        this._logger.debug('SolidityCodeEditorWidget has been deactivated');
+        if (this._autoSaveTimer) {
+            this._autoSave();
+        }
+    };
     return SolidityCodeEditorWidget;
 });
