@@ -10,10 +10,19 @@
         "src": "src/plugins/SolidityCodeGenerator",
         "test": "test/plugins/SolidityCodeGenerator"
       }
+    },
+    "decorators": {
+      "ContractStateDcoratorDecorator": {
+        "src": "src/decorators/ContractStateDcoratorDecorator"
+      },
+      "ContractStateDecorator": {
+        "src": "src/decorators/ContractStateDecorator"
+      }
     }
   },
   "dependencies": {
     "seeds": {},
-    "plugins": {}
+    "plugins": {},
+    "decorators": {}
   }
 }
