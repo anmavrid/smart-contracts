@@ -1,9 +1,5 @@
 enum States {
-<%
-for(var i = 0; i < states.length; i += 1) {
-%>
-<%- states[i].name %>,
-<%
-} %>
+  <%- initial %>, <%for(var i = 0; i < states.length; i += 1) {%>
+  <%- states[i].name %>,<% } %>
 }
 States private state = States.<%- initial %>;
