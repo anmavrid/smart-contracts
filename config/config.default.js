@@ -15,5 +15,6 @@ config.requirejsPaths['scsrc'] = './src';
 //config.visualization.svgDirs = ['./src/svgs'];
 config.seedProjects.defaultProject = 'SC';
 config.plugin.allowServerExecution = true;
+config.client.defaultConnectionRouter = 'basic1';
 validateConfig(config);
 module.exports = config;
