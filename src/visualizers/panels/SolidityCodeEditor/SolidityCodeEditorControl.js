@@ -95,8 +95,7 @@ define([
             .then(function (contract) {
                 if (contract) {
                     return utils.getModelOfContract(context.core, contract);
-                }
-                else {
+                } else {
                     throw new Error('Contract was removed!');
                 }
             })
@@ -170,7 +169,18 @@ define([
                 //addSegment('userConstructors', model.path, model);
 
                 for (i = 0; i < model.transitions.length; i += 1) {
-                    segmentId = addSegment('singleTransition', model.transitions[i].path, model.transitions[i]);
+                    segmentId = addSegment('singleTransitionStart', model.transitions[i].path, model.transitions[i], true);
+                    segmentId += addSegment('singleTransitionArguments', model.transitions[i].path, model.transitions[i]);
+                    segmentId += addSegment('singleTransitionStartEnd', model.transitions[i].path, model.transitions[i], true);
+                    segmentId += addSegment('singleTransitionReturn', model.transitions[i].path, model.transitions[i], true);
+                    segmentId += addSegment('singleTransitionOutput', model.transitions[i].path, model.transitions[i]);
+                    segmentId += addSegment('singleTransitionRequireState', model.transitions[i].path, model.transitions[i], true);
+                    segmentId += addSegment('singleTransitionRequireGuards', model.transitions[i].path, model.transitions[i], true);
+                    segmentId += addSegment('singleTransitionGuards', model.transitions[i].path, model.transitions[i]);
+                    segmentId += addSegment('singleTransitionEndGuards', model.transitions[i].path, model.transitions[i], true);
+                    segmentId += addSegment('singleTransitionStatements', model.transitions[i].path, model.transitions[i]);
+                    segmentId += addSegment('singleTransitionStateChange', model.transitions[i].path, model.transitions[i], true);
+
 
                     //parseResult = javaParser.checkForSingleFunction(
                     //    segmentedDocument.segments[segmentId].value,
@@ -205,6 +215,7 @@ define([
                 case 'userDefinitions':
                     this._client.setAttribute(segmentId[1], 'definitions', segment);
                     break;
+                    //TODO: Update
                 case 'singleTransition':
                     this._client.setAttribute(segmentId[1], 'transitionMethod', segment);
                     break;
