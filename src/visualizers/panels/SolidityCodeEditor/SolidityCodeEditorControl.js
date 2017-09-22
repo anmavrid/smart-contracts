@@ -219,6 +219,15 @@ define([
                 case 'singleTransitionGuards':
                     this._client.setAttribute(segmentId[1], 'guards', segment);
                     break;
+                case 'singleTransitionOutput':
+                    this._client.setAttribute(segmentId[1], 'output', segment);
+                    break;
+                case 'singleTransitionArguments':
+                    this._client.setAttribute(segmentId[1], 'input', segment);
+                    break;
+                case 'singleTransitionStatements':
+                    this._client.setAttribute(segmentId[1], 'statements', segment);
+                    break;
                 //case 'singleGuard':
                 //    this._client.setAttribute(segmentId[1], 'guardMethod', segment);
                 //    break;
