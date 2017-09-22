@@ -1,6 +1,3 @@
-/**
- * @author anmavrid / https://github.com/anmavrid
- */
 define(['q'], function (Q) {
 
     function _getBasicModel(core, node) {
@@ -14,11 +11,11 @@ define(['q'], function (Q) {
     function _basicModel2TransitionModel(core, node, path2Name, basicModel) {
         basicModel.src = path2Name[core.getPointerPath(node, 'src')];
         basicModel.dst = path2Name[core.getPointerPath(node, 'dst')];
-        basicModel.guards = path2Name[core.getAttribute(node, 'guards')];
-        basicModel.input = path2Name[core.getAttribute(node, 'input')];
-        basicModel.output = path2Name[core.getAttribute(node, 'output')];
-        basicModel.statements = path2Name[core.getAttribute(node, 'statements')];
-        basicModel.tags = path2Name[core.getAttribute(node, 'tags')];
+        basicModel.guards = core.getAttribute(node, 'guards');
+        basicModel.input = core.getAttribute(node, 'input');
+        basicModel.output = core.getAttribute(node, 'output');
+        basicModel.statements = core.getAttribute(node, 'statements');
+        basicModel.tags = core.getAttribute(node, 'tags');
     }
 
     function getModelOfContract(core, contractNode) {

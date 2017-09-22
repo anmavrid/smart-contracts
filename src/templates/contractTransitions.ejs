@@ -2,7 +2,9 @@
 function <%- transitions[i].name %> (<%- transitions[i].input %>)
 {
   require(states == States.<%- transitions[i].src %>);
-  (<%- transitions[i].guards %>)
-  (<%- transitions[i].statements %>)
+  <%if (transitions[i].guards != '') {%>
+  (<%- transitions[i].guards %>) <% } %>
+  <%if (transitions[i].statements != '') {%>
+  (<%- transitions[i].statements %>) <% } %>
 }
 <% } %>
