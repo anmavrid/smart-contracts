@@ -6,12 +6,16 @@
 
 define([
     'js/Constants',
-    'js/Utils/GMEConcepts',
-    'js/NodePropertyNames'
+    'q',
+    'common/util/ejs',
+    'scsrc/templates/ejsCache',
+    'scsrc/util/utils'
 ], function (
     CONSTANTS,
-    GMEConcepts,
-    nodePropertyNames
+    Q,
+    ejs,
+    ejsCache,
+    utils
 ) {
 
     'use strict';
@@ -28,17 +32,33 @@ define([
         this._widget = options.widget;
 
         this._currentNodeId = null;
-        this._currentNodeParentId = undefined;
+        this._gatheringSegments = false;
+        this._missedEvents = false;
 
-        this._initWidgetEventHandlers();
+        this._territory = null;
+        this._segmentInfo = {};
+        this._UID = null;
+
+        this._initialize();
 
         this._logger.debug('ctor finished');
     };
 
+    SolidityCodeEditorControl.prototype._initialize = function () {
+        var self = this;
+
+        this._UID = this._client.addUI(self, function (events) {
+            self._eventCallback(events);
+        });
+
+        this._initWidgetEventHandlers();
+    };
+
     SolidityCodeEditorControl.prototype._initWidgetEventHandlers = function () {
-        this._widget.onNodeClick = function (id) {
-            // Change the current active object
-            WebGMEGlobal.State.registerActiveObject(id);
+        var self = this;
+        this._widget.onSave = function (segmentedDocumentObject) {
+            // console.log(segmentedDocumentObject);
+            self._SaveDocument(segmentedDocumentObject);
         };
     };
 
@@ -47,103 +67,200 @@ define([
     // defines the parts of the project that the visualizer is interested in
     // (this allows the browser to then only load those relevant parts).
     SolidityCodeEditorControl.prototype.selectedObjectChanged = function (nodeId) {
-        var desc = this._getObjectDescriptor(nodeId),
-            self = this;
-
-        self._logger.debug('activeObject nodeId \'' + nodeId + '\'');
-
-        // Remove current territory patterns
-        if (self._currentNodeId) {
-            self._client.removeUI(self._territoryId);
-        }
-
-        self._currentNodeId = nodeId;
-        self._currentNodeParentId = undefined;
-
-        if (typeof self._currentNodeId === 'string') {
-            // Put new node's info into territory rules
-            self._selfPatterns = {};
-            self._selfPatterns[nodeId] = {children: 0};  // Territory "rule"
-
-            self._widget.setTitle(desc.name.toUpperCase());
-
-            if (typeof desc.parentId === 'string') {
-                self.$btnModelHierarchyUp.show();
-            } else {
-                self.$btnModelHierarchyUp.hide();
-            }
-
-            self._currentNodeParentId = desc.parentId;
-
-            self._territoryId = self._client.addUI(self, function (events) {
-                self._eventCallback(events);
-            });
-
-            // Update the territory
-            self._client.updateTerritory(self._territoryId, self._selfPatterns);
-
-            self._selfPatterns[nodeId] = {children: 1};
-            self._client.updateTerritory(self._territoryId, self._selfPatterns);
+        if (typeof nodeId === 'string' &&
+            this._currentNodeId !== nodeId &&
+            this._client.getNode(this._client.getNode(nodeId).getMetaTypeId())
+                .getAttribute('name') === 'Contract') {
+            //we have a viable contract so let us change things
+            this._currentNodeId = nodeId;
+            this._selfPatterns = {};
+            this._selfPatterns[nodeId] = {children: 1};
+            this._client.updateTerritory(this._UID, this._selfPatterns);
+        } else {
+            this._logger.info('received unwanted object change event');
         }
     };
 
-    // This next function retrieves the relevant node information for the widget
-    SolidityCodeEditorControl.prototype._getObjectDescriptor = function (nodeId) {
-        var node = this._client.getNode(nodeId),
-            objDescriptor;
-        if (node) {
-            objDescriptor = {
-                id: node.getId(),
-                name: node.getAttribute(nodePropertyNames.Attributes.name),
-                childrenIds: node.getChildrenIds(),
-                parentId: node.getParentId(),
-                isConnection: GMEConcepts.isConnection(nodeId)
-            };
+    SolidityCodeEditorControl.prototype._getContractModel = function (cTypeId) {
+        var self = this,
+            deferred = Q.defer(),
+            model = {},
+            context;
+
+        Q.ninvoke(self._client, 'getCoreInstance', {})
+            .then(function (context_) {
+                context = context_;
+                return context.core.loadByPath(context.rootNode, cTypeId);
+            })
+            .then(function (contract) {
+                if (contract) {
+                    return utils.getModelOfContract(context.core, contract);
+                }
+                else {
+                    throw new Error('Contract was removed!');
+                }
+            })
+            .then(deferred.resolve)
+            .catch(deferred.reject);
+
+        return deferred.promise;
+    };
+
+    SolidityCodeEditorControl.prototype._getSegmentOffset = function (segmentedDocument, segmentId) {
+        var compiledText = '',
+            index = 0,
+            sId = segmentedDocument.composition[0] || null;
+
+        while (sId !== null && sId !== segmentId && index < segmentedDocument.composition.length) {
+            compiledText += segmentedDocument.segments[sId].value + '\n';
+            sId = segmentedDocument.composition[++index];
         }
 
-        return objDescriptor;
+        return compiledText.split('\n').length;
+    };
+
+    SolidityCodeEditorControl.prototype._buildSegmentInfo = function (nodeId) {
+        var self = this,
+            deferred = Q.defer(),
+            model,
+            segmentId,
+            //guardNames = [],
+            //guardExpressionParser,
+            addSegment = function (segmentId, segmentPath, segmentModel, readonly) {
+                var fullSegmentId = segmentId + '*' + segmentPath;
+
+                segmentedDocument.composition.push(fullSegmentId);
+                segmentedDocument.segments[fullSegmentId] = {
+                    value: ejs.render(ejsCache.contractType[segmentId], segmentModel),
+                    options: {readonly: readonly === true}
+                };
+                return fullSegmentId;
+            },
+            segmentedDocument = {composition: [], segments: {}, errors: []};
+
+        self._getContractModel(nodeId)
+            .then(function (model_) {
+                var i,
+                    wholeDocument = ejs.render(ejsCache.contractType.complete, model_),
+                    parseResult;
+
+                model = model_;
+                //parseResult = javaParser.checkWholeFile(wholeDocument);
+
+                //if (parseResult) {
+                //    segmentedDocument.errors.push(parseResult);
+                //}
+
+                //for (i = 0; i < model.guards.length; i += 1) {
+                //    guardNames.push(model.guards[i].name);
+                //}
+                //if (guardNames.length > 0) {
+                //    guardExpressionParser = peg.generate(
+                //        ejs.render(ejsCache.guardExpression, {guardNames: guardNames})
+                //    );
+                //}
+
+                //addSegment('constantImports', model.path, model, true);
+                //addSegment('userImports', model.path, model);
+                //addSegment('portsAnnotations', model.path, model, true);
+                addSegment('classStart', model.path, model, true);
+                addSegment('userDefinitions', model.path, model);
+                addSegment('states', model.path, model, true);
+                //addSegment('classInitializations', model.path, model, true);
+                //addSegment('userConstructors', model.path, model);
+
+                for (i = 0; i < model.transitions.length; i += 1) {
+                    segmentId = addSegment('singleTransition', model.transitions[i].path, model.transitions[i]);
+
+                    //parseResult = javaParser.checkForSingleFunction(
+                    //    segmentedDocument.segments[segmentId].value,
+                    //    null,
+                    //    'public',
+                    //    self._getSegmentOffset(segmentedDocument, segmentId));
+                    //if (parseResult) {
+                    //    segmentedDocument.errors.push(parseResult);
+                    //}
+                }
+                addSegment('classEnd', model.path, model, true);
+                deferred.resolve(segmentedDocument);
+            })
+            .catch(deferred.reject);
+
+        return deferred.promise;
+    };
+
+    SolidityCodeEditorControl.prototype._SaveDocument = function (changedSegments) {
+        var segment,
+            segmentId;
+
+        this._client.startTransaction();
+        for (segmentId in changedSegments) {
+            segment = changedSegments[segmentId];
+            segmentId = segmentId.split('*');
+
+            switch (segmentId[0]) {
+                //case 'userImports':
+                //    this._client.setAttribute(segmentId[1], 'forwards', segment);
+                //    break;
+                case 'userDefinitions':
+                    this._client.setAttribute(segmentId[1], 'definitions', segment);
+                    break;
+                case 'singleTransition':
+                    this._client.setAttribute(segmentId[1], 'transitionMethod', segment);
+                    break;
+                //case 'singleGuard':
+                //    this._client.setAttribute(segmentId[1], 'guardMethod', segment);
+                //    break;
+            }
+        }
+        this._client.completeTransaction();
     };
 
     /* * * * * * * * Node Event Handling * * * * * * * */
+    //TODO needs a better change management
     SolidityCodeEditorControl.prototype._eventCallback = function (events) {
-        var i = events ? events.length : 0,
-            event;
+        var self = this,
+            componentRemoved = false,
+            i;
 
-        this._logger.debug('_eventCallback \'' + i + '\' items');
-
-        while (i--) {
-            event = events[i];
-            switch (event.etype) {
-
-            case CONSTANTS.TERRITORY_EVENT_LOAD:
-                this._onLoad(event.eid);
-                break;
-            case CONSTANTS.TERRITORY_EVENT_UPDATE:
-                this._onUpdate(event.eid);
-                break;
-            case CONSTANTS.TERRITORY_EVENT_UNLOAD:
-                this._onUnload(event.eid);
-                break;
-            default:
-                break;
+        if (events.length > 1) {
+            if (self._gatheringSegments) {
+                self._missedEvents = true;
+            } else {
+                for (i = 0; i < events.length; i += 1) {
+                    if (events[i].eid === this._currentNodeId && events[i].etype === CONSTANTS.TERRITORY_EVENT_UNLOAD) {
+                        componentRemoved = true;
+                        break;
+                    }
+                }
+                if (componentRemoved !== true) {
+                    self._buildSegmentInfo(this._currentNodeId)
+                        .then(function (segmentedDocumentObject) {
+                            self._gatheringSegments = false;
+                            if (self._missedEvents) {
+                                self._missedEvents = false;
+                                self._eventCallback([{
+                                    eid: self._currentNodeId,
+                                    etype: CONSTANTS.TERRITORY_EVENT_UPDATE
+                                }, {}]);
+                            } else {
+                                self._widget.setSegmentedDocument(segmentedDocumentObject);
+                            }
+                        })
+                        .catch(function (err) {
+                            self._gatheringSegments = false;
+                            self._logger.error('error during segment info build:', err);
+                            if (self._missedEvents) {
+                                self._missedEvents = false;
+                                self._eventCallback([{
+                                    eid: self._currentNodeId,
+                                    etype: CONSTANTS.TERRITORY_EVENT_UPDATE
+                                }, {}]);
+                            }
+                        });
+                }
             }
         }
-
-        this._logger.debug('_eventCallback \'' + events.length + '\' items - DONE');
-    };
-
-    SolidityCodeEditorControl.prototype._onLoad = function (gmeId) {
-        var description = this._getObjectDescriptor(gmeId);
-        this._widget.addNode(description);
-    };
-
-    SolidityCodeEditorControl.prototype._onUpdate = function (gmeId) {
-        var description = this._getObjectDescriptor(gmeId);
-        this._widget.updateNode(description);
-    };
-
-    SolidityCodeEditorControl.prototype._onUnload = function (gmeId) {
-        this._widget.removeNode(gmeId);
     };
 
     SolidityCodeEditorControl.prototype._stateActiveObjectChanged = function (model, activeObjectId) {
@@ -214,34 +331,34 @@ define([
     };
 
     SolidityCodeEditorControl.prototype._initializeToolbar = function () {
-        var self = this,
-            toolBar = WebGMEGlobal.Toolbar;
+        // var self = this,
+        //     toolBar = WebGMEGlobal.Toolbar;
 
         this._toolbarItems = [];
 
-        this._toolbarItems.push(toolBar.addSeparator());
-
-        /************** Go to hierarchical parent button ****************/
-        this.$btnModelHierarchyUp = toolBar.addButton({
-            title: 'Go to parent',
-            icon: 'glyphicon glyphicon-circle-arrow-up',
-            clickFn: function (/*data*/) {
-                WebGMEGlobal.State.registerActiveObject(self._currentNodeParentId);
-            }
-        });
-        this._toolbarItems.push(this.$btnModelHierarchyUp);
-        this.$btnModelHierarchyUp.hide();
-
-        /************** Checkbox example *******************/
-
-        this.$cbShowConnection = toolBar.addCheckBox({
-            title: 'toggle checkbox',
-            icon: 'gme icon-gme_diagonal-arrow',
-            checkChangedFn: function (data, checked) {
-                self._logger.debug('Checkbox has been clicked!');
-            }
-        });
-        this._toolbarItems.push(this.$cbShowConnection);
+        // this._toolbarItems.push(toolBar.addSeparator());
+        //
+        // /************** Go to hierarchical parent button ****************/
+        // this.$btnModelHierarchyUp = toolBar.addButton({
+        //     title: 'Go to parent',
+        //     icon: 'glyphicon glyphicon-circle-arrow-up',
+        //     clickFn: function (/*data*/) {
+        //         WebGMEGlobal.State.registerActiveObject(self._currentNodeParentId);
+        //     }
+        // });
+        // this._toolbarItems.push(this.$btnModelHierarchyUp);
+        // this.$btnModelHierarchyUp.hide();
+        //
+        // /************** Checkbox example *******************/
+        //
+        // this.$cbShowConnection = toolBar.addCheckBox({
+        //     title: 'toggle checkbox',
+        //     icon: 'gme icon-gme_diagonal-arrow',
+        //     checkChangedFn: function (data, checked) {
+        //         self._logger.debug('Checkbox has been clicked!');
+        //     }
+        // });
+        // this._toolbarItems.push(this.$cbShowConnection);
 
         this._toolbarInitialized = true;
     };

@@ -44,13 +44,13 @@ define([
         var self = this;
 
         //set Widget title
-        this.setTitle('');
+        //this.setTitle('');
 
         this.widget = new SolidityCodeEditorWidget(this.logger, this.$el);
 
-        this.widget.setTitle = function (title) {
-            self.setTitle(title);
-        };
+        //this.widget.setTitle = function (title) {
+        //    self.setTitle(title);
+        //};
 
         this.control = new SolidityCodeEditorControl({
             logger: this.logger,

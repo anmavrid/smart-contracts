@@ -1,10 +1,16 @@
 /**
  * This file is for any css that you may want for this visualizer.
  *
- * Ideally, you would use the scss file also provided in this directory 
- * and then generate this file automatically from that. However, you can 
+ * Ideally, you would use the scss file also provided in this directory
+ * and then generate this file automatically from that. However, you can
  * simply write css if you prefer
  */
 
 .solidity-code-editor {
-  outline: none; }
+  outline: none;
+  padding: 2px; }
+  .solidity-code-editor .code-editor {
+    height: 100%;
+    width: 100%; }
+  .solidity-code-editor .read-only-code {
+    opacity: 0.5; }

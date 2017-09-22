@@ -4,4 +4,13 @@
 
 .solidity-code-editor {
   outline: none;
-}
+  padding: 2px;
+
+  .code-editor {
+    height: 100%;
+    width: 100%;
+  }
+  .read-only-code {
+    opacity: 0.5;
+  }
+  }

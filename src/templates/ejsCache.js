@@ -3,6 +3,7 @@ define([
     'text!./contractClassStart.ejs',
     'text!./contractClassEnd.ejs',
     'text!./contractStates.ejs',
+    'text!./contractSingleTransition.ejs',
     'text!./contractUserDefinitions.ejs',
     'text!./contractTransitions.ejs',
     'text!./contractComplete.ejs',
@@ -10,6 +11,7 @@ define([
              classStart,
              classEnd,
              states,
+             singleTransition,
              userDefinitions,
              transitions,
              complete) {
@@ -20,6 +22,7 @@ define([
             classEnd: classEnd,
             states: states,
             transitions: transitions,
+            singleTransition: singleTransition,
             userDefinitions: userDefinitions,
             complete: ejs.render(complete, {
                 classStart: classStart,
