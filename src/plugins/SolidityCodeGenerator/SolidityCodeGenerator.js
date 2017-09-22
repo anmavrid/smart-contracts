@@ -13,13 +13,16 @@ define([
     'plugin/PluginBase',
     'q',
     'common/util/ejs',
-    'scsrc/util/utils'
+    'scsrc/util/utils',
+    'scsrc/templates/ejsCache'
 ], function (
     PluginConfig,
     pluginMetadata,
     PluginBase,
     Q,
-    ejs) {
+    ejs,
+    utils,
+    ejsCache) {
     'use strict';
 
     pluginMetadata = JSON.parse(pluginMetadata);
