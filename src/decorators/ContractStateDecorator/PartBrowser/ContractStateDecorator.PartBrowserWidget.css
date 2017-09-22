@@ -1,7 +1,12 @@
-/**
- * @author rkereskenyi / https://github.com/rkereskenyi
- */
+
 .part-browser .ContractState-decorator .name {
-  max-width: 150px;
-  overflow: hidden;
-  text-overflow: ellipsis; }
+  height: 50px;
+  line-height: 18px;
+  width: 50px;
+  text-align: center; }
+  .part-browser .ContractState-decorator .svg-container {
+    width: 48px;
+    height: 48px;
+    display: inline-block; }
+    .part-browser .ContractState-decorator .svg-container .state-circle {
+      position: relative; }

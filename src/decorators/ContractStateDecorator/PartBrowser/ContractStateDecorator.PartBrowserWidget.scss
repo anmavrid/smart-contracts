@@ -1,0 +1,16 @@
+.part-browser {
+  .ContractState-decorator {
+    height: 50px;
+    line-height: 18px;
+    width: 50px;
+    text-align: center;
+    .svg-container {
+      width: 48px;
+      height: 48px;
+      display: inline-block;
+      .state-circle {
+        position: relative;
+      }
+    }
+  }
+}

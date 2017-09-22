@@ -1,11 +1,3 @@
-/*globals define, _, DEBUG, $*/
-/*jshint browser: true*/
-
-/**
- * @author rkereskenyi / https://github.com/rkereskenyi
- */
-
-
 define([
     'js/Constants',
     'js/NodePropertyNames',
@@ -17,6 +9,7 @@ define([
 ], function (CONSTANTS,
              nodePropertyNames,
              PartBrowserWidgetDecoratorBase,
+             ContractStateDecoratorCore,
              DiagramDesignerWidgetConstants,
              ContractStateDecoratorDiagramDesignerWidgetTemplate) {
 
@@ -29,12 +22,14 @@ define([
     ContractStateDecoratorPartBrowserWidget = function (options) {
         var opts = _.extend({}, options);
 
-        __parent__.apply(this, [opts]);
+        PartBrowserWidgetDecoratorBase.apply(this, [opts]);
+        ContractStateDecoratorCore.apply(this, [opts]);
 
         this.logger.debug('ContractStateDecoratorPartBrowserWidget ctor');
     };
 
     _.extend(ContractStateDecoratorPartBrowserWidget.prototype, __parent__.prototype);
+    _.extend(ContractStateDecoratorPartBrowserWidget.prototype, ContractStateDecoratorCore.prototype);
     ContractStateDecoratorPartBrowserWidget.prototype.DECORATORID = DECORATOR_ID;
 
     /*********************** OVERRIDE DiagramDesignerWidgetDecoratorBase MEMBERS **************************/
@@ -51,7 +46,7 @@ define([
         this.$el = this.$DOMBase.clone();
 
         //find name placeholder
-        this.skinParts.$name = this.$el.find('.name');
+        //this.skinParts.$name = this.$el.find('.name');
 
         this._renderContent();
     };
@@ -61,16 +56,18 @@ define([
 
     ContractStateDecoratorPartBrowserWidget.prototype._renderContent = function () {
         var client = this._control._client,
-            nodeObj = client.getNode(this._metaInfo[CONSTANTS.GME_ID]);
-
-        //render GME-ID in the DOM, for debugging
-        if (DEBUG) {
-            this.$el.attr({'data-id': this._metaInfo[CONSTANTS.GME_ID]});
-        }
+            nodeObj = client.getNode(this._metaInfo[CONSTANTS.GME_ID]),
+            metaNode;
 
         if (nodeObj) {
-            this.skinParts.$name.text(nodeObj.getAttribute(nodePropertyNames.Attributes.name) || '');
+            this.name = nodeObj.getAttribute(nodePropertyNames.Attributes.name) || '';
+            metaNode = client.getNode(nodeObj.getMetaTypeId());
+            if (metaNode) {
+                this.metaTypeName = metaNode.getAttribute('name');
+            }
         }
+
+        this.updateSvg();
     };
 
     ContractStateDecoratorPartBrowserWidget.prototype.update = function () {
