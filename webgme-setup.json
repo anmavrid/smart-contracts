@@ -18,11 +18,21 @@
       "ContractStateDecorator": {
         "src": "src/decorators/ContractStateDecorator"
       }
+    },
+    "visualizers": {
+      "SolidityCodeEditor": {
+        "src": "panels/SolidityCodeEditor/SolidityCodeEditorPanel",
+        "title": "SolidityCodeEditor",
+        "panel": "src/visualizers/panels/SolidityCodeEditor",
+        "secondary": false,
+        "widget": "src/visualizers/widgets/SolidityCodeEditor"
+      }
     }
   },
   "dependencies": {
     "seeds": {},
     "plugins": {},
-    "decorators": {}
+    "decorators": {},
+    "visualizers": {}
   }
 }

@@ -1,0 +1,8 @@
+[
+  {
+    "id": "SolidityCodeEditor",
+    "title": "SolidityCodeEditor",
+    "panel": "panels/SolidityCodeEditor/SolidityCodeEditorPanel",
+    "DEBUG_ONLY": false
+  }
+]
