@@ -18,7 +18,7 @@ define(['q'], function (Q) {
         basicModel.input = path2Name[core.getAttribute(node, 'input')];
         basicModel.output = path2Name[core.getAttribute(node, 'output')];
         basicModel.statements = path2Name[core.getAttribute(node, 'statements')];
-        basicModel.statements = path2Name[core.getAttribute(node, 'tags')]
+        basicModel.tags = path2Name[core.getAttribute(node, 'tags')];
     }
 
     function getModelOfContract(core, contractNode) {
@@ -64,6 +64,7 @@ define(['q'], function (Q) {
                             break;
                         case 'InitialState':
                             model.initial = childModel.name;
+                            break;
                         case 'State':
                             model.states.push(childModel);
                             break;
