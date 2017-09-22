@@ -133,7 +133,7 @@ define([
                     value: ejs.render(ejsCache.contractType[segmentId], segmentModel),
                     options: {readonly: readonly === true}
                 };
-                return fullSegmentId;
+              return fullSegmentId;
             },
             segmentedDocument = {composition: [], segments: {}, errors: []};
 
@@ -172,7 +172,8 @@ define([
                     segmentId = addSegment('singleTransitionStart', model.transitions[i].path, model.transitions[i], true);
                     segmentId += addSegment('singleTransitionArguments', model.transitions[i].path, model.transitions[i]);
                     segmentId += addSegment('singleTransitionStartEnd', model.transitions[i].path, model.transitions[i], true);
-                    segmentId += addSegment('singleTransitionReturn', model.transitions[i].path, model.transitions[i], true);
+                    //if (model.transitions[i].output !== '')
+                      segmentId += addSegment('singleTransitionReturn', model.transitions[i].path, model.transitions[i], true);
                     segmentId += addSegment('singleTransitionOutput', model.transitions[i].path, model.transitions[i]);
                     segmentId += addSegment('singleTransitionRequireState', model.transitions[i].path, model.transitions[i], true);
                     segmentId += addSegment('singleTransitionRequireGuards', model.transitions[i].path, model.transitions[i], true);
@@ -180,7 +181,6 @@ define([
                     segmentId += addSegment('singleTransitionEndGuards', model.transitions[i].path, model.transitions[i], true);
                     segmentId += addSegment('singleTransitionStatements', model.transitions[i].path, model.transitions[i]);
                     segmentId += addSegment('singleTransitionStateChange', model.transitions[i].path, model.transitions[i], true);
-
 
                     //parseResult = javaParser.checkForSingleFunction(
                     //    segmentedDocument.segments[segmentId].value,
@@ -216,8 +216,8 @@ define([
                     this._client.setAttribute(segmentId[1], 'definitions', segment);
                     break;
                     //TODO: Update
-                case 'singleTransition':
-                    this._client.setAttribute(segmentId[1], 'transitionMethod', segment);
+                case 'singleTransitionGuards':
+                    this._client.setAttribute(segmentId[1], 'guards', segment);
                     break;
                 //case 'singleGuard':
                 //    this._client.setAttribute(segmentId[1], 'guardMethod', segment);
