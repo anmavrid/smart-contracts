@@ -2,56 +2,40 @@
   width: 48px;
   height: 48px;
   line-height: 0;
-  font-weight: normal;
-  .svg-container {
+  font-weight: normal; }
+  .ContractState-decorator .svg-container {
     width: 48px;
     height: 48px;
-    display: inline-block;
-    .state-circle {
-      position: absolute;
-    }
-  }
-
-  // TODO: These need to be at the border around the circle.
-  .connector {
+    display: inline-block; }
+    .ContractState-decorator .svg-container .state-circle {
+      position: absolute; }
+  .ContractState-decorator .connector {
     border: blue solid 1px;
     background-color: #fefefe;
-
     position: absolute;
     cursor: pointer;
-    z-index: 10;
-
-    &.bottom {
+    z-index: 10; }
+    .ContractState-decorator .connector.bottom {
       margin-left: 16px;
       margin-top: -6px;
       height: 15px;
-      width: 15px;
-    }
-
-    &.top {
+      width: 15px; }
+    .ContractState-decorator .connector.top {
       margin-left: 16px;
       margin-top: -58px;
       height: 15px;
-      width: 15px;
-    }
-
-    &.left {
+      width: 15px; }
+    .ContractState-decorator .connector.left {
       margin-top: -34px;
       margin-left: -10px;
       width: 15px;
-      height: 15px;
-    }
-    &.right {
+      height: 15px; }
+    .ContractState-decorator .connector.right {
       margin-top: -34px;
       margin-left: 45px;
       width: 15px;
-      height: 15px;
-    }
-
-    &:hover {
+      height: 15px; }
+    .ContractState-decorator .connector:hover {
       border: rgba(82, 168, 236, 0.6) solid 1px;
       background-color: #fefefe;
-      box-shadow: inset 0 1px 1px darkgrey, 0 0 8px rgba(82, 168, 236, 0.6);
-    }
-  }
-  }
+      box-shadow: inset 0 1px 1px darkgrey, 0 0 8px rgba(82, 168, 236, 0.6); }

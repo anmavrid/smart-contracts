@@ -17,8 +17,6 @@ define([
     'use strict';
 
     var ContractStateDecorator,
-        //__parent__ = DiagramDesignerWidgetDecoratorBase,
-        //__parent_proto__ = DiagramDesignerWidgetDecoratorBase.prototype,
         DECORATOR_ID = 'ContractStateDecorator';
 
     ContractStateDecorator = function (options) {

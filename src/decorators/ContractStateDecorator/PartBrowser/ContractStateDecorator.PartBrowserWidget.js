@@ -46,9 +46,6 @@ define([
     ContractStateDecoratorPartBrowserWidget.prototype.beforeAppend = function () {
         this.$el = this.$DOMBase.clone();
 
-        //find name placeholder
-        //this.skinParts.$name = this.$el.find('.name');
-
         this._renderContent();
     };
 

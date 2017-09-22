@@ -1,9 +1,3 @@
-/*globals define, _*/
-/*jshint browser: true, camelcase: false*/
-
-/**
- * @author rkereskenyi / https://github.com/rkereskenyi
- */
 
 define([
     'js/Decorators/DecoratorBase',
