@@ -9,6 +9,10 @@
       "SolidityCodeGenerator": {
         "src": "src/plugins/SolidityCodeGenerator",
         "test": "test/plugins/SolidityCodeGenerator"
+      },
+      "AddSecurityPatterns": {
+        "src": "src/plugins/AddSecurityPatterns",
+        "test": "test/plugins/AddSecurityPatterns"
       }
     },
     "decorators": {
