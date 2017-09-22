@@ -1,10 +1,13 @@
 <%for(var i = 0;i < transitions.length; i += 1) {%>
 function <%- transitions[i].name %> (<%- transitions[i].input %>)
+<%if (transitions[i].tags != '') {%>
+(<%- transitions[i].tags %>) <% } %>
+<%if (transitions[i].output != '') {%>
+returns (<%- transitions[i].output %>) <% } %>
 {
   require(states == States.<%- transitions[i].src %>);
-  <%if (transitions[i].guards != '') {%>
-  (<%- transitions[i].guards %>) <% } %>
-  <%if (transitions[i].statements != '') {%>
-  (<%- transitions[i].statements %>) <% } %>
+  <%if (transitions[i].guards != '') {%> require(<%- transitions[i].guards %>); <% } %>
+  <%if (transitions[i].statements != '') {%> <%- transitions[i].statements %> <% } %>
+  <%if (transitions[i].src != transitions[i].dst) {%> state = States.<%- transitions[i].dst %>; <% } %>
 }
 <% } %>
