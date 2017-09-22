@@ -2,6 +2,7 @@ define([
     'js/Constants',
     'js/NodePropertyNames',
     'js/Widgets/PartBrowser/PartBrowserWidget.DecoratorBase',
+    '../Core/ContractStateDecorator.Core',
     'js/Widgets/DiagramDesigner/DiagramDesignerWidget.Constants',
     'text!../DiagramDesigner/ContractStateDecorator.DiagramDesignerWidget.html',
     'css!../DiagramDesigner/ContractStateDecorator.DiagramDesignerWidget.css',
