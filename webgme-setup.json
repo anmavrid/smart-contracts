@@ -30,6 +30,13 @@
         "panel": "src/visualizers/panels/SolidityCodeEditor",
         "secondary": false,
         "widget": "src/visualizers/widgets/SolidityCodeEditor"
+      },
+      "ModelEditor": {
+        "src": "panels/ModelEditor/ModelEditorPanel",
+        "title": "ModelEditor",
+        "panel": "src/visualizers/panels/ModelEditor",
+        "secondary": false,
+        "widget": "src/visualizers/widgets/ModelEditor"
       }
     }
   },

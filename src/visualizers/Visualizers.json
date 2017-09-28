@@ -1,5 +1,12 @@
 [
   {
+    "id": "FSMEditor",
+    "title": "FSM Editor",
+    "panel": "panels/ModelEditor/ModelEditorPanel",
+    "DEBUG_ONLY": false,
+    "default": true
+  },
+  {
     "id": "SolidityCodeEditor",
     "title": "SolidityCodeEditor",
     "panel": "panels/SolidityCodeEditor/SolidityCodeEditorPanel",
