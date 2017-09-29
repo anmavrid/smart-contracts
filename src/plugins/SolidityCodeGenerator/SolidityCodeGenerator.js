@@ -82,7 +82,7 @@ define([
                 'See messages for details.');
             }
 
-            artifact = self.blobClient.createArtifact('SolidityContracts');
+            artifact = self.blobClient.createArtifact('SolidityContract');
             return artifact.addFiles(result.files);
         })
         .then(function (fileHashes) {
@@ -262,7 +262,7 @@ define([
                     node: child,
                     message: 'Name [' + childName + '] of transition is not unique. ' +
                     'Please rename. Transitions of the same contract ' +
-                    'type must have unique names.'
+                    'type must have distinct names.'
                 });
             }
             nameAndViolations.transitionNames[childName] = self.core.getPath(child);
