@@ -10,11 +10,19 @@
 define([
     'plugin/PluginConfig',
     'text!./metadata.json',
-    'plugin/PluginBase'
+    'plugin/PluginBase',
+    'plugin/SoldityCodeGenerator/SoldityCodeGenerator/SoldityCodeGenerator',
+    'common/util/ejs',
+    'scsrc/util/utils',
+    'scsrc/templates/ejsCache'
 ], function (
     PluginConfig,
     pluginMetadata,
-    PluginBase) {
+    PluginBase,
+    SolidityCodeGenerator,
+    ejs,
+    util,
+    ejsCache) {
     'use strict';
 
     pluginMetadata = JSON.parse(pluginMetadata);
@@ -57,20 +65,6 @@ define([
         // These are all instantiated at this point.
         var self = this,
             nodeObject;
-
-
-        // Using the logger.
-        self.logger.debug('This is a debug message.');
-        self.logger.info('This is an info message.');
-        self.logger.warn('This is a warning message.');
-        self.logger.error('This is an error message.');
-
-        // Using the coreAPI to make changes.
-
-        nodeObject = self.activeNode;
-
-        self.core.setAttribute(nodeObject, 'name', 'My new obj');
-        self.core.setRegistry(nodeObject, 'position', {x: 70, y: 70});
 
 
         // This will save the changes. If you don't want to save;

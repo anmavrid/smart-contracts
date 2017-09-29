@@ -1,7 +1,7 @@
 {
   "id": "AddSecurityPatterns",
   "name": "AddSecurityPatterns",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "",
   "icon": {
     "class": "glyphicon glyphicon-cog",
@@ -10,5 +10,42 @@
   "disableServerSideExecution": false,
   "disableBrowserSideExecution": false,
   "writeAccessRequired": false,
-  "configStructure": []
+  "configStructure": [
+    {
+      "name": "locking",
+      "displayName": "Locking",
+      "description": "Please specify whether you would like to add locking.",
+      "value": false,
+      "valueType": "boolean",
+      "readOnly": false,
+      "writeAccessRequired": true
+    },
+    {
+      "name": "counter",
+      "displayName": "Transition Counter",
+      "description": "Please specify whether you would like to add transition counter.",
+      "value": false,
+      "valueType": "boolean",
+      "readOnly": false,
+      "writeAccessRequired": true
+    },
+    {
+      "name": "timedTransitions",
+      "displayName": "Automatic Timed Transitions",
+      "description": "Please specify whether you would like to add timed transitions.",
+      "value": false,
+      "valueType": "boolean",
+      "readOnly": false,
+      "writeAccessRequired": true
+    },
+    {
+      "name": "accessControl",
+      "displayName": "Access Control",
+      "description": "Please specify whether you would like to add access control.",
+      "value": false,
+      "valueType": "boolean",
+      "readOnly": false,
+      "writeAccessRequired": true
+    }
+ ]
 }
