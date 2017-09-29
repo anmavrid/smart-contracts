@@ -18,6 +18,7 @@ define([
     'text!./contractUserDefinitions.ejs',
     'text!./contractTransitions.ejs',
     'text!./contractComplete.ejs',
+    'text!./contractPlugins.ejs'
 ], function (ejs,
              classStart,
              classEnd,
@@ -36,7 +37,8 @@ define([
              singleTransitionStateChange,
              userDefinitions,
              transitions,
-             complete) {
+             complete,
+             plugins) {
 
     return {
         contractType: {
@@ -57,10 +59,12 @@ define([
             singleTransitionStatements: singleTransitionStatements,
             singleTransitionStateChange: singleTransitionStateChange,
             userDefinitions: userDefinitions,
+            plugins: plugins,
             complete: ejs.render(complete, {
                 classStart: classStart,
                 classEnd: classEnd,
                 states: states,
+                plugins: plugins,
                 transitions: transitions,
                 userDefinitions: userDefinitions
             })

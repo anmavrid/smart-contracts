@@ -167,6 +167,7 @@ define([
 
         return utils.getModelOfContract(self.core, contractNode)
             .then(function (contractModel) {
+              //TODO: add input from widget to contractModel
                 fileContent = ejs.render(ejsCache.contractType.complete, contractModel);
                 //Need to change this for a Javascript file.
                 //var parseResult = javaParser.checkWholeFile(fileContent);
