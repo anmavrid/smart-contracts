@@ -46,6 +46,15 @@
       "valueType": "boolean",
       "readOnly": false,
       "writeAccessRequired": true
+    },
+    {
+      "name": "events",
+      "displayName": "Events",
+      "description": "Please specify whether you would like to add events.",
+      "value": false,
+      "valueType": "boolean",
+      "readOnly": false,
+      "writeAccessRequired": true
     }
  ]
 }
