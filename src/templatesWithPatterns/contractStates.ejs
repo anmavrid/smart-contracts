@@ -1,0 +1,7 @@
+  //States definition
+  enum States {
+    <%- initial %>, <%for(var i = 0; i < states.length; i += 1) {%>
+    <%-states[i].name%><%if (i < states.length-1) {%>,<% } %> <% } %>
+  }
+  States private state = States.<%- initial %>;
+  //Insert variable definitions

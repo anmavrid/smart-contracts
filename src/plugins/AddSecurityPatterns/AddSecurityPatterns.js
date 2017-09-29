@@ -14,7 +14,7 @@ define([
     'q',
     'common/util/ejs',
     'scsrc/util/utils',
-    'scsrc/templates/ejsCache'
+    'scsrc/templatesWithPatterns/ejsCache'
 ], function (
     PluginConfig,
     pluginMetadata,
@@ -271,12 +271,12 @@ define([
         return nameAndViolations;
     };
 
-    //AddSecurityPatterns.prototype.generateTestInfo = function () {
-    //  var self = this,
-    //  currentConfig = this.getCurrentConfig(),
-
-//      return currentConfig;
-  //  };
+    // AddSecurityPatterns.prototype.generateTestInfo = function () {
+    //   var self = this,
+    //   currentConfig = this.getCurrentConfig(),
+    //
+    //   return currentConfig;
+    // };
 
 return AddSecurityPatterns;
 
