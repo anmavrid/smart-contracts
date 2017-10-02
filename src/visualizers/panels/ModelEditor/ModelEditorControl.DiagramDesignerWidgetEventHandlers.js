@@ -2,10 +2,6 @@
 /*jshint browser: true*/
 /*jscs:disable maximumLineLength*/
 
-/**
- * @author rkereskenyi / https://github.com/rkereskenyi
- */
-
 define(['js/logger',
     'js/util',
     'js/Constants',

@@ -1,0 +1,54 @@
+<% if (locking) { %>
+  // Locking plugin
+  bool private locked = false;
+  modifier locking {
+    require(!locked);
+    locked = true;
+    _;
+    locked = false;
+  }
+<% } %>
+<% if (counter) { %>
+  // Transition Counter plugin
+  uint private transitionCounter = 0;
+  modifier transitionCounting(uint nextTransitionNumber) {
+    require(nextTransitionNumber == transitionCounter);
+    transitionCounter +=1;
+    _;
+  }
+<% } %>
+<% if (timedTransitions) { %>
+  // Timed Transitions plugin
+
+<% } %>
+<% if (accessControl) { %>
+  // Access Control plugin
+  mapping(address => bool) private isAdmin;
+  uint private numAdmins = 1;
+
+  function name() {
+    isAdmin[msg.sender] = true;
+  }
+
+  modifier onlyAdmin {
+    require(isAdmin[msg.sender]);
+    _;
+  }
+
+  function addAdmin(address admin) onlyAdmin {
+    require(!isAdmin[admin]);
+    isAdmin[admin] = true;
+    numAdmins +=1;
+  }
+
+  function removeAdmin(address admin) onlyAdmin {
+    require(isAdmin[admin]);
+    require(numAdmins > 1);
+    isAdmin[admin] = false;
+    numAdmins -= 1;
+  }
+<% } %>
+<% if (events) { %>
+  // Events plugin
+
+<% } %>

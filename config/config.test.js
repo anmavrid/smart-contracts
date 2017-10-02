@@ -1,8 +1,3 @@
-/*jshint node: true*/
-/**
- * @author lattmann / https://github.com/lattmann
- */
-
 'use strict';
 
 var config = require('./config.default');

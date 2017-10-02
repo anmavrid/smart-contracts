@@ -167,9 +167,17 @@ define([
 
         return utils.getModelOfContract(self.core, contractNode)
             .then(function (contractModel) {
-              //TODO: add input from widget to contractModel
+                var currentConfig = self.getCurrentConfig(),
+                info = {
+                  locking: currentConfig['locking'],
+                  counter: currentConfig['counter'],
+                  timedTransitions: currentConfig['timedTransitions'],
+                  accessControl: currentConfig['accessControl'],
+                  events: currentConfig['events']
+                };
+                Object.assign(contractModel, currentConfig);
                 fileContent = ejs.render(ejsCache.contractType.complete, contractModel);
-                //Need to change this for a Javascript file.
+                //TODO: Need to change this for a Javascript file.
                 //var parseResult = javaParser.checkWholeFile(fileContent);
                 //if (parseResult) {
                     //self.logger.debug(parseResult.line);
@@ -272,12 +280,21 @@ define([
         return nameAndViolations;
     };
 
-    // AddSecurityPatterns.prototype.generateTestInfo = function () {
-    //   var self = this,
-    //   currentConfig = this.getCurrentConfig(),
-    //
-    //   return currentConfig;
-    // };
+     AddSecurityPatterns.prototype.generatePluginInfo = function () {
+       var self = this,
+           currentConfig = this.getCurrentConfig(),
+           info = {
+             locking: currentConfig['locking'],
+             counter: currentConfig['counter'],
+             timedTransitions: currentConfig['timedTransitions'],
+             accessControl: currentConfig['accessControl'],
+             events: currentConfig['events']
+           };
+            console.log(currentConfig['locking']);
+            console.log(info.locking);
+
+       return info;
+     };
 
 return AddSecurityPatterns;
 

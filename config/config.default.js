@@ -1,6 +1,3 @@
-/**
- * @author anmavrid / https://github.com/anmavrid
- */
 'use strict';
 
 var config = require('./config.webgme'),
