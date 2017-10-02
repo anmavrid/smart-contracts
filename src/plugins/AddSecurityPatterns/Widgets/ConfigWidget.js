@@ -33,18 +33,14 @@ ConfigWidget.prototype.show = function (globalConfigStructure, pluginMetadata, p
             noParameters = true;
 
         var getParameters = function (err, child) {
-            var metaNode = core.getMetaType(child),
-                name = core.getAttribute(metaNode, 'name'),
-                cardinality;
-            if(name !== 'Transition'){
-
-            }
-            if (name !== 'Contract') {
-                pluginMetadata.configStructure.push(Object.assign({}, pluginMetadata.configStructure[0]));                pluginMetadata.configStructure.push(Object.assign({}, pluginMetadata.configStructure[1]));
-                pluginMetadata.configStructure.push(Object.assign({}, pluginMetadata.configStructure[2]));
-                pluginMetadata.configStructure.push(Object.assign({}, pluginMetadata.configStructure[3]));
-                pluginMetadata.configStructure.push(Object.assign({}, pluginMetadata.configStructure[4]));
-            }
+            //var metaNode = core.getMetaType(child),
+                //name = core.getAttribute(metaNode, 'name');
+            //if (name !== 'Contract') {
+                //pluginMetadata.configStructure.push(Object.assign({}, pluginMetadata.configStructure[0]));                pluginMetadata.configStructure.push(Object.assign({}, pluginMetadata.configStructure[1]));
+                //pluginMetadata.configStructure.push(Object.assign({}, pluginMetadata.configStructure[2]));
+                //pluginMetadata.configStructure.push(Object.assign({}, pluginMetadata.configStructure[3]));
+                //pluginMetadata.configStructure.push(Object.assign({}, pluginMetadata.configStructure[4]));
+            //}
             nextChildID++;
             if (nextChildID < childrenPaths.length) {
                 core.loadByPath(result.rootNode, childrenPaths[nextChildID], getParameters);
