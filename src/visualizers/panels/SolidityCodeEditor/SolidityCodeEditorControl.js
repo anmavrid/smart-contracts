@@ -165,16 +165,18 @@ define([
                 addSegment('classStart', model.path, model, true);
 
                 addSegment('states', model.path, model, true);
-                    addSegment('userDefinitions', model.path, model);
+                addSegment('userDefinitions', model.path, model);
+                //addSegment('plugins', model.path, model, true);
                 //addSegment('classInitializations', model.path, model, true);
                 //addSegment('userConstructors', model.path, model);
 
                 for (i = 0; i < model.transitions.length; i += 1) {
                     segmentId = addSegment('singleTransitionStart', model.transitions[i].path, model.transitions[i], true);
                     segmentId += addSegment('singleTransitionArguments', model.transitions[i].path, model.transitions[i]);
+                    //segmentId += addSegment('singleTransitionPlugins', model.transitions[i].path, model.transitions[i], true);
                     segmentId += addSegment('singleTransitionStartEnd', model.transitions[i].path, model.transitions[i], true);
                     //if (model.transitions[i].output !== '')
-                      segmentId += addSegment('singleTransitionReturn', model.transitions[i].path, model.transitions[i], true);
+                    segmentId += addSegment('singleTransitionReturn', model.transitions[i].path, model.transitions[i], true);
                     segmentId += addSegment('singleTransitionOutput', model.transitions[i].path, model.transitions[i]);
                     segmentId += addSegment('singleTransitionRequireState', model.transitions[i].path, model.transitions[i], true);
                     segmentId += addSegment('singleTransitionRequireGuards', model.transitions[i].path, model.transitions[i], true);

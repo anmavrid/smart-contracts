@@ -1,4 +1,5 @@
 public function <%- name %> (<%- input %>)
+<% if (locking) { %> locking<% } %><% if (counter) { %> transitionCounting(nextTransitionNumber)<% } %><% if (timedTransitions) { %> timedTransitions<% } %><% if (accessControl) { %> onlyAdmin<% } %><% if (events) { %> event<% } %> 
 <%if (tags != '') {%> <%- tags %> <% } %> <%if (output != '') {%> returns (<%- output %>) <% } %>
 {
     require(state == States.<%- src %>);
