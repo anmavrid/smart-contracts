@@ -13,7 +13,7 @@ and then clone the repository in your preferred directory, for example:
 cd /home/$USER
 git clone https://github.com/FSolidM/smart-contracts.git
 ```
-This makes the 'project root' for the git repo `/home/$USER/smart-contracts` (you can pick a different location for it besides `/home/$USER/` if you'd like).
+This makes the 'project root' for the git repo `/home/$USER/smart-contracts`.
 
 Install packages with npm in the project root (`smart-contracts`):
 ```
