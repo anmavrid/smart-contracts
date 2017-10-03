@@ -18,6 +18,14 @@ define(['q'], function (Q) {
         basicModel.tags = core.getAttribute(node, 'tags');
     }
 
+    function _basicModel2TimedTransitionModel(core, node, path2Name, basicModel) {
+        basicModel.src = path2Name[core.getPointerPath(node, 'src')];
+        basicModel.dst = path2Name[core.getPointerPath(node, 'dst')];
+        basicModel.guards = core.getAttribute(node, 'guards');
+        basicModel.statements = core.getAttribute(node, 'statements');
+        basicModel.time = core.getAttribute(node, 'time');
+    }
+
     function getModelOfContract(core, contractNode) {
         var deferred = Q.defer(),
             model = {},
@@ -37,6 +45,7 @@ define(['q'], function (Q) {
         model.definitions = core.getAttribute(contractNode, 'definitions');
         model.initial = '';
         model.transitions = [];
+        model.timedTrans= [];
         model.states = [];
         //model.guards = [];
 
@@ -59,6 +68,10 @@ define(['q'], function (Q) {
                             _basicModel2TransitionModel(core, children[i], path2Name, childModel);
                             model.transitions.push(childModel);
                             break;
+                        case 'TimedTransition':
+                            _basicModel2TimedTransitionModel(core, children[i], path2Name, childModel);
+                            model.timedTrans.push(childModel);
+                        break;
                         case 'InitialState':
                             model.initial = childModel.name;
                             break;

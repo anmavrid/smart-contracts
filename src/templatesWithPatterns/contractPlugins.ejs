@@ -15,8 +15,16 @@
     _;
   } <% } %> <% if (timedTransitions) { %>
   // Timed Transitions plugin
-
-<% } %> <% if (accessControl) { %>
+  modifier timedTransitions {
+ <%for(var i = 0;i < timedTrans.length; i += 1) {%>
+  if ((state == States.<%-timedTrans[i].src%>) <%if (timedTrans[i].time) {%>
+      && (now >= creationTime + <%-timedTrans[i].time%>) <% } %> <%if (timedTrans[i].guards) {%>
+      && (<%-timedTrans[i].guards%>)) <% } %> ) {   <%-timedTrans[i].statements%>
+      state = States.<%-timedTrans[i].dst%>;
+    }
+   _;
+  }
+<% } %><% } %> <% if (accessControl) { %>
   // Access Control plugin
   mapping(address => bool) private isAdmin;
   uint private numAdmins = 1;
@@ -44,5 +52,12 @@
   } <% } %>
 <% if (events) { %>
   // Events plugin
-
+  <%for(var i = 0;i < transitions.length; i += 1) {%>
+  <%if (transitions[i].tags.includes("event")) {%>
+    event Event<%-transition[i].name%>;
+    modifier event<%-transition[i].name%> {
+      _;
+      Event<%-transition[i].name%>();
+    }
+  <% } %><% } %>
 <% } %>
