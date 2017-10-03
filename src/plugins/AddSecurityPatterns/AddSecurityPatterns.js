@@ -14,7 +14,8 @@ define([
     'q',
     'common/util/ejs',
     'scsrc/util/utils',
-    'scsrc/templatesWithPatterns/ejsCache'
+    'scsrc/templatesWithPatterns/ejsCache',
+    'scsrc/parsers/solidityExtra'
 ], function (
     PluginConfig,
     pluginMetadata,
@@ -22,7 +23,8 @@ define([
     Q,
     ejs,
     utils,
-    ejsCache) {
+    ejsCache,
+    solidityParser) {
     'use strict';
 
     pluginMetadata = JSON.parse(pluginMetadata);
@@ -178,14 +180,13 @@ define([
                 Object.assign(contractModel, currentConfig);
                 fileContent = ejs.render(ejsCache.contractType.complete, contractModel);
 
-                //TODO: Need to change this for a Javascript file.
-                //var parseResult = javaParser.checkWholeFile(fileContent);
-                //if (parseResult) {
-                    //self.logger.debug(parseResult.line);
-                    //self.logger.debug(parseResult.message);
-                    //parseResult.node = componentTypeNode;
-                    //violations.push(parseResult);
-                //}
+                var parseResult = solidityParser.checkWholeFile(fileContent);
+                if (parseResult) {
+                    self.logger.debug(parseResult.line);
+                    self.logger.debug(parseResult.message);
+                    parseResult.node = contractNode;
+                    violations.push(parseResult);
+                }
                 return fileContent;
             })
             .nodeify(callback);
