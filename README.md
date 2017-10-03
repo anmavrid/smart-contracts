@@ -5,6 +5,8 @@ First, install the following:
 - [NodeJS](https://nodejs.org/en/download/) (v4.x.x recommended)
 - [MongoDB](https://www.mongodb.com/download-center#production)
 
+On Ubuntu, you also need to install `npm` and `nodes-legacy` using `apt`.
+
 To clone the repository, first install (if necessary):
 - [Git](https://git-scm.com/downloads)
 
@@ -38,3 +40,6 @@ npm start
 ```
 
 After the webgme server is up and there are no error messages in the console, open a valid address in the browser to start using the Smart Contracts. The default is http://127.0.0.1:8888/, you should see all valid addresses in the console.
+
+Click `Create New…` to create a new project.
+After entering a project name of your choice, import the seed `SC` to start working on smart contracts!
