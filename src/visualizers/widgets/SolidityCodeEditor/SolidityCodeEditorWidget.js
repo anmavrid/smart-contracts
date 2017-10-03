@@ -8,8 +8,8 @@
 define(['scsrc/bower_components/codemirror/lib/codemirror',
     'scsrc/bower_components/codemirror/mode/clike/clike',
   'css!./styles/SolidityCodeEditorWidget.css',
-  'css!bipsrc/bower_components/codemirror/lib/codemirror.css',
-  'css!bipsrc/bower_components/codemirror/theme/monokai.css'
+  'css!scsrc/bower_components/codemirror/lib/codemirror.css',
+  'css!scsrc/bower_components/codemirror/theme/monokai.css'
 ], function (CodeMirror) {
     'use strict';
 
