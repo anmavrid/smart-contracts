@@ -177,6 +177,7 @@ define([
                 };
                 Object.assign(contractModel, currentConfig);
                 fileContent = ejs.render(ejsCache.contractType.complete, contractModel);
+
                 //TODO: Need to change this for a Javascript file.
                 //var parseResult = javaParser.checkWholeFile(fileContent);
                 //if (parseResult) {
@@ -264,6 +265,13 @@ define([
                     message: 'Transition [' + childName + '] with no source encountered. Please connect or remove it.'
                 });
             }
+
+            if (!self.core.getAttribute(child, 'tags').match(/^(payable|admin|event|\s|)+$/)){
+              nameAndViolations.violations.push({
+                  node: child,
+                  message: 'Transition [' + childName + '] has invalid tags. Tags can only be any combination of "payable", "admin", and "event".'
+              });
+            }
         }
         if (self.isMetaTypeOf(child, self.META.Transition)) {
 
@@ -280,21 +288,21 @@ define([
         return nameAndViolations;
     };
 
-     AddSecurityPatterns.prototype.generatePluginInfo = function () {
-       var self = this,
-           currentConfig = this.getCurrentConfig(),
-           info = {
-             locking: currentConfig['locking'],
-             counter: currentConfig['counter'],
-             timedTransitions: currentConfig['timedTransitions'],
-             accessControl: currentConfig['accessControl'],
-             events: currentConfig['events']
-           };
-            console.log(currentConfig['locking']);
-            console.log(info.locking);
-
-       return info;
-     };
+    //  AddSecurityPatterns.prototype.generatePluginInfo = function () {
+    //    var self = this,
+    //        currentConfig = this.getCurrentConfig(),
+    //        info = {
+    //          locking: currentConfig['locking'],
+    //          counter: currentConfig['counter'],
+    //          timedTransitions: currentConfig['timedTransitions'],
+    //          accessControl: currentConfig['accessControl'],
+    //          events: currentConfig['events']
+    //        };
+    //         console.log(currentConfig['locking']);
+    //         console.log(info.locking);
+     //
+    //    return info;
+    //  };
 
 return AddSecurityPatterns;
 

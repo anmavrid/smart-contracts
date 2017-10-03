@@ -254,6 +254,12 @@ define([
                     message: 'Transition [' + childName + '] with no source encountered. Please connect or remove it.'
                 });
             }
+            if (!self.core.getAttribute(child, 'tags').match(/^(payable|admin|event|\s|)+$/)){
+              nameAndViolations.violations.push({
+                  node: child,
+                  message: 'Transition [' + childName + '] has invalid tags. Tags can only be any combination of "payable", "admin", and "event".'
+              });
+            }
         }
         if (self.isMetaTypeOf(child, self.META.Transition)) {
 
