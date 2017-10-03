@@ -1,6 +1,7 @@
 'use strict';
 
 var config = require('./config.webgme'),
+    path = require('path'),
     validateConfig = require('webgme/config/validator');
 
 // Add/overwrite any additional settings here
