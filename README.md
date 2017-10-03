@@ -20,6 +20,7 @@ Install packages with npm in the project root (`smart-contracts`):
 cd /home/$USER/smart-contracts
 npm install
 npm install webgme
+npm install -g bower
 bower install
 ```
 Start mongodb locally by running the `mongod` executable in your mongodb installation (you may need to create a `data` directory or set `--dbpath`). For example:
