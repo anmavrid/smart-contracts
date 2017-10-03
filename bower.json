@@ -1,0 +1,23 @@
+{
+  "name": "smart-contracts",
+  "description": "Smart Contracts",
+  "main": "app.js",
+  "authors": [
+  ],
+  "license": "MIT",
+  "keywords": [
+    "webgme",
+    "webgme-domain"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "codemirror": "^5.25.0",
+    "pegjs": "0.10.0"
+  }
+}
