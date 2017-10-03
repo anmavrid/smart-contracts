@@ -6,10 +6,10 @@ First, install the following:
 - [MongoDB](https://www.mongodb.com/download-center#production)
 
 Next, install packages with npm globally in your operating system:
- -```
- -npm install
- -npm install -g webgme
- -```
+ ```
+ npm install
+ npm install -g webgme
+ ```
 (If you run `whereis webgme`, it should give you a location for the executable.)
 
 To clone the repository, first install (if necessary):
