@@ -5,10 +5,11 @@ First, install the following:
 - [NodeJS](https://nodejs.org/en/download/) (v4.x.x recommended)
 - [MongoDB](https://www.mongodb.com/download-center#production)
 
-Install the command line interface version of webgme globally to your operating system:
-```
-npm install -g webgme-cli
-```
+Next, install packages with npm globally in your operating system:
+ -```
+ -npm install
+ -npm install -g webgme
+ -```
 (If you run `whereis webgme`, it should give you a location for the executable.)
 
 To clone the repository, first install (if necessary):
@@ -21,9 +22,9 @@ git clone https://github.com/FSolidM/smart-contracts.git
 ```
 This makes the 'project root' for the git repo `/home/$USER/smart-contracts` (you can pick a different location for it besides `/home/$USER/` if you'd like).
 
-Install packages with npm in the project root (`smart contracts`):
+Install packages with npm in the project root (`smart-contracts`):
 ```
-cd /home/$USER/smart contracrs
+cd /home/$USER/smart-contracts
 npm install
 npm install webgme
 ```
@@ -31,7 +32,7 @@ Start mongodb locally by running the `mongod` executable in your mongodb install
 ```
 cd /home/$USER
 mkdir bip_data
-mongodb --dbpath ./bip_data
+mongod --dbpath ./bip_data
 ```
 wait until you see a line that says "[initandlisten] waiting for connections on port 27017".
 
