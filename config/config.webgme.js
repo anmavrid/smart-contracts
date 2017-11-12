@@ -14,6 +14,7 @@ config.seedProjects.basePaths.push(__dirname + '/../src/seeds/SC');
 
 
 config.visualization.panelPaths.push(__dirname + '/../src/visualizers/panels');
+config.rest.components['routers/UserGroupAdder'] = __dirname + '/../src/routers/UserGroupAdder/UserGroupAdder.js';
 
 
 

@@ -42,7 +42,14 @@
         "secondary": false,
         "widget": "src/visualizers/widgets/ModelEditor"
       }
+    },
+    "routers": {
+     "UserGroupAdder": {
+       "src": "src/routers/UserGroupAdder",
+       "test": "test/routers/UserGroupAdder",
+       "mount": "routers/UserGroupAdder"
     }
+   }
   },
   "dependencies": {
     "seeds": {},
