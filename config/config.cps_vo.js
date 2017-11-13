@@ -25,7 +25,7 @@ config.authentication.logInUrl = 'http://cps-vo.org/group/tools'
 config.authentication.logOutUrl = 'http://cps-vo.org/group/tools'
 config.authentication.jwt.privateKey = path.join(__dirname, '..', '..', 'token_keys','private_key');
 config.authentication.jwt.publicKey = path.join(__dirname, '..', '..', 'token_keys', 'public_key');
-config.server.port = 80;
+config.server.port = 8888;
 
 console.log('#### Using CPS-VO Config ###');
 
