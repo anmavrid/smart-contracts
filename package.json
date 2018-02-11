@@ -22,6 +22,8 @@
     "rimraf": "^2.4.0",
     "chai": "^3.0.0"
   },
-  "dependencies": {},
+  "dependencies": {
+    "webgme": "^2.22.1"
+  },
   "license": "MIT"
 }

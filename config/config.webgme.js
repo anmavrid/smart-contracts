@@ -23,7 +23,8 @@ config.visualization.visualizerDescriptors.push(__dirname + '/../src/visualizers
 // Add requirejs paths
 config.requirejsPaths = {
   'panels': './src/visualizers/panels',
-  'widgets': './src/visualizers/widgets'
+  'widgets': './src/visualizers/widgets',
+  'smartcontracts': './src/common'
 };
 
 

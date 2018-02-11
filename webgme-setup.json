@@ -13,6 +13,10 @@
       "AddSecurityPatterns": {
         "src": "src/plugins/AddSecurityPatterns",
         "test": "test/plugins/AddSecurityPatterns"
+      },
+      "VerifyContract": {
+        "src": "src/plugins/VerifyContract",
+        "test": "test/plugins/VerifyContract"
       }
     },
     "decorators": {

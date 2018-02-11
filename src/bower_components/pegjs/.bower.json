@@ -1,0 +1,40 @@
+{
+  "name": "pegjs",
+  "description": "PEG.js: Parser Generator for JavaScript (Browser version)",
+  "version": "0.10.0",
+  "main": [
+    "./peg-0.10.0.js"
+  ],
+  "license": "MIT",
+  "ignore": [],
+  "keywords": [
+    "peg",
+    "pegjs",
+    "grammar",
+    "parser",
+    "generator",
+    "browser"
+  ],
+  "authors": [
+    {
+      "name": "David Majda",
+      "email": "david@majda.cz"
+    }
+  ],
+  "homepage": "http://pegjs.majda.cz/",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/dmajda/pegjs.git"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "_release": "0.10.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "0.10.0",
+    "commit": "b952d4b4aae4b1a06e65b5cb1700ace955248df5"
+  },
+  "_source": "https://github.com/pegjs/bower.git",
+  "_target": "0.10.0",
+  "_originalSource": "pegjs"
+}
