@@ -66,9 +66,10 @@ define([
         var self = this,
             nodeObject;
 
-        // Using the coreAPI to make changes.
-
-        nodeObject = self.activeNode;
+        self.loadNodeMap(self.activeNode)
+           .then(function (nodes_) {
+            nodes = nodes_;
+        });
 
 
         // This will save the changes. If you don't want to save;
