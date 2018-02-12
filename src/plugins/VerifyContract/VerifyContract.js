@@ -67,8 +67,8 @@ define([
             nodeObject;
 
         self.loadNodeMap(self.activeNode)
-           .then(function (nodes_) {
-            nodes = nodes_;
+          .then(function (nodes) {
+              return VerifyContract.getVerificationResults(self, nodes, self.activeNode);
         });
 
 
@@ -85,6 +85,213 @@ define([
             });
 
     };
+
+    VerifyContract.getVerificationResults = function (self, nodes, activeNode, callback) {
+        var contract;
+        
+        for (contract of VerifyContract.prototype.getContractPaths.call(self, nodes))
+          VerifyContract.prototype.verifyContract.call(self, nodes, contract);
+    };
+    
+  VerifyContract.prototype.verifyContract = function (nodes, contract) {
+    var self = this,
+        core = self.core,
+        node, 
+        name, 
+        childPath, 
+        child,
+        childName,
+        pathToName = {},
+        states = [],
+        initialState,
+        transitions = [],
+        transition,
+        model;
+        
+    node = nodes[contract];
+    name = self.core.getAttribute(node, 'name');
+    
+    for (childPath of  self.core.getChildrenPaths(node))
+      pathToName[childPath] = self.core.getAttribute(nodes[childPath], 'name');
+    
+    for (childPath of self.core.getChildrenPaths(node)) {
+      child = nodes[childPath];
+      childName = self.core.getAttribute(child, 'name');
+      
+      if (self.isMetaTypeOf(child, self.META.State))
+        states.push(childName);
+      if (self.isMetaTypeOf(child, self.META.InitialState)) {
+        states.push(childName);
+        initialState = childName;
+      }
+      else if (self.isMetaTypeOf(child, self.META.Transition)) {
+        transition = {
+          'name': childName,
+          'src': pathToName[core.getPointerPath(child, 'src')],
+          'dst': pathToName[core.getPointerPath(child, 'dst')],
+          'guards': core.getAttribute(child, 'guards'),
+          'input': core.getAttribute(child, 'input'),
+          'output': core.getAttribute(child, 'output'),
+          'statements': core.getAttribute(child, 'statements'),
+          'tags': core.getAttribute(child, 'tags')
+        };        
+        transitions.push(transition);
+      }
+    }
+    
+    model = {
+      'name': name,
+      'states': states,
+      'transitions': transitions,
+      'initialState': initialState, 
+      'finalStates': [], // TODO: get final states from somewhere
+      'initialAction': "", // TODO: get initial action from somewhere
+      'fallbackAction': "" // TODO: get fallback action from somewhere
+    };
+    
+    model = VerifyContract.prototype.conformance.call(self, model);
+    model = VerifyContract.prototype.augmentModel.call(self, model);
+    
+    // TODO: generate BIP and verify
+  }
+
+  VerifyContract.prototype.conformance = function (model) {
+    var self = this,
+        states = [],
+        transitions = [];
+        
+    for (state of model['states']) {
+      states.push(state);
+      transitions.push({
+        'name': state + "_fallback",
+        'src': state,
+        'dst': state,
+        'guards': "",
+        'input': "",
+        'output': "",
+        'statements': model['fallbackAction'],
+        'tags': "payable" // TODO: check if this is the correct syntax for tags!
+      });
+    }
+      
+    for (transition of model['transitions'])
+      transitions.push(transition);
+      
+    states.push("pre_constructor");
+    transitions.push({
+      'name': model['name'],
+      'src': "pre_constructor",
+      'dst': model['initialState'],
+      'guards': "",
+      'input': "",
+      'output': "",
+      'statements': model['initialAction'],
+      'tags': "" 
+    });
+        
+    return {
+      'name': model['name'],
+      'states': augmentedStates, 
+      'transitions': augmentedTransitions, 
+      'initialStates': "pre_constructor", // TODO: update!
+      'finalStates': model['finalStates']
+    };    
+  }
+  
+  VerifyContract.prototype.augmentModel = function (model) {
+    var self = this,
+        state,
+        transition,
+        augmentedStates = [],
+        augmentedTransitions = [];
+        
+    for (state of model['states'])
+      augmentedStates.push(state);
+        
+    for (transition of model['transitions']) {
+      augmentedStates.push(transition['name']);
+      augmentedTransitions.push({
+        'name': transition['name'] + '_guard',
+        'src': transition['src'],
+        'dst': transition['name'],
+        'guards': transition['guards'],
+        'input': transition['input'],
+        'output': transition['output'],
+        'statements': "",
+        'tags': transition['tags']
+      });
+      if (false) // TODO: if statements cannot raise exception
+        VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions, 
+          transition['statements'], transition['name'], transition['dst'], transition['dst']);
+      else {
+        augmentedTransitions.push({
+          'name': transition['name'] + '_revert',
+          'src': transition['name'],
+          'dst': transition['src'],
+          'guards': "revert", // TODO: this needs to be a special value
+          'input': "",
+          'output': "",
+          'statements': "",
+          'tags': ""
+        });
+        augmentedStates.push(transition['name'] + "_no_revert");
+        augmentedTransitions.push({
+          'name': transition['name'] + '_no_revert',
+          'src': transition['name'],
+          'dst': transition['name'] + '_no_revert',
+          'guards': "no revert", // TODO: this needs to be a special value
+          'input': "",
+          'output': "",
+          'statements': "",
+          'tags': ""
+        });
+        VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions, 
+          transition['statements'], transition['name'] + '_no_revert', transition['dst'], transition['dst']);
+      }
+    }
+    
+    return {
+      'name': model['name'],
+      'states': augmentedStates, 
+      'transitions': augmentedTransitions, 
+      'initialState': model['initialState'], 
+      'finalStates': model['finalStates']
+    };
+  }
+  
+  VerifyContract.prototype.augmentStatement = function (augmentedStates, augmentedTransitions, statement, src, dst, ret) {
+    var self = this;
+    
+    // this takes care of simple statements
+    augmentedTransitions.push({
+      'name': augmentedTransitions.length.toString(),
+      'src': src,
+      'dst': dst,
+      'guards': "", 
+      'input': "",
+      'output': "",
+      'statements': statement,
+      'tags': ""
+    })   
+    // TODO: implement rest of Algorithm 2
+  }  
+    
+  VerifyContract.prototype.getContractPaths = function (nodes) {
+    var self = this,
+            path,
+            node,
+            //Using an array for the multiple contracts extention
+            contracts = [];
+
+        for (path in nodes) {
+            node = nodes[path];
+            if (self.isMetaTypeOf(node, self.META.Contract)) {
+                contracts.push(path);
+            }
+        }
+        return contracts;
+    };
+
 
     return VerifyContract;
 });
