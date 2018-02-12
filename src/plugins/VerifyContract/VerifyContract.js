@@ -157,6 +157,8 @@ define([
 
   VerifyContract.prototype.conformance = function (model) {
     var self = this,
+        state,
+        transition,
         states = [],
         transitions = [];
         
@@ -191,8 +193,8 @@ define([
         
     return {
       'name': model['name'],
-      'states': augmentedStates, 
-      'transitions': augmentedTransitions, 
+      'states': states, 
+      'transitions': transitions, 
       'initialStates': "pre_constructor", // TODO: update!
       'finalStates': model['finalStates']
     };    
