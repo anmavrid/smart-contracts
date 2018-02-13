@@ -224,7 +224,7 @@ define([
       });
       if (false) // TODO: if statements cannot raise exception
         VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions, 
-          transition['statements'], transition['name'], transition['dst'], transition['dst']);
+          "{" + transition['statements'] + "}", transition['name'], transition['dst'], transition['dst']);
       else {
         augmentedTransitions.push({
           'name': transition['name'] + '_revert',
@@ -248,7 +248,7 @@ define([
           'tags': ""
         });
         VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions, 
-          transition['statements'], transition['name'] + '_no_revert', transition['dst'], transition['dst']);
+          "{" + transition['statements'] + "}", transition['name'] + '_no_revert', transition['dst'], transition['dst']);
       }
     }
     
@@ -271,31 +271,16 @@ define([
         state,
         condition;
         
-    statement = "for (uint i = 0; i < 10; i++) msg.sender.transfer(10);";
+//    statement = "for (uint i = 0; i < 10; i++) msg.sender.transfer(10);";
+//    statement = "if (1 == 1) msg.sender.transfer(10);";
 
-    code = "contract Contract { function Function() { " + statement + " } } ";
-    parsed = solidity.parse(code);            
-    body = parsed["body"][0]["body"][0]["body"]["body"];
-
-    statement = "if (1 == 1) msg.sender.transfer(10);";
-    
+    if (!(statement.trim().endsWith("}") || statement.trim().endsWith(";") || (statement.trim().length == 0)))
+      statement = statement + ";";
     code = "contract Contract { function Function() { " + statement + " } } ";
     parsed = solidity.parse(code);            
     body = parsed["body"][0]["body"][0]["body"]["body"];
     
-    if (body.length > 1) { // compound statement
-      state = augmentedStates.length.toString();
-      for (i = 1; i < body.length; i++)
-        augmentedStates.push(state + "_" + i);
-      VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions, 
-          code.substring(body[0]['start'], body[0]['end']), src, state + "_1", ret);
-      for (i = 1; i < body.length - 1; i++)
-        VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions, 
-            code.substring(body[i]['start'], body[i]['end']), state + "_" + i, state + "_" + (i + 1), ret);
-      VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions, 
-          code.substring(body[body.length - 1]['start'], body[body.length - 1]['end']), state + "_" + (body.length - 1), dst, ret);
-    }
-    else if (body.length == 0) { // empty action
+    if (body.length == 0) { // empty action
       augmentedTransitions.push({
         'name': augmentedTransitions.length.toString(),
         'src': src,
@@ -309,8 +294,39 @@ define([
     }
     else {
       parsedStatement = body[0];
-        
-      if (parsedStatement["type"] == "ExpressionStatement") {
+      
+      if (parsedStatement["type"] == "BlockStatement") { // compound statement
+        body = parsedStatement["body"];
+        if (body.length > 1) {
+          state = augmentedStates.length.toString();
+          for (i = 1; i < body.length; i++)
+            augmentedStates.push(state + "_" + i);
+          VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions, 
+            code.substring(body[0]['start'], body[0]['end']), src, state + "_1", ret);
+          for (i = 1; i < body.length - 1; i++)
+            VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions, 
+              code.substring(body[i]['start'], body[i]['end']), state + "_" + i, state + "_" + (i + 1), ret);
+          VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions, 
+            code.substring(body[body.length - 1]['start'], body[body.length - 1]['end']), state + "_" + (body.length - 1), dst, ret);
+        }
+        else if (body.length == 1) {
+          VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions, 
+            code.substring(body[0]['start'], body[0]['end']), src, dst, ret);
+        }
+        else {
+          augmentedTransitions.push({
+            'name': augmentedTransitions.length.toString(),
+            'src': src,
+            'dst': dst,
+            'guards': "", 
+            'input': "",
+            'output': "",
+            'statements': "",
+            'tags': ""
+          });           
+        }
+      }      
+      else if ((parsedStatement["type"] == "ExpressionStatement") || (parsedStatement["type"] == "VariableDeclaration") || (parsedStatement["type"] == "VariableDeclarationTuple")) {
         augmentedTransitions.push({
           'name': augmentedTransitions.length.toString(),
           'src': src,
