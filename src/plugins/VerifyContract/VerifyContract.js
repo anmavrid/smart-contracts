@@ -14,7 +14,7 @@ define([
     'common/util/ejs',
     'scsrc/util/utils',
     'scsrc/templates/ejsCache',
-    'scsrc/parsers/solidityExtra'
+    'scsrc/parsers/solidity'
 ], function (
     PluginConfig,
     pluginMetadata,
@@ -22,7 +22,7 @@ define([
     ejs,
     utils,
     ejsCache,
-    solidityParser) {
+    solidity) {
     'use strict';
 
     pluginMetadata = JSON.parse(pluginMetadata);
@@ -195,7 +195,7 @@ define([
       'name': model['name'],
       'states': states, 
       'transitions': transitions, 
-      'initialStates': "pre_constructor", // TODO: update!
+      'initialStates': "pre_constructor", 
       'finalStates': model['finalStates']
     };    
   }
@@ -262,20 +262,158 @@ define([
   }
   
   VerifyContract.prototype.augmentStatement = function (augmentedStates, augmentedTransitions, statement, src, dst, ret) {
-    var self = this;
+    var self = this,
+        code,
+        parsed,
+        body,
+        parsedStatement,
+        i,
+        state,
+        condition;
+        
+    statement = "for (uint i = 0; i < 10; i++) msg.sender.transfer(10);";
+
+    code = "contract Contract { function Function() { " + statement + " } } ";
+    parsed = solidity.parse(code);            
+    body = parsed["body"][0]["body"][0]["body"]["body"];
+
+    statement = "if (1 == 1) msg.sender.transfer(10);";
     
-    // this takes care of simple statements
-    augmentedTransitions.push({
-      'name': augmentedTransitions.length.toString(),
-      'src': src,
-      'dst': dst,
-      'guards': "", 
-      'input': "",
-      'output': "",
-      'statements': statement,
-      'tags': ""
-    })   
-    // TODO: implement rest of Algorithm 2
+    code = "contract Contract { function Function() { " + statement + " } } ";
+    parsed = solidity.parse(code);            
+    body = parsed["body"][0]["body"][0]["body"]["body"];
+    
+    if (body.length > 1) { // compound statement
+      state = augmentedStates.length.toString();
+      for (i = 1; i < body.length; i++)
+        augmentedStates.push(state + "_" + i);
+      VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions, 
+          code.substring(body[0]['start'], body[0]['end']), src, state + "_1", ret);
+      for (i = 1; i < body.length - 1; i++)
+        VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions, 
+            code.substring(body[i]['start'], body[i]['end']), state + "_" + i, state + "_" + (i + 1), ret);
+      VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions, 
+          code.substring(body[body.length - 1]['start'], body[body.length - 1]['end']), state + "_" + (body.length - 1), dst, ret);
+    }
+    else if (body.length == 0) { // empty action
+      augmentedTransitions.push({
+        'name': augmentedTransitions.length.toString(),
+        'src': src,
+        'dst': dst,
+        'guards': "", 
+        'input': "",
+        'output': "",
+        'statements': "",
+        'tags': ""
+      });   
+    }
+    else {
+      parsedStatement = body[0];
+        
+      if (parsedStatement["type"] == "ExpressionStatement") {
+        augmentedTransitions.push({
+          'name': augmentedTransitions.length.toString(),
+          'src': src,
+          'dst': dst,
+          'guards': "", 
+          'input': "",
+          'output': "",
+          'statements': statement,
+          'tags': ""
+        });         
+      }
+      else if (parsedStatement["type"] == "ReturnStatement") {
+        augmentedTransitions.push({
+          'name': augmentedTransitions.length.toString(),
+          'src': src,
+          'dst': ret,
+          'guards': "", 
+          'input': "",
+          'output': "",
+          'statements': statement,
+          'tags': ""
+        });         
+      }
+      else if (parsedStatement["type"] == "IfStatement") {
+        condition = code.substring(parsedStatement["test"]["start"], parsedStatement["test"]["end"]);
+        state = augmentedStates.length.toString();
+        // true branch
+        augmentedStates.push(state + "_T");
+        augmentedTransitions.push({
+          'name': augmentedTransitions.length.toString(),
+          'src': src,
+          'dst': state + "_T",
+          'guards': condition, 
+          'input': "",
+          'output': "",
+          'statements': "",
+          'tags': ""
+        }); 
+        VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions, 
+          code.substring(parsedStatement["consequent"]["start"], parsedStatement["consequent"]["end"]), state + "_T", dst, ret);
+        if (parsedStatement["alternate"] == null) { // no false branch
+          augmentedTransitions.push({
+            'name': augmentedTransitions.length.toString(),
+            'src': src,
+            'dst': dst,
+            'guards': "!(" + condition + ")", 
+            'input': "",
+            'output': "",
+            'statements': "",
+            'tags': ""
+          });           
+        }
+        else { // false branch
+          augmentedStates.push(state + "_F");
+          augmentedTransitions.push({
+            'name': augmentedTransitions.length.toString(),
+            'src': src,
+            'dst': state + "_F",
+            'guards': "!(" + condition + ")", 
+            'input': "",
+            'output': "",
+            'statements': "",
+            'tags': ""
+          }); 
+          VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions, 
+            code.substring(parsedStatement["alternate"]["start"], parsedStatement["alternate"]["end"]), state + "_F", dst, ret);
+        }
+      }
+      else if (parsedStatement["type"] == "ForStatement") {
+        state = augmentedStates.length.toString();
+        condition = code.substring(parsedStatement["test"]["start"], parsedStatement["test"]["end"]);
+        augmentedStates.push(state + "_I");
+        augmentedStates.push(state + "_C");
+        augmentedStates.push(state + "_B");
+        VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions, 
+          code.substring(parsedStatement["init"]["start"], parsedStatement["init"]["end"]), src, state + "_I", ret);
+        augmentedTransitions.push({
+          'name': augmentedTransitions.length.toString(),
+          'src': state + "_I",
+          'dst': dst,
+          'guards': "!(" + condition + ")", 
+          'input': "",
+          'output': "",
+          'statements': "",
+          'tags': ""
+        });         
+        augmentedTransitions.push({
+          'name': augmentedTransitions.length.toString(),
+          'src': state + "_I",
+          'dst': state + "_C",
+          'guards': condition, 
+          'input': "",
+          'output': "",
+          'statements': "",
+          'tags': ""
+        });      
+        VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions, 
+          code.substring(parsedStatement["body"]["start"], parsedStatement["body"]["end"]), state + "_C", state + "_B", ret);   
+        VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions, 
+          code.substring(parsedStatement["update"]["start"], parsedStatement["update"]["end"]), state + "_B", state + "_I", ret);   
+      }
+      else throw "Unsupported statement type!";
+    }
   }  
     
   VerifyContract.prototype.getContractPaths = function (nodes) {
