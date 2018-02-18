@@ -104,6 +104,7 @@ define([
         pathToName = {},
         states = [],
         initialState,
+        finalStates = [],
         transitions = [],
         transition,
         model;
@@ -120,10 +121,14 @@ define([
       
       if (self.isMetaTypeOf(child, self.META.State))
         states.push(childName);
-      if (self.isMetaTypeOf(child, self.META.InitialState)) {
+      else if (self.isMetaTypeOf(child, self.META.InitialState)) {
         states.push(childName);
         initialState = childName;
       }
+      else if (self.isMetaTypeOf(child, self.META.FinalState)) {
+        states.push(childName);
+        finalStates.push(childName);
+      }      
       else if (self.isMetaTypeOf(child, self.META.Transition)) {
         transition = {
           'name': childName,
@@ -144,9 +149,9 @@ define([
       'states': states,
       'transitions': transitions,
       'initialState': initialState, 
-      'finalStates': [], // TODO: get final states from somewhere
-      'initialAction': "", // TODO: get initial action from somewhere
-      'fallbackAction': "" // TODO: get fallback action from somewhere
+      'finalStates': finalStates, 
+      'initialAction': self.core.getAttribute(node, 'initialAction'), 
+      'fallbackAction': self.core.getAttribute(node, 'fallbackAction')
     };
     
     model = VerifyContract.prototype.conformance.call(self, model);
