@@ -1,0 +1,15 @@
+//Transitions <%for(var i = 0;i < transitions.length; i += 1) {%>
+function <%- transitions[i].name %> (<%- transitions[i].input %>) public
+<%if (transitions[i].tags != '') {%> <%- transitions[i].tags %> <% } %> <%if (transitions[i].output != '') {%> returns (<%- transitions[i].output %>) <% } %>
+{
+    require(state == States.<%- transitions[i].src %>);
+  <%if (transitions[i].guards != '') {%> //Guards
+    require(<%- transitions[i].guards %>); <% } %>  <%if (transitions[i].statements != '') {%>
+    //State change
+    state = States.InTransition;
+    //Actions
+    <%- transitions[i].statements %> <% } %>  <%if (transitions[i].src != transitions[i].dst || transitions[i].statements != '') {%>
+    //State change
+    state = States.<%- transitions[i].dst %>; <% } %>
+}
+<% } %>

@@ -1,0 +1,9 @@
+model <%- name %>Model
+
+	port type syncPort
+
+  connector type SINGLE(syncPort p1)
+    define p1
+  end
+
+atomic type <%- name %>

@@ -13,7 +13,7 @@ define([
     'plugin/PluginBase',
     'common/util/ejs',
     'scsrc/util/utils',
-    'scsrc/templates/ejsCache',
+    'scsrc/templatesForBIP/ejsCache',
     'scsrc/parsers/solidity'
 ], function (
     PluginConfig,
@@ -88,7 +88,7 @@ define([
 
     VerifyContract.getVerificationResults = function (self, nodes, activeNode, callback) {
         var contract;
-
+        console.log('getVerificationResults');
         for (contract of VerifyContract.prototype.getContractPaths.call(self, nodes))
           VerifyContract.prototype.verifyContract.call(self, nodes, contract);
     };
@@ -107,8 +107,9 @@ define([
         finalStates = [],
         transitions = [],
         transition,
-        model;
+        model, bipModel;
 
+    console.log('verifyContract');
     node = nodes[contract];
     name = self.core.getAttribute(node, 'name');
 
@@ -154,8 +155,18 @@ define([
       'fallbackAction': self.core.getAttribute(node, 'fallbackAction')
     };
 
+    console.log('beforeConformance');
     model = VerifyContract.prototype.conformance.call(self, model);
+    console.log('afterConformance');
     model = VerifyContract.prototype.augmentModel.call(self, model);
+    console.log('afterAugmentation');
+    console.log(model.transitions[1]);
+    bipModel = ejs.render(ejsCache.contractType.complete, model);
+
+    console.log('hi');
+    console.log(bipModel);
+    //self.logger.error('hi');
+    //self.logger.error(bipModel);
 
     // TODO: generate BIP and verify
   }
