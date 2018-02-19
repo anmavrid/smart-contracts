@@ -5,6 +5,7 @@ define([
     'text!./BIPPorts.ejs',
     'text!./BIPStates.ejs',
     'text!./initialBIPAction.ejs',
+    'text!./BIPTransitions.ejs',
     'text!./BIPComplete.ejs'
 ], function (ejs,
              classStart,
@@ -12,6 +13,7 @@ define([
              ports,
              states,
              initialAction,
+             transitions,
              complete
              ) {
 
@@ -22,11 +24,13 @@ define([
             bipPorts: ports,
             bipStates: states,
             bipInitialAction: initialAction,
+            bipTransitions: transitions,
             complete: ejs.render(complete, {
                 classStart: classStart,
                 ports: ports,
                 states: states,
                 initialAction: initialAction,
+                transitions: transitions,
                 classEnd: classEnd
             })
         }
