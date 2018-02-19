@@ -124,7 +124,7 @@ define([
         finalStates = [],
         transitions = [],
         transition,
-        model, bipModel;
+        model, bipModel, runbip2smv;
 
     //console.log('verifyContract');
     node = nodes[contract];
@@ -185,9 +185,25 @@ define([
               }
           }
           fs.writeFileSync(path + '/' + model.name+ '.bip', bipModel, 'utf8');
+          runbip2smv = 'java -jar bip-to-nusmv.jar' +  model.name + model.name+ '.bip' + + model.name+ '.smv';
+          console.log(runbip2smv);
+
+          fs.writeFileSync(path + '/runbip2smv.sh', runbip2smv, 'utf8');
+          self.sendNotification('Starting the BIP to NuSMV translation..');
+          try {
+              child = execSync('/bin/bash ' + path + '/runbip2smv.sh');
+          } catch (e) {
+              self.logger.error('stderr ' + e.stderr);
+              throw e;
+          }
+          self.sendNotification('BIP to NuSMV translation successful.');
       }
 
   }
+
+  VerifyContract.prototype.runVerification = function(path, fs, fileName, fileValue){
+
+  };
 
   VerifyContract.prototype.conformance = function (model) {
     var self = this,
