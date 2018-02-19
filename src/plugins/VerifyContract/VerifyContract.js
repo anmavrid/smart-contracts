@@ -160,7 +160,6 @@ define([
     console.log('afterConformance');
     model = VerifyContract.prototype.augmentModel.call(self, model);
     console.log('afterAugmentation');
-    console.log(model.transitions[1]);
     bipModel = ejs.render(ejsCache.contractType.complete, model);
 
     console.log('hi');
