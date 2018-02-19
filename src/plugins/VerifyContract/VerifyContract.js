@@ -88,17 +88,17 @@ define([
 
     VerifyContract.getVerificationResults = function (self, nodes, activeNode, callback) {
         var contract;
-        
+
         for (contract of VerifyContract.prototype.getContractPaths.call(self, nodes))
           VerifyContract.prototype.verifyContract.call(self, nodes, contract);
     };
-    
+
   VerifyContract.prototype.verifyContract = function (nodes, contract) {
     var self = this,
         core = self.core,
-        node, 
-        name, 
-        childPath, 
+        node,
+        name,
+        childPath,
         child,
         childName,
         pathToName = {},
@@ -108,17 +108,17 @@ define([
         transitions = [],
         transition,
         model;
-        
+
     node = nodes[contract];
     name = self.core.getAttribute(node, 'name');
-    
+
     for (childPath of  self.core.getChildrenPaths(node))
       pathToName[childPath] = self.core.getAttribute(nodes[childPath], 'name');
-    
+
     for (childPath of self.core.getChildrenPaths(node)) {
       child = nodes[childPath];
       childName = self.core.getAttribute(child, 'name');
-      
+
       if (self.isMetaTypeOf(child, self.META.State))
         states.push(childName);
       else if (self.isMetaTypeOf(child, self.META.InitialState)) {
@@ -128,7 +128,7 @@ define([
       else if (self.isMetaTypeOf(child, self.META.FinalState)) {
         states.push(childName);
         finalStates.push(childName);
-      }      
+      }
       else if (self.isMetaTypeOf(child, self.META.Transition)) {
         transition = {
           'name': childName,
@@ -139,24 +139,24 @@ define([
           'output': core.getAttribute(child, 'output'),
           'statements': core.getAttribute(child, 'statements'),
           'tags': core.getAttribute(child, 'tags')
-        };        
+        };
         transitions.push(transition);
       }
     }
-    
+
     model = {
       'name': name,
       'states': states,
       'transitions': transitions,
-      'initialState': initialState, 
-      'finalStates': finalStates, 
-      'initialAction': self.core.getAttribute(node, 'initialAction'), 
+      'initialState': initialState,
+      'finalStates': finalStates,
+      'initialAction': self.core.getAttribute(node, 'initialAction'),
       'fallbackAction': self.core.getAttribute(node, 'fallbackAction')
     };
-    
+
     model = VerifyContract.prototype.conformance.call(self, model);
     model = VerifyContract.prototype.augmentModel.call(self, model);
-    
+
     // TODO: generate BIP and verify
   }
 
@@ -166,55 +166,59 @@ define([
         transition,
         states = [],
         transitions = [];
-        
+
     for (state of model['states']) {
       states.push(state);
+      if (model['fallbackAction'].trim().length != 0) {
+        transitions.push({
+          'name': state + "_fallback",
+          'src': state,
+          'dst': state,
+          'guards': "",
+          'input': "",
+          'output': "",
+          'statements': model['fallbackAction'],
+          'tags': "payable" // TODO: check if this is the correct syntax for tags!
+        });
+      }
+    }
+
+    for (transition of model['transitions'])
+      transitions.push(transition);
+
+    if (model['initialAction'].trim().length != 0) {
+      states.push("pre_constructor");
       transitions.push({
-        'name': state + "_fallback",
-        'src': state,
-        'dst': state,
+        'name': model['name'],
+        'src': "pre_constructor",
+        'dst': model['initialState'],
         'guards': "",
         'input': "",
         'output': "",
-        'statements': model['fallbackAction'],
-        'tags': "payable" // TODO: check if this is the correct syntax for tags!
+        'statements': model['initialAction'],
+        'tags': ""
       });
     }
-      
-    for (transition of model['transitions'])
-      transitions.push(transition);
-      
-    states.push("pre_constructor");
-    transitions.push({
-      'name': model['name'],
-      'src': "pre_constructor",
-      'dst': model['initialState'],
-      'guards': "",
-      'input': "",
-      'output': "",
-      'statements': model['initialAction'],
-      'tags': "" 
-    });
-        
+
     return {
       'name': model['name'],
-      'states': states, 
-      'transitions': transitions, 
-      'initialStates': "pre_constructor", 
+      'states': states,
+      'transitions': transitions,
+      'initialStates': "pre_constructor",
       'finalStates': model['finalStates']
-    };    
+    };
   }
-  
+
   VerifyContract.prototype.augmentModel = function (model) {
     var self = this,
         state,
         transition,
         augmentedStates = [],
         augmentedTransitions = [];
-        
+
     for (state of model['states'])
       augmentedStates.push(state);
-        
+
     for (transition of model['transitions']) {
       augmentedStates.push(transition['name']);
       augmentedTransitions.push({
@@ -228,7 +232,7 @@ define([
         'tags': transition['tags']
       });
       if (false) // TODO: if statements cannot raise exception
-        VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions, 
+        VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions,
           "{" + transition['statements'] + "}", transition['name'], transition['dst'], transition['dst']);
       else {
         augmentedTransitions.push({
@@ -252,20 +256,20 @@ define([
           'statements': "",
           'tags': ""
         });
-        VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions, 
+        VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions,
           "{" + transition['statements'] + "}", transition['name'] + '_no_revert', transition['dst'], transition['dst']);
       }
     }
-    
+
     return {
       'name': model['name'],
-      'states': augmentedStates, 
-      'transitions': augmentedTransitions, 
-      'initialState': model['initialState'], 
+      'states': augmentedStates,
+      'transitions': augmentedTransitions,
+      'initialState': model['initialState'],
       'finalStates': model['finalStates']
     };
   }
-  
+
   VerifyContract.prototype.augmentStatement = function (augmentedStates, augmentedTransitions, statement, src, dst, ret) {
     var self = this,
         code,
@@ -275,47 +279,47 @@ define([
         i,
         state,
         condition;
-        
+
 //    statement = "for (uint i = 0; i < 10; i++) msg.sender.transfer(10);";
 //    statement = "if (1 == 1) msg.sender.transfer(10);";
 
     if (!(statement.trim().endsWith("}") || statement.trim().endsWith(";") || (statement.trim().length == 0)))
       statement = statement + ";";
     code = "contract Contract { function Function() { " + statement + " } } ";
-    parsed = solidity.parse(code);            
+    parsed = solidity.parse(code);
     body = parsed["body"][0]["body"][0]["body"]["body"];
-    
+
     if (body.length == 0) { // empty action
       augmentedTransitions.push({
         'name': augmentedTransitions.length.toString(),
         'src': src,
         'dst': dst,
-        'guards': "", 
+        'guards': "",
         'input': "",
         'output': "",
         'statements': "",
         'tags': ""
-      });   
+      });
     }
     else {
       parsedStatement = body[0];
-      
+
       if (parsedStatement["type"] == "BlockStatement") { // compound statement
         body = parsedStatement["body"];
         if (body.length > 1) {
           state = augmentedStates.length.toString();
           for (i = 1; i < body.length; i++)
             augmentedStates.push(state + "_" + i);
-          VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions, 
+          VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions,
             code.substring(body[0]['start'], body[0]['end']), src, state + "_1", ret);
           for (i = 1; i < body.length - 1; i++)
-            VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions, 
+            VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions,
               code.substring(body[i]['start'], body[i]['end']), state + "_" + i, state + "_" + (i + 1), ret);
-          VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions, 
+          VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions,
             code.substring(body[body.length - 1]['start'], body[body.length - 1]['end']), state + "_" + (body.length - 1), dst, ret);
         }
         else if (body.length == 1) {
-          VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions, 
+          VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions,
             code.substring(body[0]['start'], body[0]['end']), src, dst, ret);
         }
         else {
@@ -323,37 +327,37 @@ define([
             'name': augmentedTransitions.length.toString(),
             'src': src,
             'dst': dst,
-            'guards': "", 
+            'guards': "",
             'input': "",
             'output': "",
             'statements': "",
             'tags': ""
-          });           
+          });
         }
-      }      
+      }
       else if ((parsedStatement["type"] == "ExpressionStatement") || (parsedStatement["type"] == "VariableDeclaration") || (parsedStatement["type"] == "VariableDeclarationTuple")) {
         augmentedTransitions.push({
           'name': augmentedTransitions.length.toString(),
           'src': src,
           'dst': dst,
-          'guards': "", 
+          'guards': "",
           'input': "",
           'output': "",
           'statements': statement,
           'tags': ""
-        });         
+        });
       }
       else if (parsedStatement["type"] == "ReturnStatement") {
         augmentedTransitions.push({
           'name': augmentedTransitions.length.toString(),
           'src': src,
           'dst': ret,
-          'guards': "", 
+          'guards': "",
           'input': "",
           'output': "",
           'statements': statement,
           'tags': ""
-        });         
+        });
       }
       else if (parsedStatement["type"] == "IfStatement") {
         condition = code.substring(parsedStatement["test"]["start"], parsedStatement["test"]["end"]);
@@ -364,25 +368,25 @@ define([
           'name': augmentedTransitions.length.toString(),
           'src': src,
           'dst': state + "_T",
-          'guards': condition, 
+          'guards': condition,
           'input': "",
           'output': "",
           'statements': "",
           'tags': ""
-        }); 
-        VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions, 
+        });
+        VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions,
           code.substring(parsedStatement["consequent"]["start"], parsedStatement["consequent"]["end"]), state + "_T", dst, ret);
         if (parsedStatement["alternate"] == null) { // no false branch
           augmentedTransitions.push({
             'name': augmentedTransitions.length.toString(),
             'src': src,
             'dst': dst,
-            'guards': "!(" + condition + ")", 
+            'guards': "!(" + condition + ")",
             'input': "",
             'output': "",
             'statements': "",
             'tags': ""
-          });           
+          });
         }
         else { // false branch
           augmentedStates.push(state + "_F");
@@ -390,13 +394,13 @@ define([
             'name': augmentedTransitions.length.toString(),
             'src': src,
             'dst': state + "_F",
-            'guards': "!(" + condition + ")", 
+            'guards': "!(" + condition + ")",
             'input': "",
             'output': "",
             'statements': "",
             'tags': ""
-          }); 
-          VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions, 
+          });
+          VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions,
             code.substring(parsedStatement["alternate"]["start"], parsedStatement["alternate"]["end"]), state + "_F", dst, ret);
         }
       }
@@ -406,37 +410,37 @@ define([
         augmentedStates.push(state + "_I");
         augmentedStates.push(state + "_C");
         augmentedStates.push(state + "_B");
-        VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions, 
+        VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions,
           code.substring(parsedStatement["init"]["start"], parsedStatement["init"]["end"]), src, state + "_I", ret);
         augmentedTransitions.push({
           'name': augmentedTransitions.length.toString(),
           'src': state + "_I",
           'dst': dst,
-          'guards': "!(" + condition + ")", 
+          'guards': "!(" + condition + ")",
           'input': "",
           'output': "",
           'statements': "",
           'tags': ""
-        });         
+        });
         augmentedTransitions.push({
           'name': augmentedTransitions.length.toString(),
           'src': state + "_I",
           'dst': state + "_C",
-          'guards': condition, 
+          'guards': condition,
           'input': "",
           'output': "",
           'statements': "",
           'tags': ""
-        });      
-        VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions, 
-          code.substring(parsedStatement["body"]["start"], parsedStatement["body"]["end"]), state + "_C", state + "_B", ret);   
-        VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions, 
-          code.substring(parsedStatement["update"]["start"], parsedStatement["update"]["end"]), state + "_B", state + "_I", ret);   
+        });
+        VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions,
+          code.substring(parsedStatement["body"]["start"], parsedStatement["body"]["end"]), state + "_C", state + "_B", ret);
+        VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions,
+          code.substring(parsedStatement["update"]["start"], parsedStatement["update"]["end"]), state + "_B", state + "_I", ret);
       }
       else throw "Unsupported statement type!";
     }
-  }  
-    
+  }
+
   VerifyContract.prototype.getContractPaths = function (nodes) {
     var self = this,
             path,
