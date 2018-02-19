@@ -3,6 +3,7 @@
 # Logs
 logs
 *.log
+projectOutputs
 
 # Runtime data
 pids
