@@ -14,7 +14,8 @@ define([
     'common/util/ejs',
     'scsrc/util/utils',
     'scsrc/templatesForBIP/ejsCache',
-    'scsrc/parsers/solidity'
+    'scsrc/parsers/solidity',
+    'common/util/guid'
 ], function (
     PluginConfig,
     pluginMetadata,
@@ -22,7 +23,8 @@ define([
     ejs,
     utils,
     ejsCache,
-    solidity) {
+    solidity,
+    guid) {
     'use strict';
 
     pluginMetadata = JSON.parse(pluginMetadata);
@@ -64,11 +66,26 @@ define([
         // Use self to access core, project, result, logger etc from PluginBase.
         // These are all instantiated at this point.
         var self = this,
+            path,
+            fs,
+            bipModel,
+            artifact,
             nodeObject;
+
+        if (typeof window === 'undefined') {
+          path = process.cwd();
+          fs = require('fs');
+          if (!fs.existsSync('projectOutputs')) {
+            fs.mkdirSync('projectOutputs');
+          }
+          path += '/projectOutputs/' + self.core.getAttribute(self.activeNode, 'name') + guid();
+          path = path.replace(/\s+/g, '');
+        }
 
         self.loadNodeMap(self.activeNode)
           .then(function (nodes) {
-              return VerifyContract.getVerificationResults(self, nodes, self.activeNode);
+
+            return VerifyContract.getVerificationResults(self, nodes, self.activeNode, fs, path);
         });
 
 
@@ -86,14 +103,14 @@ define([
 
     };
 
-    VerifyContract.getVerificationResults = function (self, nodes, activeNode, callback) {
+    VerifyContract.getVerificationResults = function (self, nodes, activeNode, fs, path, callback) {
         var contract;
-        console.log('getVerificationResults');
+        //console.log('getVerificationResults');
         for (contract of VerifyContract.prototype.getContractPaths.call(self, nodes))
-          VerifyContract.prototype.verifyContract.call(self, nodes, contract);
+          VerifyContract.prototype.verifyContract.call(self, nodes, contract, fs, path);
     };
 
-  VerifyContract.prototype.verifyContract = function (nodes, contract) {
+  VerifyContract.prototype.verifyContract = function (nodes, contract, fs, path) {
     var self = this,
         core = self.core,
         node,
@@ -109,7 +126,7 @@ define([
         transition,
         model, bipModel;
 
-    console.log('verifyContract');
+    //console.log('verifyContract');
     node = nodes[contract];
     name = self.core.getAttribute(node, 'name');
 
@@ -155,19 +172,21 @@ define([
       'fallbackAction': self.core.getAttribute(node, 'fallbackAction')
     };
 
-    console.log('beforeConformance');
     model = VerifyContract.prototype.conformance.call(self, model);
-    console.log('afterConformance');
     model = VerifyContract.prototype.augmentModel.call(self, model);
-    console.log('afterAugmentation');
     bipModel = ejs.render(ejsCache.contractType.complete, model);
 
-    console.log('hi');
-    console.log(bipModel);
-    //self.logger.error('hi');
-    //self.logger.error(bipModel);
+    if (fs && path) {
+          try {
+              fs.statSync(path);
+          } catch (err) {
+              if (err.code === 'ENOENT') {
+                  fs.mkdirSync(path);
+              }
+          }
+          fs.writeFileSync(path + '/' + model.name+ '.bip', bipModel, 'utf8');
+      }
 
-    // TODO: generate BIP and verify
   }
 
   VerifyContract.prototype.conformance = function (model) {
