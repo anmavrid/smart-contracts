@@ -4,8 +4,10 @@ public function <%- name %> (<%- input %>)
     require(state == States.<%- src %>);
   <%if (guards != '') {%> //Guards
     require(<%- guards %>); <% } %>  <%if (statements != '') {%>
+    //State change
+    state = States.InTransition;
     //Actions
-    <%- statements %> <% } %>  <%if (src != dst) {%>
+    <%- statements %> <% } %>  <%if ((src != dst) || (statements != '')) {%>
     //State change
     state = States.<%- dst %>; <% } %>
 }

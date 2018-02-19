@@ -1,4 +1,2 @@
-<%if (src != dst) {%>   //State change
+<%if (src != dst || statements != '') {%>   //State change
   state = States.<%- dst %>; <% } %>
-  }
-  
