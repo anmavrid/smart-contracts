@@ -175,7 +175,8 @@ define([
         state,
         transition,
         states = [],
-        transitions = [];
+        transitions = [],
+        initialState = model['initialState'];
 
     for (state of model['states']) {
       states.push(state);
@@ -198,6 +199,7 @@ define([
 
     if (model['initialAction'].trim().length != 0) {
       states.push("pre_constructor");
+      initialState = "pre_constructor";
       transitions.push({
         'name': model['name'],
         'src': "pre_constructor",
@@ -214,7 +216,7 @@ define([
       'name': model['name'],
       'states': states,
       'transitions': transitions,
-      'initialStates': "pre_constructor",
+      'initialState': initialState,
       'finalStates': model['finalStates']
     };
   }
