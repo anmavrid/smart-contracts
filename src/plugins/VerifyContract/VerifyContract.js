@@ -69,6 +69,7 @@ define([
             path,
             fs,
             bipModel,
+            filesToAdd = {},
             artifact,
             nodeObject;
 
@@ -84,19 +85,22 @@ define([
 
         self.loadNodeMap(self.activeNode)
           .then(function (nodes) {
-
             return VerifyContract.getVerificationResults(self, nodes, self.activeNode, fs, path);
-        });
-
-
-        // This will save the changes. If you don't want to save;
-        // exclude self.save and call callback directly from this scope.
-        self.save('VerifyContract updated model.')
+        }). then(function () {
+          filesToAdd['output.text'] = fs.readFileSync(path +'/output.txt','utf8');
+          artifact = self.blobClient.createArtifact('VerificationOutput');
+          return artifact.addFiles(filesToAdd);
+            })
+            .then(function (fileHash) {
+                self.result.addArtifact(fileHash);
+                return artifact.save();
+            })
             .then(function () {
                 self.result.setSuccess(true);
                 callback(null, self.result);
             })
             .catch(function (err) {
+                self.logger.error(err.stack);
                 // Result success is false at invocation.
                 callback(err, self.result);
             });
