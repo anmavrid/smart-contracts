@@ -132,7 +132,10 @@ define([
         finalStates = [],
         transitions = [],
         properties = [],
+        bipTransitionsToSMVNames =[],
+        bipTransitionToSMVName,
         transition,
+        inINVAR = false;
         currentConfig = this.getCurrentConfig(),
         model, bipModel, runbip2smv, child;
 
@@ -185,12 +188,6 @@ define([
     model = VerifyContract.prototype.conformance.call(self, model);
     model = VerifyContract.prototype.augmentModel.call(self, model);
 
-    // properties =VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateOne']);
-    // properties +=VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateTwo']);
-    // properties +=VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateThree']);
-    // properties +=VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateFour']);
-    // console.log(properties);
-
     // test strings
     // type1properties = "bid#close; cancelABB|cancelRB#finish"
     // type2properties = "finish#close"
@@ -225,6 +222,14 @@ define([
               throw e;
           }
           self.sendNotification('BIP to NuSMV translation successful.');
+
+          /* Get the properties specified by the user  */
+          properties =VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateOne']);
+          // properties +=VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateTwo']);
+          // properties +=VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateThree']);
+          // properties +=VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateFour']);
+          // console.log(properties);
+
           runNusmv = '.' + '/verificationTools/nuXmv -r ' + path + '/' + model.name+ '.smv >> ' + path + '/output.txt';
 
           fs.writeFileSync(path + '/runNusmv.sh', runNusmv, 'utf8');
