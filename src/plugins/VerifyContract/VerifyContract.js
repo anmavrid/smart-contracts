@@ -180,6 +180,7 @@ define([
     model = VerifyContract.prototype.augmentModel.call(self, model);
     bipModel = ejs.render(ejsCache.contractType.complete, model);
 
+    execSync = require('child_process').execSync;
     if (fs && path) {
           try {
               fs.statSync(path);
@@ -200,7 +201,7 @@ define([
               throw e;
           }
           self.sendNotification('BIP to NuSMV translation successful.');
-          runNusmv = './'+ process.cwd() + '/verificationTools/nuxmv -r' + path + '/' + model.name+ '.smv >> output.txt';
+          runNusmv = '.' + '/verificationTools/nuXmv -r ' + path + '/' + model.name+ '.smv >> ' + path + '/output.txt';
 
           fs.writeFileSync(path + '/runNusmv.sh', runNusmv, 'utf8');
           self.sendNotification('Starting the NuSMV verification..');
