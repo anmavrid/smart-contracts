@@ -228,9 +228,9 @@ define([
           //Template one
           if(currentConfig['templateOne']!=''){
             properties =VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateOne']);
-            console.log(properties);
+            //console.log(properties);
             for (property of properties){
-              console.log(property);
+              //console.log(property);
               propertiesSMV += '-- AG ( ';
               for (clause of property[0]){
                 propertiesSMV += clause + "|"
@@ -249,9 +249,9 @@ define([
           //Template two
           if(currentConfig['templateTwo']!=''){
             properties =VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateTwo']);
-            console.log(properties);
+            //console.log(properties);
             for (property of properties){
-              console.log(property);
+              //console.log(property);
               propertiesSMV += '-- A ( !(';
               for (clause of property[0]){
                 propertiesSMV += clause + "|"
@@ -263,6 +263,51 @@ define([
                 }
                 propertiesSMV = propertiesSMV.slice(0,-1);
                 propertiesSMV += '))\n';
+                  console.log(propertiesSMV);
+            }
+          }
+
+          //Template three
+          if(currentConfig['templateThree']!=''){
+            properties =VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateThree']);
+            //console.log(properties);
+            for (property of properties){
+              //console.log(property);
+              propertiesSMV += '-- AG (()';
+              for (clause of property[0]){
+                propertiesSMV += clause + "|"
+              }
+                propertiesSMV = propertiesSMV.slice(0,-1);
+                propertiesSMV += ') -> AF (';
+                for (clause of property[1]){
+                  propertiesSMV += clause + "|"
+                }
+                propertiesSMV = propertiesSMV.slice(0,-1);
+                propertiesSMV += '))\n';
+                  console.log(propertiesSMV);
+            }
+          }
+
+          //Template four
+          if(currentConfig['templateFour']!=''){
+            properties =VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateFour']);
+            for (property of properties){
+              propertiesSMV += '-- AG (';
+              for (clause of property[0]){
+                propertiesSMV += clause + "|"
+              }
+                propertiesSMV = propertiesSMV.slice(0,-1);
+                propertiesSMV += ') -> AX A [ !(';
+                for (clause of property[1]){
+                  propertiesSMV += clause + "|"
+                }
+                propertiesSMV = propertiesSMV.slice(0,-1);
+                propertiesSMV += ') W (';
+                for (clause of property[2]){
+                  propertiesSMV += clause + "|"
+                }
+                propertiesSMV = propertiesSMV.slice(0,-1);
+                propertiesSMV += ')]\n';
                   console.log(propertiesSMV);
             }
           }
@@ -388,7 +433,7 @@ define([
         'statements': "",
         'tags': transition['tags']
       });
-      
+
       if (!regexpTransfer.test(transition['statements'])) // TODO: if statements cannot raise exception
         VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions,
           "{" + transition['statements'] + "}", transition['name'], transition['dst'], transition['dst'], transition['name']);
