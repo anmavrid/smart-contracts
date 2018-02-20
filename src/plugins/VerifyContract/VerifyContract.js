@@ -131,7 +131,9 @@ define([
         initialState,
         finalStates = [],
         transitions = [],
+        properties = [],
         transition,
+        currentConfig = this.getCurrentConfig(),
         model, bipModel, runbip2smv, child;
 
     //console.log('verifyContract');
@@ -182,18 +184,24 @@ define([
 
     model = VerifyContract.prototype.conformance.call(self, model);
     model = VerifyContract.prototype.augmentModel.call(self, model);
-    
+
+    // properties =VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateOne']);
+    // properties +=VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateTwo']);
+    // properties +=VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateThree']);
+    // properties +=VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateFour']);
+    // console.log(properties);
+
     // test strings
-    type1properties = "bid#close; cancelABB|cancelRB#finish"
-    type2properties = "finish#close"
-    type3properties = "withdraw.msg.sender.transfer(amount) # withdraw.msg.sender.transfer(amount) # withdraw.pendingReturns[msg.sender]=0"
-    type4properties = "withdraw.pendingReturns[msg.sender]=0 # withdraw.msg.sender.transfer(amount)"
-    
-    VerifyContract.prototype.parseProperties.call(self, model, type1properties); 
-    VerifyContract.prototype.parseProperties.call(self, model, type2properties); 
-    VerifyContract.prototype.parseProperties.call(self, model, type3properties); 
-    VerifyContract.prototype.parseProperties.call(self, model, type4properties); 
-    
+    // type1properties = "bid#close; cancelABB|cancelRB#finish"
+    // type2properties = "finish#close"
+    // type3properties = "withdraw.msg.sender.transfer(amount) # withdraw.msg.sender.transfer(amount) # withdraw.pendingReturns[msg.sender]=0"
+    // type4properties = "withdraw.pendingReturns[msg.sender]=0 # withdraw.msg.sender.transfer(amount)"
+    //
+    // VerifyContract.prototype.parseProperties.call(self, model, type1properties);
+    // VerifyContract.prototype.parseProperties.call(self, model, type2properties);
+    // VerifyContract.prototype.parseProperties.call(self, model, type3properties);
+    // VerifyContract.prototype.parseProperties.call(self, model, type4properties);
+
     bipModel = ejs.render(ejsCache.contractType.complete, model);
 
     execSync = require('child_process').execSync;
@@ -231,13 +239,13 @@ define([
       }
 
   }
-  
+
   VerifyContract.prototype.parseProperties = function (model, properties) {
     var self = this,
-        parsedProperties, clauses, actions,       
+        parsedProperties, clauses, actions,
         property, clause, action, actionName,
         transitions, transition;
-        
+
     parsedProperties = [];
     for (property of properties.split(";")) {
       clauses = []; // collect all clauses for this property
@@ -246,9 +254,11 @@ define([
         for (action of clause.split("|")) {
           actionName = action.replace(/\s/g, "") // all comparisons will be whitespace-agnostic
           transitions = []
-          for (transition of model["transitions"]) // for each transition, check if it matches the action specification
+          for (transition of model["transitions"]) { // for each transition, check if it matches the action specification
+            //TODO: the following statement is not correct, we should not use includes for checking statement
             if ((transition['name'].replace(/\s/g, "") === actionName) || (transition['statements'].replace(/\s/g, "").includes(actionName)))
               transitions.push(transition['name']);
+            }
           if (transitions.length != 1) // action specification is ambiguous since multiple transitions match it
             throw "Ambiguous action: " + action;
           actions.push(transitions[0]); // single transition matches the action specification
@@ -257,7 +267,7 @@ define([
       }
       parsedProperties.push(clauses); // push this property
     }
-    return parseProperties;
+    return parsedProperties;
   }
 
   VerifyContract.prototype.conformance = function (model) {
