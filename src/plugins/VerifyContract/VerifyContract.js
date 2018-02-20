@@ -329,6 +329,7 @@ define([
 
   VerifyContract.prototype.augmentModel = function (model) {
     var self = this,
+        regexpTransfer = /\.\s*transfer\s*\(/,
         state,
         transition,
         augmentedStates = [],
@@ -350,7 +351,8 @@ define([
         'statements': "",
         'tags': transition['tags']
       });
-      if (false) // TODO: if statements cannot raise exception
+      
+      if (!regexpTransfer.test(transition['statements'])) // TODO: if statements cannot raise exception
         VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions,
           "{" + transition['statements'] + "}", transition['name'], transition['dst'], transition['dst'], transition['name']);
       else {
