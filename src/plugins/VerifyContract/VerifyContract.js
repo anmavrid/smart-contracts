@@ -114,6 +114,7 @@ define([
     var self = this,
         core = self.core,
         runbip2smv ='',
+        runNusmv = '',
         execSync,
         file,
         node,
@@ -189,7 +190,6 @@ define([
           }
           fs.writeFileSync(path + '/' + model.name+ '.bip', bipModel, 'utf8');
           runbip2smv = 'java -jar '+ process.cwd() + '/verificationTools/bip-to-nusmv.jar ' + path + '/' +   model.name + '.bip ' + path + '/' + model.name+ '.smv';
-          //console.log(runbip2smv);
 
           fs.writeFileSync(path + '/runbip2smv.sh', runbip2smv, 'utf8');
           self.sendNotification('Starting the BIP to NuSMV translation..');
@@ -200,13 +200,20 @@ define([
               throw e;
           }
           self.sendNotification('BIP to NuSMV translation successful.');
+          runNusmv = './'+ process.cwd() + '/verificationTools/nuxmv -r' + path + '/' + model.name+ '.smv >> output.txt';
+
+          fs.writeFileSync(path + '/runNusmv.sh', runNusmv, 'utf8');
+          self.sendNotification('Starting the NuSMV verification..');
+          try {
+              child = execSync('/bin/bash ' + path + '/runNusmv.sh');
+          } catch (e) {
+              self.logger.error('stderr ' + e.stderr);
+              throw e;
+          }
+          self.sendNotification('NuSMV verification successful.');
       }
 
   }
-
-  VerifyContract.prototype.runVerification = function(path, fs, fileName, fileValue){
-
-  };
 
   VerifyContract.prototype.conformance = function (model) {
     var self = this,
