@@ -272,7 +272,7 @@ define([
     for (transition of model['transitions']) {
       augmentedStates.push(transition['name']);
       augmentedTransitions.push({
-        'name': transition['name'] + '_guard',
+        'name': "a" + transition['name'] + '_guard',
         'src': transition['src'],
         'dst': transition['name'],
         'guards': transition['guards'],
@@ -286,7 +286,7 @@ define([
           "{" + transition['statements'] + "}", transition['name'], transition['dst'], transition['dst']);
       else {
         augmentedTransitions.push({
-          'name': transition['name'] + '_revert',
+          'name': "a" + transition['name'] + '_revert',
           'src': transition['name'],
           'dst': transition['src'],
           'guards': "revert", // TODO: this needs to be a special value
@@ -297,7 +297,7 @@ define([
         });
         augmentedStates.push(transition['name'] + "_no_revert");
         augmentedTransitions.push({
-          'name': transition['name'] + '_no_revert',
+          'name': "a" + transition['name'] + '_no_revert',
           'src': transition['name'],
           'dst': transition['name'] + '_no_revert',
           'guards': "no revert", // TODO: this needs to be a special value
@@ -341,7 +341,7 @@ define([
 
     if (body.length == 0) { // empty action
       augmentedTransitions.push({
-        'name': augmentedTransitions.length.toString(),
+        'name': "a" + augmentedTransitions.length.toString(),
         'src': src,
         'dst': dst,
         'guards': "",
@@ -357,7 +357,7 @@ define([
       if (parsedStatement["type"] == "BlockStatement") { // compound statement
         body = parsedStatement["body"];
         if (body.length > 1) {
-          state = augmentedStates.length.toString();
+          state = "s"+augmentedStates.length.toString();
           for (i = 1; i < body.length; i++)
             augmentedStates.push(state + "_" + i);
           VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions,
@@ -374,7 +374,7 @@ define([
         }
         else {
           augmentedTransitions.push({
-            'name': augmentedTransitions.length.toString(),
+            'name': "a" + augmentedTransitions.length.toString(),
             'src': src,
             'dst': dst,
             'guards': "",
@@ -387,7 +387,7 @@ define([
       }
       else if ((parsedStatement["type"] == "ExpressionStatement") || (parsedStatement["type"] == "VariableDeclaration") || (parsedStatement["type"] == "VariableDeclarationTuple")) {
         augmentedTransitions.push({
-          'name': augmentedTransitions.length.toString(),
+          'name': "a" + augmentedTransitions.length.toString(),
           'src': src,
           'dst': dst,
           'guards': "",
@@ -399,7 +399,7 @@ define([
       }
       else if (parsedStatement["type"] == "ReturnStatement") {
         augmentedTransitions.push({
-          'name': augmentedTransitions.length.toString(),
+          'name': "a" + augmentedTransitions.length.toString(),
           'src': src,
           'dst': ret,
           'guards': "",
@@ -411,11 +411,11 @@ define([
       }
       else if (parsedStatement["type"] == "IfStatement") {
         condition = code.substring(parsedStatement["test"]["start"], parsedStatement["test"]["end"]);
-        state = augmentedStates.length.toString();
+        state = "s" + augmentedStates.length.toString();
         // true branch
         augmentedStates.push(state + "_T");
         augmentedTransitions.push({
-          'name': augmentedTransitions.length.toString(),
+          'name': "a" + augmentedTransitions.length.toString(),
           'src': src,
           'dst': state + "_T",
           'guards': condition,
@@ -428,7 +428,7 @@ define([
           code.substring(parsedStatement["consequent"]["start"], parsedStatement["consequent"]["end"]), state + "_T", dst, ret);
         if (parsedStatement["alternate"] == null) { // no false branch
           augmentedTransitions.push({
-            'name': augmentedTransitions.length.toString(),
+            'name': "a" + augmentedTransitions.length.toString(),
             'src': src,
             'dst': dst,
             'guards': "!(" + condition + ")",
@@ -441,7 +441,7 @@ define([
         else { // false branch
           augmentedStates.push(state + "_F");
           augmentedTransitions.push({
-            'name': augmentedTransitions.length.toString(),
+            'name': "a" + augmentedTransitions.length.toString(),
             'src': src,
             'dst': state + "_F",
             'guards': "!(" + condition + ")",
@@ -455,7 +455,7 @@ define([
         }
       }
       else if (parsedStatement["type"] == "ForStatement") {
-        state = augmentedStates.length.toString();
+        state = "s" + augmentedStates.length.toString();
         condition = code.substring(parsedStatement["test"]["start"], parsedStatement["test"]["end"]);
         augmentedStates.push(state + "_I");
         augmentedStates.push(state + "_C");
@@ -463,7 +463,7 @@ define([
         VerifyContract.prototype.augmentStatement.call(self, augmentedStates, augmentedTransitions,
           code.substring(parsedStatement["init"]["start"], parsedStatement["init"]["end"]), src, state + "_I", ret);
         augmentedTransitions.push({
-          'name': augmentedTransitions.length.toString(),
+          'name': "a" + augmentedTransitions.length.toString(),
           'src': state + "_I",
           'dst': dst,
           'guards': "!(" + condition + ")",
@@ -473,7 +473,7 @@ define([
           'tags': ""
         });
         augmentedTransitions.push({
-          'name': augmentedTransitions.length.toString(),
+          'name': "a" + augmentedTransitions.length.toString(),
           'src': state + "_I",
           'dst': state + "_C",
           'guards': condition,
