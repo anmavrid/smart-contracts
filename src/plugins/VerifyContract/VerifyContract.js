@@ -134,7 +134,8 @@ define([
         properties = [],
         bipTransitionsToSMVNames =[],
         bipTransitionToSMVName,
-        transition,
+        propertiesSMV='', property,
+        transition, action, clauses =[],
         inINVAR = false,
         currentConfig = this.getCurrentConfig(),
         model, bipModel, runbip2smv, child;
@@ -224,11 +225,19 @@ define([
           self.sendNotification('BIP to NuSMV translation successful.');
 
           /* Get the properties specified by the user  */
-          //properties =VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateOne']);
+          if(currentConfig['templateOne']!=''){
+            properties =VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateOne']);
+            console.log(properties);
+            for (property of properties){
+              console.log(property);
+                  propertiesSMV += '-- AG ( ' + property[0] + '-> AG ( !' + property[1] + '))\n';
+                  console.log(propertiesSMV);
+            }
+          }
           // properties +=VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateTwo']);
           // properties +=VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateThree']);
           // properties +=VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateFour']);
-           //console.log(properties);
+
 
           runNusmv = '.' + '/verificationTools/nuXmv -r ' + path + '/' + model.name+ '.smv >> ' + path + '/output.txt';
 
@@ -260,9 +269,9 @@ define([
           actionName = action.replace(/\s/g, ""); // all comparisons will be whitespace-agnostic
           transitions = [];
           for (transition of model["transitions"]) { // for each transition, check if it matches the action specification
-            console.log(transition['actionName']);
+            //console.log(transition['actionName']);
             if (transition['actionName'] != undefined && transition['actionName'].replace(/\s/g, "") === actionName) {
-              transitions.push(transition['name']);
+              transitions.push(transition['actionName']);
             }
           }
           if (transitions.length != 1) // action specification is ambiguous since multiple transitions match it
