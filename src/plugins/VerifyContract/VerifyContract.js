@@ -135,7 +135,7 @@ define([
         bipTransitionsToSMVNames =[],
         bipTransitionToSMVName,
         propertiesSMV='', property,
-        transition, action, clauses =[],
+        transition, action, clause,
         inINVAR = false,
         currentConfig = this.getCurrentConfig(),
         model, bipModel, runbip2smv, child;
@@ -225,19 +225,47 @@ define([
           self.sendNotification('BIP to NuSMV translation successful.');
 
           /* Get the properties specified by the user  */
+          //Template one
           if(currentConfig['templateOne']!=''){
             properties =VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateOne']);
             console.log(properties);
             for (property of properties){
               console.log(property);
-                  propertiesSMV += '-- AG ( ' + property[0] + '-> AG ( !' + property[1] + '))\n';
+              propertiesSMV += '-- AG ( ';
+              for (clause of property[0]){
+                propertiesSMV += clause + "|"
+              }
+                propertiesSMV = propertiesSMV.slice(0,-1);
+                propertiesSMV += ' -> AG (!(';
+                for (clause of property[1]){
+                  propertiesSMV += clause + "|"
+                }
+                propertiesSMV = propertiesSMV.slice(0,-1);
+                propertiesSMV += ')))\n';
                   console.log(propertiesSMV);
             }
           }
-          // properties +=VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateTwo']);
-          // properties +=VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateThree']);
-          // properties +=VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateFour']);
 
+          //Template two
+          if(currentConfig['templateTwo']!=''){
+            properties =VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateTwo']);
+            console.log(properties);
+            for (property of properties){
+              console.log(property);
+              propertiesSMV += '-- A ( !(';
+              for (clause of property[0]){
+                propertiesSMV += clause + "|"
+              }
+                propertiesSMV = propertiesSMV.slice(0,-1);
+                propertiesSMV += ') W (';
+                for (clause of property[1]){
+                  propertiesSMV += clause + "|"
+                }
+                propertiesSMV = propertiesSMV.slice(0,-1);
+                propertiesSMV += '))\n';
+                  console.log(propertiesSMV);
+            }
+          }
 
           runNusmv = '.' + '/verificationTools/nuXmv -r ' + path + '/' + model.name+ '.smv >> ' + path + '/output.txt';
 
