@@ -136,7 +136,7 @@ define([
         bipTransitionToSMVName,
         propertiesSMV='', property,
         transition, action, clause,
-        inINVAR = false,
+        inINVAR = false, inModuleMain = false,
         currentConfig = this.getCurrentConfig(),
         model, bipModel, runbip2smv, child;
 
@@ -223,6 +223,25 @@ define([
               throw e;
           }
           self.sendNotification('BIP to NuSMV translation successful.');
+
+          var lineReader = require('readline').createInterface({
+            input: fs.createReadStream(path + '/' + model.name+ '.smv')
+          });
+
+          lineReader.on('line', function (line) {
+            console.log('Line from file0:', line);
+            if (line.includes("INVAR")){
+              inINVAR = true;
+            }
+            else if (line.includes("MODULE main")){
+              inModuleMain = true;
+            }
+            else if (inModuleMain && inINVAR){
+              console.log('Line from file1:', line);
+              line = line.slice( 0 , -1 );
+              console.log('Line from file2:', line);
+            }
+          });
 
           /* Get the properties specified by the user  */
           //Template one
