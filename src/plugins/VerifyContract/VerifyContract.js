@@ -189,17 +189,6 @@ define([
     model = VerifyContract.prototype.conformance.call(self, model);
     model = VerifyContract.prototype.augmentModel.call(self, model);
 
-    // test strings
-    // type1properties = "bid#close; cancelABB|cancelRB#finish"
-    // type2properties = "finish#close"
-    // type3properties = "withdraw.msg.sender.transfer(amount) # withdraw.msg.sender.transfer(amount) # withdraw.pendingReturns[msg.sender]=0"
-    // type4properties = "withdraw.pendingReturns[msg.sender]=0 # withdraw.msg.sender.transfer(amount)"
-    //
-    // VerifyContract.prototype.parseProperties.call(self, model, type1properties);
-    // VerifyContract.prototype.parseProperties.call(self, model, type2properties);
-    // VerifyContract.prototype.parseProperties.call(self, model, type3properties);
-    // VerifyContract.prototype.parseProperties.call(self, model, type4properties);
-
     bipModel = ejs.render(ejsCache.contractType.complete, model);
 
     execSync = require('child_process').execSync;
@@ -254,9 +243,7 @@ define([
           //Template one
           if(currentConfig['templateOne']!=''){
             properties =VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateOne']);
-            //console.log(properties);
             for (property of properties){
-              //console.log(property);
               propertiesSMV += '-- AG ( ';
               for (clause of property[0]){
                 propertiesSMV += clause + "|"
@@ -268,37 +255,58 @@ define([
                 }
                 propertiesSMV = propertiesSMV.slice(0,-1);
                 propertiesSMV += ')))\n';
-                  console.log(propertiesSMV);
+                //console.log(actionNamesToTransitionNames[clause]);
+                //console.log(bipTransitionsToSMVNames);
+                //console.log(bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]]);
+                propertiesSMV += 'CTLSPEC AG ( ';
+                 for (clause of property[0]){
+                   propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+                 }
+                   propertiesSMV = propertiesSMV.slice(0,-1);
+                   propertiesSMV += ' -> AG (!(';
+                   for (clause of property[1]){
+                     propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+                   }
+                   propertiesSMV = propertiesSMV.slice(0,-1);
+                   propertiesSMV += ')))\n\n';
+                   console.log(propertiesSMV);
             }
           }
 
           //Template two
           if(currentConfig['templateTwo']!=''){
             properties =VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateTwo']);
-            //console.log(properties);
             for (property of properties){
-              //console.log(property);
               propertiesSMV += '-- A ( !(';
               for (clause of property[0]){
-                propertiesSMV += clause + "|"
+                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
               }
                 propertiesSMV = propertiesSMV.slice(0,-1);
                 propertiesSMV += ') U (';
                 for (clause of property[1]){
-                  propertiesSMV += clause + "|"
+                  propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
                 }
                 propertiesSMV = propertiesSMV.slice(0,-1);
                 propertiesSMV += '))\n';
+                propertiesSMV += 'CTLSPEC A ( !(';
+                for (clause of property[0]){
+                  propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+                }
+                  propertiesSMV = propertiesSMV.slice(0,-1);
+                  propertiesSMV += ') U (';
+                  for (clause of property[1]){
+                    propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+                  }
+                  propertiesSMV = propertiesSMV.slice(0,-1);
+                  propertiesSMV += '))\n\n';
                   console.log(propertiesSMV);
             }
           }
 
           //Template three
-          if(currentConfig['templateThree']!=''){
-            properties =VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateThree']);
-            //console.log(properties);
+          if(currentConfig['templateFour']!=''){
+            properties =VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateFour']);
             for (property of properties){
-              //console.log(property);
               propertiesSMV += '-- AG (()';
               for (clause of property[0]){
                 propertiesSMV += clause + "|"
@@ -310,13 +318,24 @@ define([
                 }
                 propertiesSMV = propertiesSMV.slice(0,-1);
                 propertiesSMV += '))\n';
+                propertiesSMV += 'CTLSPEC AG (()';
+                for (clause of property[0]){
+                  propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+                }
+                  propertiesSMV = propertiesSMV.slice(0,-1);
+                  propertiesSMV += ') -> AF (';
+                  for (clause of property[1]){
+                    propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+                  }
+                  propertiesSMV = propertiesSMV.slice(0,-1);
+                  propertiesSMV += '))\n\n';
                   console.log(propertiesSMV);
             }
           }
 
-          //Template four
-          if(currentConfig['templateFour']!=''){
-            properties =VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateFour']);
+          //Template three
+          if(currentConfig['templateThree']!=''){
+            properties =VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateThree']);
             for (property of properties){
               propertiesSMV += '-- AG (';
               for (clause of property[0]){
@@ -334,6 +353,22 @@ define([
                 }
                 propertiesSMV = propertiesSMV.slice(0,-1);
                 propertiesSMV += ')]\n';
+                propertiesSMV += 'CTLSPEC AG (';
+                for (clause of property[0]){
+                  propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+                }
+                  propertiesSMV = propertiesSMV.slice(0,-1);
+                  propertiesSMV += ') -> AX A [ !(';
+                  for (clause of property[1]){
+                    propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+                  }
+                  propertiesSMV = propertiesSMV.slice(0,-1);
+                  propertiesSMV += ') U (';
+                  for (clause of property[2]){
+                    propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+                  }
+                  propertiesSMV = propertiesSMV.slice(0,-1);
+                  propertiesSMV += ')]\n\n';
                   console.log(propertiesSMV);
             }
           }
