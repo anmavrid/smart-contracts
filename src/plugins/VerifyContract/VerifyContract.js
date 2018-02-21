@@ -87,7 +87,7 @@ define([
           .then(function (nodes) {
             return VerifyContract.getVerificationResults(self, nodes, self.activeNode, fs, path);
         }). then(function () {
-          filesToAdd['finalOutput.txt'] = fs.readFileSync(path +'/finalOutput.txt','utf8');
+          filesToAdd['output.txt'] = fs.readFileSync(path +'/output.txt_translated.txt','utf8');
           artifact = self.blobClient.createArtifact('VerificationOutput');
           return artifact.addFiles(filesToAdd);
             })
@@ -138,7 +138,7 @@ define([
         transition, action, clause,
         inINVAR = false, inModuleMain = false,
         currentConfig = this.getCurrentConfig(),
-        model, bipModel, runbip2smv, child;
+        model, bipModel, runbip2smv, runsmv2bip, child;
 
     //console.log('verifyContract');
     node = nodes[contract];
@@ -227,7 +227,7 @@ define([
           var lineReader = require('readline').createInterface({
             input: fs.createReadStream(path + '/' + model.name+ '.smv')
           });
-          
+
           lineReader.on('line', function (line) {
             if (line.includes("INVAR") && inModuleMain){
               inINVAR = true;
@@ -241,8 +241,8 @@ define([
                 bipTransitionsToSMVNames[fields[10].substring(5)] = "(NuInteraction) = (" + fields[6] + ")";
               }
             }
-          });  
-          
+          });
+
           // temporary code that we might use
           var actionNamesToTransitionNames = {};
           for (transition of model['transitions'])
@@ -351,7 +351,7 @@ define([
           }
           self.sendNotification('NuSMV verification successful.');
 
-          runsmv2bip = 'java -jar '+ process.cwd() + '/verificationTools/smv2bip.jar ' + path + '/' +   model.name + '.smv ' + path + '/finalOutput.txt';
+          runsmv2bip = 'java -jar '+ process.cwd() + '/verificationTools/smv2bip.jar ' + path + '/' +   model.name + '.smv ' + path + '/output.txt';
 
           fs.writeFileSync(path + '/runsmv2bip.sh', runsmv2bip, 'utf8');
           self.sendNotification('Starting the NuSMV to BIP counterexamples translation..');
