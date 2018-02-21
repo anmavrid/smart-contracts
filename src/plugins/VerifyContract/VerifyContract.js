@@ -132,7 +132,7 @@ define([
         finalStates = [],
         transitions = [],
         properties = [],
-        bipTransitionsToSMVNames =[],
+        bipTransitionsToSMVNames = {},
         bipTransitionToSMVName,
         propertiesSMV='', property,
         transition, action, clause,
@@ -227,10 +227,9 @@ define([
           var lineReader = require('readline').createInterface({
             input: fs.createReadStream(path + '/' + model.name+ '.smv')
           });
-
+          
           lineReader.on('line', function (line) {
-            console.log('Line from file0:', line);
-            if (line.includes("INVAR")){
+            if (line.includes("INVAR") && inModuleMain){
               inINVAR = true;
             }
             else if (line.includes("MODULE main")){
@@ -238,10 +237,12 @@ define([
             }
             else if (inModuleMain && inINVAR){
               console.log('Line from file1:', line);
-              line = line.slice( 0 , -1 );
-              console.log('Line from file2:', line);
+              if (line.includes("Nu")) {
+                var fields = line.split(/\(|\)/);
+                bipTransitionsToSMVNames[fields[10]] = "(NuInteraction) = (" + fields[6] + ")";
+              }
             }
-          });
+          });                  
 
           /* Get the properties specified by the user  */
           //Template one
