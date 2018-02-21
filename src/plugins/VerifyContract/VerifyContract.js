@@ -212,8 +212,8 @@ define([
               throw e;
           }
           self.sendNotification('BIP to NuSMV translation successful.');
-          
-          for (var line of fs.readFileSync(path + '/' + model.name + '.smv', 'utf-8').split("\n")) {            
+
+          for (var line of fs.readFileSync(path + '/' + model.name + '.smv', 'utf-8').split("\n")) {
             if (line.includes("INVAR") && inModuleMain){
               inINVAR = true;
             }
@@ -227,13 +227,13 @@ define([
               }
             }
           }
-          
+
           // temporary code that we might use
           var actionNamesToTransitionNames = {};
           for (transition of model['transitions'])
             if (transition['actionName'] != undefined)
               actionNamesToTransitionNames[transition['actionName'].replace(/\s/g, "")] = transition['name'];
-          console.log(actionNamesToTransitionNames);
+          //console.log(actionNamesToTransitionNames);
 
           /* Get the properties specified by the user  */
           //Template one
@@ -265,7 +265,7 @@ define([
                    }
                    propertiesSMV = propertiesSMV.slice(0,-1);
                    propertiesSMV += ')))\n\n';
-                   console.log(propertiesSMV);
+                   //console.log(propertiesSMV);
             }
           }
 
@@ -295,7 +295,7 @@ define([
                   }
                   propertiesSMV = propertiesSMV.slice(0,-1);
                   propertiesSMV += '))\n\n';
-                  console.log(propertiesSMV);
+                  //console.log(propertiesSMV);
             }
           }
 
@@ -325,7 +325,7 @@ define([
                   }
                   propertiesSMV = propertiesSMV.slice(0,-1);
                   propertiesSMV += '))\n\n';
-                  console.log(propertiesSMV);
+                  //console.log(propertiesSMV);
             }
           }
 
@@ -365,7 +365,7 @@ define([
                   }
                   propertiesSMV = propertiesSMV.slice(0,-1);
                   propertiesSMV += ')]\n\n';
-                  console.log(propertiesSMV);
+                  //console.log(propertiesSMV);
             }
           }
           fs.appendFileSync(path + '/' + model.name+ '.smv', propertiesSMV);
