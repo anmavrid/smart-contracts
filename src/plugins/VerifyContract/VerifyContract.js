@@ -87,7 +87,7 @@ define([
           .then(function (nodes) {
             return VerifyContract.getVerificationResults(self, nodes, self.activeNode, fs, path);
         }). then(function () {
-          filesToAdd['output.text'] = fs.readFileSync(path +'/output.txt','utf8');
+          filesToAdd['finalOutput.txt'] = fs.readFileSync(path +'/finalOutput.txt','utf8');
           artifact = self.blobClient.createArtifact('VerificationOutput');
           return artifact.addFiles(filesToAdd);
             })
@@ -276,7 +276,7 @@ define([
                 propertiesSMV += clause + "|"
               }
                 propertiesSMV = propertiesSMV.slice(0,-1);
-                propertiesSMV += ') W (';
+                propertiesSMV += ') U (';
                 for (clause of property[1]){
                   propertiesSMV += clause + "|"
                 }
@@ -321,7 +321,7 @@ define([
                   propertiesSMV += clause + "|"
                 }
                 propertiesSMV = propertiesSMV.slice(0,-1);
-                propertiesSMV += ') W (';
+                propertiesSMV += ') U (';
                 for (clause of property[2]){
                   propertiesSMV += clause + "|"
                 }
@@ -330,6 +330,7 @@ define([
                   console.log(propertiesSMV);
             }
           }
+          fs.appendFileSync(path + '/' + model.name+ '.smv', propertiesSMV);
 
           runNusmv = '.' + '/verificationTools/nuXmv -r ' + path + '/' + model.name+ '.smv >> ' + path + '/output.txt';
 
@@ -342,9 +343,23 @@ define([
               throw e;
           }
           self.sendNotification('NuSMV verification successful.');
+
+          runsmv2bip = 'java -jar '+ process.cwd() + '/verificationTools/smv2bip.jar ' + path + '/' +   model.name + '.smv ' + path + '/finalOutput.txt';
+
+          fs.writeFileSync(path + '/runsmv2bip.sh', runsmv2bip, 'utf8');
+          self.sendNotification('Starting the NuSMV to BIP counterexamples translation..');
+          try {
+              child = execSync('/bin/bash ' + path + '/runsmv2bip.sh');
+          } catch (e) {
+              self.logger.error('stderr ' + e.stderr);
+              throw e;
+          }
+          self.sendNotification('NuSMV to BIP counterexamples translation successful.');
+
       }
 
-  }
+
+  };
 
   VerifyContract.prototype.parseProperties = function (model, properties) {
     var self = this,
