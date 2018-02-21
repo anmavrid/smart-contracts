@@ -236,13 +236,19 @@ define([
               inModuleMain = true;
             }
             else if (inModuleMain && inINVAR){
-              console.log('Line from file1:', line);
               if (line.includes("Nu")) {
                 var fields = line.split(/\(|\)/);
-                bipTransitionsToSMVNames[fields[10]] = "(NuInteraction) = (" + fields[6] + ")";
+                bipTransitionsToSMVNames[fields[10].substring(5)] = "(NuInteraction) = (" + fields[6] + ")";
               }
             }
-          });                  
+          });  
+          
+          // temporary code that we might use
+          var actionNamesToTransitionNames = {};
+          for (transition of model['transitions'])
+            if (transition['actionName'] != undefined)
+              actionNamesToTransitionNames[transition['actionName'].replace(/\s/g, "")] = transition['name'];
+          console.log(actionNamesToTransitionNames);
 
           /* Get the properties specified by the user  */
           //Template one
