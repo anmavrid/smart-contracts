@@ -212,12 +212,8 @@ define([
               throw e;
           }
           self.sendNotification('BIP to NuSMV translation successful.');
-
-          var lineReader = require('readline').createInterface({
-            input: fs.createReadStream(path + '/' + model.name+ '.smv')
-          });
-
-          lineReader.on('line', function (line) {
+          
+          for (var line of fs.readFileSync(path + '/' + model.name + '.smv', 'utf-8').split("\n")) {            
             if (line.includes("INVAR") && inModuleMain){
               inINVAR = true;
             }
@@ -230,8 +226,8 @@ define([
                 bipTransitionsToSMVNames[fields[10].substring(5)] = "(NuInteraction) = (" + fields[6] + ")";
               }
             }
-          });
-
+          }
+          
           // temporary code that we might use
           var actionNamesToTransitionNames = {};
           for (transition of model['transitions'])
