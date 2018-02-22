@@ -1,4 +1,4 @@
-# SmartContracts
+# SmartContracts - The FSolidM framework
 
 ## Quick Start
 First, install the following:
