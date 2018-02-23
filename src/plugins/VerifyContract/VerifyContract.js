@@ -129,18 +129,17 @@ define([
         pathToName = {},
         states = [],
         initialState,
+        actionNamesToTransitionNames = {},
         finalStates = [],
         transitions = [],
-        properties = [],
         bipTransitionsToSMVNames = {},
         bipTransitionToSMVName,
-        propertiesSMV='', property,
-        transition, action, clause,
+        propertiesSMV='',
+        transition, action,
         inINVAR = false, inModuleMain = false,
         currentConfig = this.getCurrentConfig(),
         model, bipModel, runbip2smv, runsmv2bip, child;
 
-    //console.log('verifyContract');
     node = nodes[contract];
     name = self.core.getAttribute(node, 'name');
 
@@ -228,145 +227,19 @@ define([
             }
           }
 
-          // temporary code that we might use
-          var actionNamesToTransitionNames = {};
-          for (transition of model['transitions'])
-            if (transition['actionName'] != undefined)
-              actionNamesToTransitionNames[transition['actionName'].replace(/\s/g, "")] = transition['name'];
-          //console.log(actionNamesToTransitionNames);
+          actionNamesToTransitionNames = VerifyContract.prototype.actionNamesToTransitions(model['transitions'], actionNamesToTransitionNames);
 
-          /* Get the properties specified by the user  */
-          //Template one
-          if(currentConfig['templateOne']!=''){
-            properties =VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateOne']);
-            for (property of properties){
-              propertiesSMV += '-- AG ( ';
-              for (clause of property[0]){
-                propertiesSMV += clause + "|"
-              }
-                propertiesSMV = propertiesSMV.slice(0,-1);
-                propertiesSMV += ' -> AG (!(';
-                for (clause of property[1]){
-                  propertiesSMV += clause + "|"
-                }
-                propertiesSMV = propertiesSMV.slice(0,-1);
-                propertiesSMV += ')))\n';
-                //console.log(actionNamesToTransitionNames[clause]);
-                //console.log(bipTransitionsToSMVNames);
-                //console.log(bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]]);
-                propertiesSMV += 'CTLSPEC AG ( ';
-                 for (clause of property[0]){
-                   propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
-                 }
-                   propertiesSMV = propertiesSMV.slice(0,-1);
-                   propertiesSMV += ' -> AG (!(';
-                   for (clause of property[1]){
-                     propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
-                   }
-                   propertiesSMV = propertiesSMV.slice(0,-1);
-                   propertiesSMV += ')))\n\n';
-                   //console.log(propertiesSMV);
-            }
+          if (currentConfig['templateOne']!=''){
+            propertiesSMV += VerifyContract.prototype.generateFirstTemplateProperties(currentConfig['templateOne'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
           }
-
-          //Template two
           if(currentConfig['templateTwo']!=''){
-            properties =VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateTwo']);
-            for (property of properties){
-              propertiesSMV += '-- A ( !(';
-              for (clause of property[0]){
-                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
-              }
-                propertiesSMV = propertiesSMV.slice(0,-1);
-                propertiesSMV += ') U (';
-                for (clause of property[1]){
-                  propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
-                }
-                propertiesSMV = propertiesSMV.slice(0,-1);
-                propertiesSMV += '))\n';
-                propertiesSMV += 'CTLSPEC A ( !(';
-                for (clause of property[0]){
-                  propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
-                }
-                  propertiesSMV = propertiesSMV.slice(0,-1);
-                  propertiesSMV += ') U (';
-                  for (clause of property[1]){
-                    propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
-                  }
-                  propertiesSMV = propertiesSMV.slice(0,-1);
-                  propertiesSMV += '))\n\n';
-                  //console.log(propertiesSMV);
-            }
+            propertiesSMV += VerifyContract.prototype.generateSecondTemplateProperties(currentConfig['templateTwo'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
           }
-
-          //Template three
-          if(currentConfig['templateFour']!=''){
-            properties =VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateFour']);
-            for (property of properties){
-              propertiesSMV += '-- AG (()';
-              for (clause of property[0]){
-                propertiesSMV += clause + "|"
-              }
-                propertiesSMV = propertiesSMV.slice(0,-1);
-                propertiesSMV += ') -> AF (';
-                for (clause of property[1]){
-                  propertiesSMV += clause + "|"
-                }
-                propertiesSMV = propertiesSMV.slice(0,-1);
-                propertiesSMV += '))\n';
-                propertiesSMV += 'CTLSPEC AG (()';
-                for (clause of property[0]){
-                  propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
-                }
-                  propertiesSMV = propertiesSMV.slice(0,-1);
-                  propertiesSMV += ') -> AF (';
-                  for (clause of property[1]){
-                    propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
-                  }
-                  propertiesSMV = propertiesSMV.slice(0,-1);
-                  propertiesSMV += '))\n\n';
-                  //console.log(propertiesSMV);
-            }
-          }
-
-          //Template three
           if(currentConfig['templateThree']!=''){
-            properties =VerifyContract.prototype.parseProperties.call(self, model, currentConfig['templateThree']);
-            for (property of properties){
-              propertiesSMV += '-- AG (';
-              for (clause of property[0]){
-                propertiesSMV += clause + "|"
-              }
-                propertiesSMV = propertiesSMV.slice(0,-1);
-                propertiesSMV += ') -> AX A [ !(';
-                for (clause of property[1]){
-                  propertiesSMV += clause + "|"
-                }
-                propertiesSMV = propertiesSMV.slice(0,-1);
-                propertiesSMV += ') U (';
-                for (clause of property[2]){
-                  propertiesSMV += clause + "|"
-                }
-                propertiesSMV = propertiesSMV.slice(0,-1);
-                propertiesSMV += ')]\n';
-                propertiesSMV += 'CTLSPEC AG (';
-                for (clause of property[0]){
-                  propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
-                }
-                  propertiesSMV = propertiesSMV.slice(0,-1);
-                  propertiesSMV += ') -> AX A [ !(';
-                  for (clause of property[1]){
-                    propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
-                  }
-                  propertiesSMV = propertiesSMV.slice(0,-1);
-                  propertiesSMV += ') U (';
-                  for (clause of property[2]){
-                    propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
-                  }
-                  propertiesSMV = propertiesSMV.slice(0,-1);
-                  propertiesSMV += ')]\n\n';
-                  //console.log(propertiesSMV);
-            }
+            propertiesSMV += VerifyContract.prototype.generateThirdTemplateProperties(currentConfig['templateThree'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
+          }
+          if(currentConfig['templateFour']!=''){
+            propertiesSMV += VerifyContract.prototype.generateFourthTemplateProperties(currentConfig['templateFour'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
           }
           fs.appendFileSync(path + '/' + model.name+ '.smv', propertiesSMV);
 
@@ -397,6 +270,168 @@ define([
       }
 
 
+  };
+
+  /* Get the properties specified by the user in Template One */
+  VerifyContract.prototype.generateFirstTemplateProperties = function (templateOne, model, bipTransitionsToSMVNames, actionNamesToTransitionNames){
+    var self = this,
+        properties = [],
+        property, clause,
+        propertiesSMV = '';
+
+    properties =VerifyContract.prototype.parseProperties.call(self, model, templateOne);
+    for (property of properties){
+      propertiesSMV += '-- AG ( ';
+      for (clause of property[1]){
+        propertiesSMV += clause + "|"
+      }
+        propertiesSMV = propertiesSMV.slice(0,-1);
+        propertiesSMV += ' -> AG (!(';
+        for (clause of property[0]){
+          propertiesSMV += clause + "|"
+        }
+        propertiesSMV = propertiesSMV.slice(0,-1);
+        propertiesSMV += ')))\n';
+        propertiesSMV += 'CTLSPEC AG ( ';
+         for (clause of property[1]){
+           propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+         }
+           propertiesSMV = propertiesSMV.slice(0,-1);
+           propertiesSMV += ' -> AG (!(';
+           for (clause of property[0]){
+             propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+           }
+           propertiesSMV = propertiesSMV.slice(0,-1);
+           propertiesSMV += ')))\n\n';
+    }
+    return propertiesSMV;
+  };
+
+  /* Get the properties specified by the user in Template Two */
+  VerifyContract.prototype.generateSecondTemplateProperties = function (templateTwo, model, bipTransitionsToSMVNames, actionNamesToTransitionNames){
+    var self = this,
+        properties = [],
+        property, clause,
+        propertiesSMV = '';
+
+    properties =VerifyContract.prototype.parseProperties.call(self, model, templateTwo);
+    for (property of properties){
+      propertiesSMV += '-- A ( !(';
+      for (clause of property[1]){
+        propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+      }
+        propertiesSMV = propertiesSMV.slice(0,-1);
+        propertiesSMV += ') U (';
+        for (clause of property[0]){
+          propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+        }
+        propertiesSMV = propertiesSMV.slice(0,-1);
+        propertiesSMV += '))\n';
+        propertiesSMV += 'CTLSPEC A ( !(';
+        for (clause of property[1]){
+          propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+        }
+          propertiesSMV = propertiesSMV.slice(0,-1);
+          propertiesSMV += ') U (';
+          for (clause of property[0]){
+            propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+          }
+          propertiesSMV = propertiesSMV.slice(0,-1);
+          propertiesSMV += '))\n\n';
+    }
+    return propertiesSMV;
+  };
+
+  /* Get the properties specified by the user in Template Three */
+  VerifyContract.prototype.generateThirdTemplateProperties = function (templateThree, model, bipTransitionsToSMVNames, actionNamesToTransitionNames){
+    var self = this,
+        properties = [],
+        property, clause,
+        propertiesSMV = '';
+
+        properties =VerifyContract.prototype.parseProperties.call(self, model, templateThree);
+        for (property of properties){
+          propertiesSMV += '-- AG (';
+          for (clause of property[0]){
+            propertiesSMV += clause + "|"
+          }
+            propertiesSMV = propertiesSMV.slice(0,-1);
+            propertiesSMV += ') -> AX A [ !(';
+            for (clause of property[1]){
+              propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0,-1);
+            propertiesSMV += ') U (';
+            for (clause of property[2]){
+              propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0,-1);
+            propertiesSMV += ')]\n';
+            propertiesSMV += 'CTLSPEC AG (';
+            for (clause of property[0]){
+              propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+            }
+              propertiesSMV = propertiesSMV.slice(0,-1);
+              propertiesSMV += ') -> AX A [ !(';
+              for (clause of property[1]){
+                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+              }
+              propertiesSMV = propertiesSMV.slice(0,-1);
+              propertiesSMV += ') U (';
+              for (clause of property[2]){
+                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+              }
+              propertiesSMV = propertiesSMV.slice(0,-1);
+              propertiesSMV += ')]\n\n';
+        }
+
+    return propertiesSMV;
+  };
+
+  /* Get the properties specified by the user in Template Four */
+  VerifyContract.prototype.generateFourthTemplateProperties = function (templateFour, model, bipTransitionsToSMVNames, actionNamesToTransitionNames){
+    var self = this,
+        properties = [],
+        property, clause,
+        propertiesSMV = '';
+
+    properties =VerifyContract.prototype.parseProperties.call(self, model, templateFour);
+    for (property of properties){
+      propertiesSMV += '-- AG (()';
+      for (clause of property[1]){
+        propertiesSMV += clause + "|"
+      }
+        propertiesSMV = propertiesSMV.slice(0,-1);
+        propertiesSMV += ') -> AF (';
+        for (clause of property[0]){
+          propertiesSMV += clause + "|"
+        }
+        propertiesSMV = propertiesSMV.slice(0,-1);
+        propertiesSMV += '))\n';
+        propertiesSMV += 'CTLSPEC AG (()';
+        for (clause of property[1]){
+          propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+        }
+          propertiesSMV = propertiesSMV.slice(0,-1);
+          propertiesSMV += ') -> AF (';
+          for (clause of property[0]){
+            propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+          }
+          propertiesSMV = propertiesSMV.slice(0,-1);
+          propertiesSMV += '))\n\n';
+    }
+    return propertiesSMV;
+    };
+
+  VerifyContract.prototype.actionNamesToTransitions = function (transitions, actionNamesToTransitionNames){
+    var self = this,
+        transition;
+    for (transition of transitions){
+      if (transition['actionName'] != undefined){
+        actionNamesToTransitionNames[transition['actionName'].replace(/\s/g, "")] = transition['name'];
+      }
+    }
+    return actionNamesToTransitionNames;
   };
 
   VerifyContract.prototype.parseProperties = function (model, properties) {
