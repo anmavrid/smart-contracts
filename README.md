@@ -1,6 +1,17 @@
 # SmartContracts - The FSolidM framework
 
-## Quick Start
+This repository contains the implementation of the FSolidM framework, which allows designing and generating secure Solidity smart contracts. FSolidM is built on [WebGME](http://github.com/webgme/webgme). 
+
+## Contents
+1. [What is FSolidM?](#what-is-fsolidm)
+2. [How to install FSolidM?](#how-to-install-fsolidm)
+
+## What is FSolidM?
+The adoption of blockchain-based distributed computation platforms is growing fast. Some of these platforms, such as Ethereum, provide support for implementing smart contracts, which are envisioned to have novel applications in a broad range of areas, including finance and Internet-of-Things. However, a significant number of smart contracts deployed in practice suffer from security vulnerabilities, which enable malicious users to steal assets from a contract or to cause damage. Vulnerabilities present a serious issue since contracts may handle financial assets of considerable value, and contract bugs are non-fixable by design.
+
+To help developers create more secure smart contracts, we introduce FSolidM, a framework rooted in rigorous semantics for designing contracts as Finite State Machines (FSM). We present a design studio for creating FSM on an easy-to-use graphical interface and for automatically generating Ethereum contracts. We have integrated in FSolidM a set of design patterns, which we implement as plugins that developers can easily add to their contracts to enhance security and functionality.
+
+## How to install FSolidM?
 First, install the following:
 - [NodeJS](https://nodejs.org/en/download/) (v4.x.x recommended)
 - [MongoDB](https://www.mongodb.com/download-center#production)
