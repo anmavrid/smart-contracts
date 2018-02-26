@@ -389,7 +389,7 @@ define([
             }
             propertiesSMV = propertiesSMV.slice(0,-1);
             propertiesSMV += ')]\n';
-            propertiesSMV += 'CTLSPEC AG (';
+            propertiesSMV += 'CTLSPEC AG ((';
             for (clause of property[0]){
               propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
             }
@@ -404,7 +404,7 @@ define([
                 propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
               }
               propertiesSMV = propertiesSMV.slice(0,-1);
-              propertiesSMV += '])\n\n';
+              propertiesSMV += ')])\n\n';
         }
 
     return propertiesSMV;
@@ -465,7 +465,7 @@ define([
         transition;
     for (transition of transitions){
       if (transition['actionName'] != undefined){
-        actionNamesToTransitionNames[transition['actionName'].replace(/\s/g, "")] = transition['name'];
+        actionNamesToTransitionNames[transition['actionName']] = transition['name'];
       }
     }
     return actionNamesToTransitionNames;
@@ -486,9 +486,13 @@ define([
           actionName = action.replace(/\s/g, ""); // all comparisons will be whitespace-agnostic
           transitions = [];
           for (transition of model["transitions"]) { // for each transition, check if it matches the action specification
-            //console.log(transition['actionName']);
-            if (transition['actionName'] != undefined && transition['actionName'].replace(/\s/g, "") === actionName) {
+            // if(transition['actionName']!= undefined){
+            //   console.log('1 '+transition['actionName'].replace(/[;\s]+/g,""));
+            // }
+            // console.log('2 '+actionName);
+            if (transition['actionName'] != undefined && transition['actionName'].replace(/[;\s]+/g,"") === actionName) {
               transitions.push(transition['actionName']);
+              //transitions.push(transition['actionName'].replace(/[;\s]+/g,""));
             }
           }
           if (transitions.length != 1) // action specification is ambiguous since multiple transitions match it
