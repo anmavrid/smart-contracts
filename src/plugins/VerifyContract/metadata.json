@@ -14,7 +14,7 @@
     {
       "name": "templateOne",
       "displayName": "Type 1: <action> cannot happen after <action>",
-      "description": "Specify actions separated by '#'. To add or clauses use '|'. To check many properties of this type, separate properties by ';'. For example, write p1#q1|q3;p2#q2 to check properties 1) p1 cannot happen after q1 or q3 and 2) p2 cannot happen after q2.",
+      "description": "Specify actions separated by '#'. Please omit ';', when writing an action if the action is a statement, e.g., write 'p=10' instead of 'p=10;'. To add or clauses use '|'. To check many properties of this type, separate properties by ';'. For example, write p1#q1|q3;p2#q2 to check properties 1) p1 cannot happen after q1 or q3 and 2) p2 cannot happen after q2.",
       "value": "",
       "valueType": "string",
       "readOnly": false,
@@ -23,7 +23,7 @@
     {
       "name": "templateTwo",
       "displayName": "Type 2: <action> can happen only after <action>",
-      "description": "Specify actions separated by '#'. To add or clauses use '|'. To check many properties of this type, separate properties by ';'.",
+      "description": "Specify actions separated by '#'. Please omit ';', when writing an action if the action is a statement, e.g., write 'p=10' instead of 'p=10;'. To add or clauses use '|'. To check many properties of this type, separate properties by ';'.",
       "value": "",
       "valueType": "string",
       "readOnly": false,
@@ -32,7 +32,7 @@
     {
       "name": "templateThree",
       "displayName": "Type 3: If <action> happens, <action> can happen only after <action> happens",
-      "description": "Specify actions separated by '#'. To add or clauses use '|'. To check many properties of this type, separate properties by ';'.",
+      "description": "Specify actions separated by '#'. Please omit ';', when writing an action if the action is a statement, e.g., write 'p=10' instead of 'p=10;'.  To add or clauses use '|'. To check many properties of this type, separate properties by ';'.",
       "value": "",
       "valueType": "string",
       "readOnly": false,
@@ -41,7 +41,7 @@
     {
       "name": "templateFour",
       "displayName": "Type 4: <action> will eventually happen after <action> happens",
-      "description": "Specify actions separated by '#'. To add or clauses use '|'. To check many properties of this type, separate properties by ';'.",
+      "description": "Specify actions separated by '#'. Please omit ';', when writing an action if the action is a statement, e.g., write 'p=10' instead of 'p=10;'. To add or clauses use '|'. To check many properties of this type, separate properties by ';'.",
       "value": "",
       "valueType": "string",
       "readOnly": false,

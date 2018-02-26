@@ -434,7 +434,7 @@ define([
 
     properties =VerifyContract.prototype.parseProperties.call(self, model, templateFour);
     for (property of properties){
-      propertiesSMV += '-- AG (()';
+      propertiesSMV += '-- AG ((';
       for (clause of property[1]){
         propertiesSMV += clause + "|"
       }
@@ -445,7 +445,7 @@ define([
         }
         propertiesSMV = propertiesSMV.slice(0,-1);
         propertiesSMV += '))\n';
-        propertiesSMV += 'CTLSPEC AG (()';
+        propertiesSMV += 'CTLSPEC AG ((';
         for (clause of property[1]){
           propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
         }
@@ -483,7 +483,7 @@ define([
       for (clause of property.split("#")) {
         actions = []; // collect all actions for this clause
         for (action of clause.split("|")) {
-          actionName = action.replace(/\s/g, ""); // all comparisons will be whitespace-agnostic
+          actionName = action.replace(/\s/g,""); // all comparisons will be whitespace-agnostic
           transitions = [];
           for (transition of model["transitions"]) { // for each transition, check if it matches the action specification
             // if(transition['actionName']!= undefined){
