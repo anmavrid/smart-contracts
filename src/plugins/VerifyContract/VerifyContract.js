@@ -225,6 +225,9 @@ define([
               }
             }
           }
+          // for (transition of model["transitions"]) {
+          //   console.log(transition['actionName']);
+          // }
           actionNamesToTransitionNames = VerifyContract.prototype.actionNamesToTransitions(model['transitions'], actionNamesToTransitionNames);
           if (currentConfig['templateTwo'] != '' || currentConfig['templateThree']!=''){
             fairnessProperties = 'FAIRNESS ( ';
@@ -318,7 +321,7 @@ define([
     }
     return propertiesSMV;
   };
-  
+
   /* Get the textual properties specified by the user in Template One */
   VerifyContract.prototype.generateFirstTemplatePropertiesTxt = function (templateOne, model, bipTransitionsToSMVNames, actionNamesToTransitionNames){
     var self = this,
@@ -339,7 +342,7 @@ define([
         }
         propertiesSMV = propertiesSMV.slice(0,-1);
         propertiesSMV += ')\n';
-       
+
     }
     return propertiesSMV;
   };
@@ -354,23 +357,23 @@ define([
     properties =VerifyContract.prototype.parseProperties.call(self, model, templateTwo);
     for (property of properties){
       propertiesSMV += '-- A [ !(';
-      for (clause of property[1]){
+      for (clause of property[0]){
         propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
       }
         propertiesSMV = propertiesSMV.slice(0,-1);
         propertiesSMV += ') U (';
-        for (clause of property[0]){
+        for (clause of property[1]){
           propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
         }
         propertiesSMV = propertiesSMV.slice(0,-1);
         propertiesSMV += ')]\n';
         propertiesSMV += 'CTLSPEC A [ !(';
-        for (clause of property[1]){
+        for (clause of property[0]){
           propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
         }
           propertiesSMV = propertiesSMV.slice(0,-1);
           propertiesSMV += ') U (';
-          for (clause of property[0]){
+          for (clause of property[1]){
             propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
           }
           propertiesSMV = propertiesSMV.slice(0,-1);
@@ -378,7 +381,7 @@ define([
     }
     return propertiesSMV;
   };
-  
+
   /* Get the properties specified by the user in Template Two */
   VerifyContract.prototype.generateSecondTemplatePropertiesTxt = function (templateTwo, model, bipTransitionsToSMVNames, actionNamesToTransitionNames){
     var self = this,
@@ -490,7 +493,7 @@ define([
             }
             propertiesSMV = propertiesSMV.slice(0,-1);
             propertiesSMV += ') happens\n';
-           
+
         }
 
     return propertiesSMV;
@@ -544,7 +547,7 @@ define([
     }
     return propertiesSMV;
     };
-    
+
     /* Get the properties specified by the user in Template Four */
     VerifyContract.prototype.generateFourthTemplatePropertiesTxt = function (templateFour, model, bipTransitionsToSMVNames, actionNamesToTransitionNames){
       var self = this,
@@ -604,8 +607,12 @@ define([
               //transitions.push(transition['actionName'].replace(/[;\s]+/g,""));
             }
           }
-          if (transitions.length != 1) // action specification is ambiguous since multiple transitions match it
-            throw "Ambiguous action: " + action;
+          if (transitions.length != 1) {// action specification is ambiguous since multiple transitions match it
+            if(transitions.length== 0){
+              throw "Could not find action: " + action + " Possible reason: Statement was specified without function name.";
+            }
+            throw "Ambiguous action (multiple instances occured): " + action;
+          }
           actions.push(transitions[0]); // single transition matches the action specification
         }
         clauses.push(actions); // push this clause
