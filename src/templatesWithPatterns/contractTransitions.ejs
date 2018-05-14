@@ -6,8 +6,10 @@ function <%- transitions[i].name%> (<%-transitions[i].input%><% if(counter) { %>
     require(state == States.<%- transitions[i].src %>);
   <%if (transitions[i].guards != '') {%> //Guards
     require(<%- transitions[i].guards %>); <% } %>  <%if (transitions[i].statements != '') {%>
+    //State change
+    state = States.InTransition;
     //Actions
-    <%- transitions[i].statements %> <% } %>  <%if (transitions[i].src != transitions[i].dst) {%>
+    <%- transitions[i].statements %> <% } %>  <%if (transitions[i].src != transitions[i].dst || transitions[i].statements != '') {%>
     //State change
     state = States.<%- transitions[i].dst %>; <% } %>
 }

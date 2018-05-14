@@ -43,10 +43,13 @@ define(['q'], function (Q) {
         model.path = core.getPath(contractNode);
         model.name = core.getAttribute(contractNode, 'name');
         model.definitions = core.getAttribute(contractNode, 'definitions');
+        model.initialAction = core.getAttribute(contractNode, 'initialAction');
+        model.fallbackAction = core.getAttribute(contractNode, 'fallbackAction');
         model.initial = '';
         model.transitions = [];
         model.timedTrans= [];
         model.states = [];
+        model.finalStates = [];
         //model.guards = [];
 
         core.loadChildren(contractNode)
@@ -77,6 +80,9 @@ define(['q'], function (Q) {
                             break;
                         case 'State':
                             model.states.push(childModel);
+                            break;
+                        case 'FinalState':
+                            model.finalStates.push(childModel);
                             break;
                     }
                 }

@@ -11,7 +11,8 @@ define([
     'use strict';
     var META_TO_TEMPLATE = {
         State: STATE_SVG,
-        InitialState: STATE_SVG
+        InitialState: STATE_SVG,
+        FinalState: STATE_SVG
     };
 
     function ContractStateDecoratorCore() {
@@ -123,6 +124,9 @@ define([
         // If state is InitialState then, the border color is red
         if (this.metaTypeName === 'InitialState') {
             this.skinParts.$svg.find('circle').css('stroke', 'red');
+        }
+        else if (this.metaTypeName === 'FinalState') {
+            this.skinParts.$svg.find('circle').css('stroke', 'blue');
         }
     };
 

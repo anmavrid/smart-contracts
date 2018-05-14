@@ -26,8 +26,8 @@ define(['scsrc/bower_components/codemirror/lib/codemirror',
             segments: {}
         };
         this._wholeDocument = null;
-        this._autoSaveTimer = null;
-        this._autoSaveInterval = 20000;
+        //this._autoSaveTimer = null;
+        //this._autoSaveInterval = 20000;
 
         this._initialize();
         this._logger.debug('ctor finished');
@@ -36,6 +36,7 @@ define(['scsrc/bower_components/codemirror/lib/codemirror',
     SolidityCodeEditorWidget.prototype._initialize = function () {
         var self = this,
           saving = function () {
+            //self._save();
             self._autoSave();
         };
 
@@ -44,10 +45,10 @@ define(['scsrc/bower_components/codemirror/lib/codemirror',
 
         //handling the ctrl+S / cmd+S key pressing
         CodeMirror.commands.save = function (editor) {
-            if (self._autoSaveTimer) {
-                clearTimeout(self._autoSaveTimer);
+            //if (self._autoSaveTimer) {
+                //clearTimeout(self._autoSaveTimer);
                 saving();
-            }
+            //}
         };
 
         // The code editor.
@@ -67,14 +68,26 @@ define(['scsrc/bower_components/codemirror/lib/codemirror',
 
         $(this.editor.getWrapperElement()).addClass('code-editor');
         this._wholeDocument = this.editor.getDoc();
+        // this._wholeDocument.on('beforeChange', function(doc, changeObj){
+        //   var markers = doc.findMarksAt(changeObj.from),
+        //       i;
+        //   for (i = 0; i <markers.length; i += 1) {
+        //     if (markers[i].readonly){
+        //       changeObj.cancel();
+        //     }
+        //   }
+        // });
         this._wholeDocument.on('change', function (/*doc,changeObj*/) {
-            self.editor.clearGutter(SYNTAX_GUTTER);
-            if (self._autoSaveTimer) {
-                clearTimeout(self._autoSaveTimer);
-                self._autoSaveTimer = setTimeout(saving, self._autoSaveInterval);
-            }
-            self._autoSaveTimer = setTimeout(saving, self._autoSaveInterval);
+          self.editor.clearGutter(SYNTAX_GUTTER);
         });
+        // this._wholeDocument.on('change', function (/*doc,changeObj*/) {
+        //     self.editor.clearGutter(SYNTAX_GUTTER);
+        //     if (self._autoSaveTimer) {
+        //         clearTimeout(self._autoSaveTimer);
+        //         self._autoSaveTimer = setTimeout(saving, self._autoSaveInterval);
+        //     }
+        //     self._autoSaveTimer = setTimeout(saving, self._autoSaveInterval);
+        // });
     };
 
     SolidityCodeEditorWidget.prototype._setSyntaxError = function (lineNumber, message) {
@@ -92,9 +105,9 @@ define(['scsrc/bower_components/codemirror/lib/codemirror',
     };
 
     /* * * * * * * * Visualizer event handlers * * * * * * * */
-    SolidityCodeEditorWidget.prototype.onSave = function (/*segmentedDocumentObject*/) {
-        this._logger.info('The onSave event is not overwritten!');
-    };
+    // SolidityCodeEditorWidget.prototype.onSave = function (/*segmentedDocumentObject*/) {
+    //     this._logger.info('The onSave event is not overwritten!');
+    // };
 
     /* * * * * * * * Complex document management services  * * * * */
     SolidityCodeEditorWidget.prototype.setDocumentSegment = function (segmentName, segmentValue) {
@@ -160,10 +173,10 @@ define(['scsrc/bower_components/codemirror/lib/codemirror',
                     this._setSyntaxError(segmentedDocumentObject.errors[i].line, segmentedDocumentObject.errors[i].message);
                 }
             }
-            if (this._autoSaveTimer) {
-                clearTimeout(this._autoSaveTimer);
-                this._autoSaveTimer = null;
-            }
+            // if (this._autoSaveTimer) {
+            //     clearTimeout(this._autoSaveTimer);
+            //     this._autoSaveTimer = null;
+            // }
         };
 
     SolidityCodeEditorWidget.prototype.getDocument = function () {
@@ -270,25 +283,37 @@ define(['scsrc/bower_components/codemirror/lib/codemirror',
             }
         };
 
+    // SolidityCodeEditorWidget.prototype._autoSave = function () {
+    //     var changedSegments = this.getChangedSegments(),
+    //       segment;
+    //
+    //     this._autoSaveTimer = null;
+    //     if (Object.keys(changedSegments).length > 0) {
+    //         for (segment in changedSegments) {
+    //             this._segmentedDocument.segments[segment].value = changedSegments[segment];
+    //         }
+    //
+    //         this.onSave(changedSegments);
+    //     }
+    // };
+
     SolidityCodeEditorWidget.prototype._autoSave = function () {
-        var changedSegments = this.getChangedSegments(),
+      var changedSegments = this.getChangedSegments(),
           segment;
 
-        this._autoSaveTimer = null;
-        if (Object.keys(changedSegments).length > 0) {
-            for (segment in changedSegments) {
-                this._segmentedDocument.segments[segment].value = changedSegments[segment];
-            }
-
-            this.onSave(changedSegments);
+      if (Object.keys(changedSegments).length > 0) {
+        for (segment in changedSegments) {
+          this._segmentedDocument.segments[segment].value = changedSegments[segment];
         }
+        this.onSave(changedSegments);
+      }
     };
 
     /* * * * * * * * Visualizer life cycle callbacks * * * * * * * */
     SolidityCodeEditorWidget.prototype.destroy = function () {
-        if (this._autoSaveTimer) {
-            this._autoSave();
-        }
+      //  if (this._autoSaveTimer) {
+            //this._autoSave();
+        //}
     };
 
     SolidityCodeEditorWidget.prototype.onActivate = function () {
@@ -297,9 +322,9 @@ define(['scsrc/bower_components/codemirror/lib/codemirror',
 
     SolidityCodeEditorWidget.prototype.onDeactivate = function () {
       this._logger.debug('SolidityCodeEditorWidget has been deactivated');
-      if (this._autoSaveTimer) {
-          this._autoSave();
-      }
+      //if (this._autoSaveTimer) {
+          //this._autoSave();
+    //  }
     };
     return SolidityCodeEditorWidget;
 });

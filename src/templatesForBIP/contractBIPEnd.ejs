@@ -1,0 +1,15 @@
+end
+
+compound type globModel
+
+  component <%- name %> BAUC
+
+  <%for(var i = 0;i < transitions.length; i += 1) {%>
+  connector SINGLE BAUC_<%- transitions[i].name %> ( BAUC.<%- transitions[i].name %> )
+  <% } %>
+
+  end
+
+  component globModel Root
+
+  end

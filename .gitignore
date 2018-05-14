@@ -3,6 +3,10 @@
 # Logs
 logs
 *.log
+projectOutputs
+*.model
+*.timod
+.DS_Store
 
 # Runtime data
 pids

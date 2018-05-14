@@ -23,7 +23,7 @@
     "chai": "^3.0.0"
   },
   "dependencies": {
-    "webgme": "^2.22.1"
+    "webgme": "^2.23.0"
   },
   "license": "MIT"
 }
