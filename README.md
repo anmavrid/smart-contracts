@@ -5,6 +5,7 @@ This repository contains the implementation of the FSolidM framework, which allo
 ## Contents
 1. [What is FSolidM?](#what-is-fsolidm)
 2. [How to install FSolidM?](#how-to-install-fsolidm)
+3. [Features of VeriSolid](#features)
 
 ## What is FSolidM?
 The adoption of blockchain-based distributed computation platforms is growing fast. Some of these platforms, such as Ethereum, provide support for implementing smart contracts, which are envisioned to have novel applications in a broad range of areas, including finance and Internet-of-Things. However, a significant number of smart contracts deployed in practice suffer from security vulnerabilities, which enable malicious users to steal assets from a contract or to cause damage. Vulnerabilities present a serious issue since contracts may handle financial assets of considerable value, and contract bugs are non-fixable by design.
@@ -54,3 +55,27 @@ After the webgme server is up and there are no error messages in the console, op
 
 Click `Create New…` to create a new project.
 After entering a project name of your choice, import the seed `SC` to start working on smart contracts!
+
+## Features
+
+* Collaborative, automatically versioned web-based development.
+
+![Project history view with branching and tagging](./img/S1.png)
+
+* Dedicated Transition System Editors. In the upper left corner you can see the plugins offered by the tool for: 1) adding functionality through design patterns; 2) generating Solidity code and 3) verifying smart contracts.
+
+![TS model editors](./img/S2.png)
+
+* Fully integrated Solidity code development.
+
+![Solidity development](./img/S3.png)
+
+* Templates for writing security properties in natural language when running the VerifyContract plugin. If no property is specified the tool still verifies deadlock-freedom. We have integrated BIP and NuSMV verification tools.
+
+![Safety properties](./img/S4.png)
+
+* The verification results are returned to the user. If a security property is not true, VeriSolid returns a counter-example that invalidates the property.
+
+![Verification](./img/S5.png)
+
+* Embeddable documentation at every level of the model.
