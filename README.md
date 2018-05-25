@@ -56,7 +56,7 @@ After the webgme server is up and there are no error messages in the console, op
 Click `Create New…` to create a new project.
 After entering a project name of your choice, import the seed `SC` to start working on smart contracts!
 
-IMPORTANT: To use the VerifyContract plugin, please download the nuXmv tool from https://es-static.fbk.eu/tools/nuxmv/index.php?n=Download.Download and just add it in the smart-contracts/verificationTools folder.
+IMPORTANT: To use the VerifyContract plugin, please download the nuXmv tool (version 1.1.1) from https://es-static.fbk.eu/tools/nuxmv/index.php?n=Download.Download and just add it in the smart-contracts/verificationTools folder.
 
 ## Features
 
