@@ -141,6 +141,9 @@ define([
         model, bipModel, runbip2smv, runsmv2bip, child,
         propertiesTxt='';
 
+    if (!fs.existsSync('./verificationTools/nuXmv')) {
+      throw new Error('The NuSMV tool was not added. Please follow the instructions of the README file to add the NuSMV tool.');
+    }
     node = nodes[contract];
     name = self.core.getAttribute(node, 'name');
 
