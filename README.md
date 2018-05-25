@@ -56,6 +56,8 @@ After the webgme server is up and there are no error messages in the console, op
 Click `Create New…` to create a new project.
 After entering a project name of your choice, import the seed `SC` to start working on smart contracts!
 
+IMPORTANT: To use the VerifyContract plugin, please download the nuXmv tool from https://es-static.fbk.eu/tools/nuxmv/index.php?n=Download.Download and just add it in the smart-contracts/verificationTools folder.
+
 ## Features
 
 * Collaborative, automatically versioned web-based development.
@@ -70,7 +72,7 @@ After entering a project name of your choice, import the seed `SC` to start work
 
 ![Solidity development](./img/S3.png)
 
-* Templates for writing security properties in natural language when running the VerifyContract plugin. If no property is specified the tool still verifies deadlock-freedom. We have integrated BIP and NuSMV verification tools.
+* Templates for writing security properties in natural language when running the VerifyContract plugin. If no property is specified the tool still verifies deadlock-freedom. 
 
 ![Safety properties](./img/S4.png)
 
