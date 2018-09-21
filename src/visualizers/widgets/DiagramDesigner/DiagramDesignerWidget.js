@@ -37,6 +37,7 @@ define([
     './DiagramDesignerWidget.Tabs',
     './DiagramDesignerWidget.Print',
     'js/Utils/ComponentSettings',
+    'js/Utils/SvgManager',
     'css!./styles/DiagramDesignerWidget.css'
 ], function (Logger,
              CONSTANTS,
@@ -66,7 +67,8 @@ define([
              DiagramDesignerWidgetMouse,
              DiagramDesignerWidgetTabs,
              DiagramDesignerWidgetPrint,
-             ComponentSettings) {
+             ComponentSettings,
+             SvgManager) {
 
     'use strict';
 
@@ -498,7 +500,7 @@ define([
             'stroke-dasharray': pattern
         });
 
-        return el;
+        return SvgManager.sanitizeSvgForEdge(el);
     };
 
     DiagramDesignerWidget.prototype._attachScrollHandler = function (el) {
