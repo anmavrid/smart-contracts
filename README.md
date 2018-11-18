@@ -1,6 +1,6 @@
-# SmartContracts - The FSolidM framework
+# Correct-by-Design Smart Contracts - The FSolidM / VeriSolid framework
 
-This repository contains the implementation of the FSolidM framework, which allows designing and generating secure Solidity smart contracts. FSolidM is built on [WebGME](http://github.com/webgme/webgme). 
+This repository contains the implementation of the FSolidM / VeriSolid framework, which allows designing and generating secure Solidity smart contracts. FSolidM / VeriSolid is built on [WebGME](http://github.com/webgme/webgme). A hosted version of FSolidM is available online on [CPS-VO](http://cps-vo.org/group/SmartContracts) for non-commercial and academic use.
 
 ## Contents
 1. [What is FSolidM?](#what-is-fsolidm)
