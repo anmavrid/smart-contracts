@@ -131,7 +131,7 @@ define([
                 segmentedDocument.composition.push(fullSegmentId);
                 segmentedDocument.segments[fullSegmentId] = {
                     value: ejs.render(ejsCache.contractType[segmentId], segmentModel),
-                    options: {readonly: readonly === true}
+                    options: {readonly: readonly === false}
                 };
               return fullSegmentId;
             },

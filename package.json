@@ -2,6 +2,7 @@
   "name": "smartcontracts",
   "scripts": {
     "start": "node app.js",
+    "dev": "nodemon app.js",
     "test": "node ./node_modules/mocha/bin/mocha --recursive test",
     "apply": "node ./node_modules/webgme/src/bin/apply.js",
     "diff": "node ./node_modules/webgme/src/bin/diff.js",
@@ -23,6 +24,7 @@
     "chai": "^3.0.0"
   },
   "dependencies": {
+    "nodemon": "^1.19.1",
     "webgme": "^2.23.0"
   },
   "license": "MIT"
