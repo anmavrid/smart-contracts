@@ -23,7 +23,6 @@ define(['q',
         SolidityCodeEditorWidget = function (logger, container, client) {
             this._logger = logger.fork('Widget');
             this._client = client;
-            console.log(Q);
             this._el = container;
             this._segmentedDocument = {
                 composition: [],
@@ -344,24 +343,49 @@ define(['q',
             //Creating initial state
             var initialState = self._client.createChild({parentId: node.getId(), baseId: '/m/z'});
 
-            //Adding fallback transition for input state
-            var transition = self._client.createChild({parentId: node.getId(), baseId: '/m/A'});
             var fNames = this.getAllFunctions();
-            self._client.setAttribute(transition, 'name', fNames.join(','));
-            self._client.setPointer(transition, 'src', initialState);
-            self._client.setPointer(transition, 'dst', initialState);
-
+            fNames.forEach(fn => {
+                var transition = self._client.createChild({parentId: node.getId(), baseId: '/m/A'});
+            
+                self._client.setAttribute(transition, 'name', fn.name);
+                self._client.setPointer(transition, 'src', initialState);
+                self._client.setPointer(transition, 'dst', initialState);
+                if(fn.modifiers.length > 0){
+                    self._client.setAttribute(transition, 'guards', fn.modifiers.join(','));
+                }
+            });
+            
             self._client.completeTransaction();
         };
 
+        
         SolidityCodeEditorWidget.prototype.getAllFunctions = function () {
-            var codeContent = this._wholeDocument.getValue();
-            var functionsList = codeContent.match(/function [a-zA-Z]+/g);
-            var fNames = functionsList.map(fname => fname.replace('function ', ''));
-            var fallback = codeContent.match(/function\(\)/g);
-            if(fallback.length > 0) {
-                fNames.push('fallback');
+            var codeContent = this._wholeDocument.getValue().replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*/g, '');
+            //Get all modifier names
+            var modifiersList = codeContent.match(/modifier [^\{}]*/g);
+            var mNames = [];  
+            if(modifiersList){
+                mNames = modifiersList.map(fname => fname.match(/modifier [^\()]*/g)[0].replace('modifier ', ''));
             }
+            
+            //Get all function names
+            var fNames = [];
+            var functionDefinitionList = codeContent.match(/function [^\{}]*/g);
+            if(functionDefinitionList){
+                functionDefinitionList.forEach(fd => {
+                    var fName = {};
+                    fName.name = fd.match(/function [^\()]*/g)[0].replace('function ', '');
+                    fName.modifiers = [];
+
+                    mNames.forEach(mn => {
+                        if(fd.indexOf(mn) !== -1){
+                            fName.modifiers.push(mn);
+                        }
+                    });
+                    fNames.push(fName);
+                });
+            }
+
             return fNames;
         };
 
