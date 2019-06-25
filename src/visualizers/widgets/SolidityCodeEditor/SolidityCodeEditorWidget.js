@@ -29,6 +29,8 @@ define(['q',
                 segments: {}
             };
             this._wholeDocument = null;
+            this._fsmGenerated = false;
+            this._fNames = [];
             //this._autoSaveTimer = null;
             //this._autoSaveInterval = 20000;
 
@@ -253,6 +255,7 @@ define(['q',
             this.editor.refresh();
             this._wholeDocument.setCursor(oldCursorPosition);
             this.editor.scrollTo(oldScrollInfo.left, oldScrollInfo.top);
+            if (this._fsmGenerated) this.updateFunctionBody();
         };
 
         SolidityCodeEditorWidget.prototype._setSegmentReadOnly = function (segmentName, readOnly) {
@@ -333,60 +336,113 @@ define(['q',
 
         //Start creating FSM on save
         SolidityCodeEditorWidget.prototype._onSave = function () {
-            var self = this,
-                core,
-                deferred = Q.defer();
-
-            var node = self._client.getNode(WebGMEGlobal.State.getActiveObject());
-            self._client.startTransaction();
-
-            //Creating initial state
-            var initialState = self._client.createChild({parentId: node.getId(), baseId: '/m/z'});
-
-            var fNames = this.getAllFunctions();
-            fNames.forEach(fn => {
-                var transition = self._client.createChild({parentId: node.getId(), baseId: '/m/A'});
-            
-                self._client.setAttribute(transition, 'name', fn.name);
-                self._client.setPointer(transition, 'src', initialState);
-                self._client.setPointer(transition, 'dst', initialState);
-                if(fn.modifiers.length > 0){
-                    self._client.setAttribute(transition, 'guards', fn.modifiers.join(','));
-                }
-            });
-            
-            self._client.completeTransaction();
+            this.createFSM();
         };
 
-        
+
         SolidityCodeEditorWidget.prototype.getAllFunctions = function () {
             var codeContent = this._wholeDocument.getValue().replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*/g, '');
             //Get all modifier names
             var modifiersList = codeContent.match(/modifier [^\{}]*/g);
-            var mNames = [];  
-            if(modifiersList){
-                mNames = modifiersList.map(fname => fname.match(/modifier [^\()]*/g)[0].replace('modifier ', ''));
+            var mNames = [];
+            if (modifiersList) {
+                for (var i = 0; i < modifiersList.length; i++) {
+                    var mName = {};
+                    mName.name = modifiersList[i].match(/modifier [^\()]*/g)[0].replace('modifier ', '');
+
+                    if(i != modifiersList.length-1){
+                        var body = codeContent.substring(codeContent.indexOf(modifiersList[i]) + modifiersList[i].length + 1, codeContent.indexOf(modifiersList[i + 1]));
+                        body = body.trim().substring(0, body.length - 2);
+                        mName.condition = body;
+                    } else {
+                        var body = codeContent.substring(codeContent.indexOf(modifiersList[i]) + modifiersList[i].length + 1, codeContent.length - 1);
+                        body = body.trim().substring(0, body.length - 2);
+                        mName.condition = body;
+                    }
+                    mNames.push(mName);
+                }
             }
-            
+
             //Get all function names
             var fNames = [];
             var functionDefinitionList = codeContent.match(/function [^\{}]*/g);
-            if(functionDefinitionList){
-                functionDefinitionList.forEach(fd => {
+            if (functionDefinitionList) {
+                for (var i = 0; i < functionDefinitionList.length; i++) {
                     var fName = {};
-                    fName.name = fd.match(/function [^\()]*/g)[0].replace('function ', '');
+                    fName.definition = functionDefinitionList[i];
+                    fName.name = functionDefinitionList[i].match(/function [^\()]*/g)[0].replace('function ', '');
                     fName.modifiers = [];
 
                     mNames.forEach(mn => {
-                        if(fd.indexOf(mn) !== -1){
-                            fName.modifiers.push(mn);
+                        if (functionDefinitionList[i].indexOf(mn.name) !== -1) {
+                            fName.modifiers.push(mn.name);
                         }
                     });
+
+                    if (i != functionDefinitionList.length - 1) {
+                        var body = codeContent.substring(codeContent.indexOf(functionDefinitionList[i]) + functionDefinitionList[i].length + 1, codeContent.indexOf(functionDefinitionList[i + 1]));
+                        body = body.trim().substring(0, body.length - 2);
+                        fName.code = body;
+                    } else {
+                        var body = codeContent.substring(codeContent.indexOf(functionDefinitionList[i]) + functionDefinitionList[i].length + 1, codeContent.length - 1);
+                        body = body.trim().substring(0, body.length - 2);
+                        fName.code = body;
+                    }
                     fNames.push(fName);
-                });
+                }
             }
 
             return fNames;
+        };
+
+        SolidityCodeEditorWidget.prototype.createFSM = function () {
+            var self = this,
+                core,
+                all_promises = [];
+            var fNames = this.getAllFunctions();
+            this._fNames = fNames;
+            var node = self._client.getNode(WebGMEGlobal.State.getActiveObject());
+            self._client.startTransaction();
+
+            //Creating initial state
+            var initialState = self._client.createChild({ parentId: node.getId(), baseId: '/m/z' });
+            var deferred = Q.defer();
+            fNames.forEach(fn => {
+
+                var transition = self._client.createChild({ parentId: node.getId(), baseId: '/m/A' });
+
+                self._client.setAttribute(transition, 'name', fn.name);
+                self._client.setPointer(transition, 'src', initialState);
+                self._client.setPointer(transition, 'dst', initialState);
+                if (fn.modifiers.length > 0) {
+                    self._client.setAttribute(transition, 'guards', fn.modifiers.join(','));
+                }
+                deferred.resolve(fn);
+                all_promises.push(deferred.promise);
+            });
+
+            self._client.completeTransaction();
+            this._fsmGenerated = true;
+            return Q.all(all_promises);
+        };
+
+        SolidityCodeEditorWidget.prototype.updateFunctionBody = function () {
+            var codeContent = this._wholeDocument.getValue().replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*/g, '');
+            var i, j = 0, segment, wholeDocument = '';
+            for (i = 0; i < this._segmentedDocument.composition.length; i += 1) {
+                if (this._segmentedDocument.composition[i] != 'userDefinitions*/9/v') {
+                    segment = this._segmentedDocument.segments[this._segmentedDocument.composition[i]];
+                    wholeDocument += segment.value + '\n';
+                }
+
+                if (this._segmentedDocument.composition[i].startsWith('singleTransitionEndGuards')) {
+                    segment = this._segmentedDocument.segments[this._segmentedDocument.composition[i]];
+                    wholeDocument += this._fNames[j].code + '\n';
+                    j++;
+                }
+            }
+            this._wholeDocument.setValue(wholeDocument);
+            this.editor.refresh();
         };
 
         return SolidityCodeEditorWidget;
