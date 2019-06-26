@@ -356,8 +356,9 @@ define(['q',
                         body = body.replace('_;', '').replace('}','').replace('if (','').replace('))', ')');
                         mName.condition = body;
                     } else {
-                        var body = codeContent.substring(codeContent.indexOf(modifiersList[i]) + modifiersList[i].length + 1, codeContent.length - 1);
+                        var body = codeContent.substring(codeContent.indexOf(modifiersList[i]) + modifiersList[i].length + 1, codeContent.indexOf('function')-1);
                         body = body.trim().substring(0, body.length - 2);
+                        body = body.replace('_;', '').replace('}','').replace('if (','').replace('))', ')');
                         mName.condition = body;
                     }
                     mNames.push(mName);
@@ -376,7 +377,7 @@ define(['q',
 
                     mNames.forEach(mn => {
                         if (functionDefinitionList[i].indexOf(mn.name) !== -1) {
-                            fName.modifiers.push(mn.name);
+                            fName.modifiers.push(mn.condition);
                         }
                     });
 
@@ -413,6 +414,7 @@ define(['q',
                 var transition = self._client.createChild({ parentId: node.getId(), baseId: '/m/A' });
 
                 self._client.setAttribute(transition, 'name', fn.name);
+                self._client.setAttribute(transition, 'statements', fn.code);
                 self._client.setPointer(transition, 'src', initialState);
                 self._client.setPointer(transition, 'dst', initialState);
                 if (fn.modifiers.length > 0) {
@@ -425,25 +427,6 @@ define(['q',
             self._client.completeTransaction();
             this._fsmGenerated = true;
             return Q.all(all_promises);
-        };
-
-        SolidityCodeEditorWidget.prototype.updateFunctionBody = function () {
-            var codeContent = this._wholeDocument.getValue().replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*/g, '');
-            var i, j = 0, segment, wholeDocument = '';
-            for (i = 0; i < this._segmentedDocument.composition.length; i += 1) {
-                if (this._segmentedDocument.composition[i] != 'userDefinitions*/9/v') {
-                    segment = this._segmentedDocument.segments[this._segmentedDocument.composition[i]];
-                    wholeDocument += segment.value + '\n';
-                }
-
-                if (this._segmentedDocument.composition[i].startsWith('singleTransitionEndGuards')) {
-                    segment = this._segmentedDocument.segments[this._segmentedDocument.composition[i]];
-                    wholeDocument += this._fNames[j].code + '\n';
-                    j++;
-                }
-            }
-            this._wholeDocument.setValue(wholeDocument);
-            this.editor.refresh();
         };
 
         return SolidityCodeEditorWidget;
