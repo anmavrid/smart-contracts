@@ -353,6 +353,7 @@ define(['q',
                     if(i != modifiersList.length-1){
                         var body = codeContent.substring(codeContent.indexOf(modifiersList[i]) + modifiersList[i].length + 1, codeContent.indexOf(modifiersList[i + 1]));
                         body = body.trim().substring(0, body.length - 2);
+                        body = body.replace('_;', '').replace('}','').replace('if (','').replace('))', ')');
                         mName.condition = body;
                     } else {
                         var body = codeContent.substring(codeContent.indexOf(modifiersList[i]) + modifiersList[i].length + 1, codeContent.length - 1);
