@@ -11,5 +11,11 @@
     "title": "SolidityCodeEditor",
     "panel": "panels/SolidityCodeEditor/SolidityCodeEditorPanel",
     "DEBUG_ONLY": false
+  },
+  {
+    "id": "DeploymentEditor",
+    "title": "Deployment Editor",
+    "panel": "panels/DeploymentEditor/DeploymentEditorPanel",
+    "DEBUG_ONLY": false
   }
 ]

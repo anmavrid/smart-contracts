@@ -42,12 +42,25 @@
         "secondary": false,
         "widget": "src/visualizers/widgets/ModelEditor"
       }
-    }
+    },
+    "DeploymentEditor": {
+      "src": "panels/DeploymentEditor/DeploymentEditorPanel",
+      "title": "DeploymentEditor",
+      "panel": "src/visualizers/panels/DeploymentEditor",
+      "secondary": false,
+      "widget": "src/visualizers/widgets/DeploymentEditor"
+    },
+    "addons": {},
+    "layouts": {},
+    "routers": {}
   },
   "dependencies": {
     "seeds": {},
     "plugins": {},
     "decorators": {},
-    "visualizers": {}
+    "visualizers": {},
+    "addons": {},
+    "layouts": {},
+    "routers": {}
   }
 }
