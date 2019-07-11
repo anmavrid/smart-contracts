@@ -374,6 +374,16 @@ define(['q',
                     fName.definition = functionDefinitionList[i];
                     fName.name = functionDefinitionList[i].match(/function [^\()]*/g)[0].replace('function ', '');
                     fName.modifiers = [];
+                    fName.outputs = '';
+                    fName.inputs = functionDefinitionList[i].substring(functionDefinitionList[i].indexOf('(')+1, functionDefinitionList[i].indexOf(')'));
+                    if(functionDefinitionList[i].indexOf('returns') != -1) {
+                        var returnval = functionDefinitionList[i].substring(functionDefinitionList[i].indexOf('returns')+1);
+                        fName.outputs = returnval.substring(returnval.indexOf('(')+1, returnval.indexOf(')'));
+                        fName.tags = functionDefinitionList[i].substring(functionDefinitionList[i].indexOf(')')+1, functionDefinitionList[i].indexOf('returns'));
+                    } else {
+                        fName.tags = functionDefinitionList[i].substring(functionDefinitionList[i].indexOf(')')+1);
+                    }
+    
 
                     mNames.forEach(mn => {
                         if (functionDefinitionList[i].indexOf(mn.name) !== -1) {
@@ -381,6 +391,7 @@ define(['q',
                         }
                     });
 
+                    //Moving internal function code
                     if (i != functionDefinitionList.length - 1) {
                         var body = codeContent.substring(codeContent.indexOf(functionDefinitionList[i]) + functionDefinitionList[i].length + 1, codeContent.indexOf(functionDefinitionList[i + 1]));
                         body = body.trim().substring(0, body.length - 2);
@@ -390,11 +401,25 @@ define(['q',
                         body = body.trim().substring(0, body.length - 2);
                         fName.code = body;
                     }
+
+                    //Loading inputs for each function
+
                     fNames.push(fName);
                 }
             }
 
             return fNames;
+        };
+
+        SolidityCodeEditorWidget.prototype.getVariableDefinitions = function () {
+            var definitions = '';
+            var codeContent = this._wholeDocument.getValue().replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*/g, '');
+            
+            var defaultdef = 'uint private creationTime = now;';
+            var stateDef = 'enum States';
+
+            definitions = codeContent.substring(codeContent.indexOf(defaultdef) + defaultdef.length + 1, codeContent.indexOf(stateDef));
+            return definitions;
         };
 
         SolidityCodeEditorWidget.prototype.createFSM = function () {
@@ -406,6 +431,7 @@ define(['q',
             var node = self._client.getNode(WebGMEGlobal.State.getActiveObject());
             self._client.startTransaction();
 
+            self._client.setAttribute(node.getId(), 'definitions', this.getVariableDefinitions());
             //Creating initial state
             var initialState = self._client.createChild({ parentId: node.getId(), baseId: '/m/z' });
             var deferred = Q.defer();
@@ -415,6 +441,9 @@ define(['q',
 
                 self._client.setAttribute(transition, 'name', fn.name);
                 self._client.setAttribute(transition, 'statements', fn.code);
+                self._client.setAttribute(transition, 'input', fn.inputs);
+                self._client.setAttribute(transition, 'output', fn.outputs);
+                self._client.setAttribute(transition, 'tags', fn.tags);
                 self._client.setPointer(transition, 'src', initialState);
                 self._client.setPointer(transition, 'dst', initialState);
                 if (fn.modifiers.length > 0) {
