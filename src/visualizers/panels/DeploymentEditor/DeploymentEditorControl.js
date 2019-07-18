@@ -169,6 +169,12 @@ define(['js/logger',
                         this.designerCanvas._onConnectionRouteManagerChanged('basic');
                         this._connectionManagerType = 'basic';
                     }
+                } else if (this.isOfMetaTypeName(node.getMetaTypeId(), 'Contracts')) {
+                    console.log('In contracts type');
+                    if (this._connectionManagerType !== 'basic') {
+                        this.designerCanvas._onConnectionRouteManagerChanged('basic');
+                        this._connectionManagerType = 'basic';
+                    }
                 } else if (this._connectionManagerType !== 'basic3') {
                     this.designerCanvas._onConnectionRouteManagerChanged('basic3');
                     this._connectionManagerType = 'basic3';

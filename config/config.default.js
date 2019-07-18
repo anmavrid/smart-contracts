@@ -13,7 +13,7 @@ config.requirejsPaths['widgets/DiagramDesigner'] =
 config.requirejsPaths['scsrc'] = './src';
 //config.visualization.svgDirs = ['./src/svgs'];
 config.visualization.svgDirs.push(path.join(__dirname, '../src/svgs'));
-config.seedProjects.defaultProject = 'SC';
+config.seedProjects.defaultProject = 'SC_new';
 config.plugin.allowServerExecution = true;
 config.client.defaultConnectionRouter = 'basic';
 validateConfig(config);

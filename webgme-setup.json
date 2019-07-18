@@ -3,6 +3,9 @@
     "seeds": {
       "SC": {
         "src": "src/seeds/SC"
+      },
+      "SC_new": {
+        "src": "src/seeds/SC_new"
       }
     },
     "plugins": {
