@@ -66,7 +66,10 @@ define([
         // Use this to access core, project, result, logger etc from PluginBase.
         var self = this,
         nodes,
-        artifact;
+        artifact,
+        childPath,
+        child,
+        childName;
 
         // Using the coreAPI to make changes.
         // this.core.setAttribute(nodeObject, 'name', 'My new obj');
@@ -77,16 +80,73 @@ define([
         // exclude self.save and call callback directly from this scope.
         self.loadNodeMap(self.rootNode)
             .then(function (nodes) {
-                self.logger.info(Object.keys(nodes));
-                console.log(nodes);
-                self.result.setSuccess(true);
-                callback(null, self.result);
+                // self.logger.info(Object.keys(nodes));
+                // console.log(nodes);
+                // self.result.setSuccess(true);
+                // callback(null, self.result);
+
+                //Get the deployment node information
+                var currentNode = self.activeNode;
+                var allcontracts = self.getContractPaths(nodes);
+                for (childPath of self.core.getChildrenPaths(currentNode)) {
+                    child = nodes[childPath];
+                    childName = self.core.getAttribute(child, "name");
+
+                    if(self.isMetaTypeOf(child, self.META.ContractType)){
+                        console.log(childName);
+                        var contract = allcontracts.find(item => item.name == childName);
+                        if(contract == undefined)
+                            throw new Error('No contract with the name is defined.');
+                        else {
+                            console.log(contract);
+                            console.log(self.getContractFile(nodes[contract.path]));
+
+                        }
+                    }
+                }
+                console.log(currentNode);
             })
             .catch(function (err) {
                 // (3)
                 self.logger.error(err.stack);
                 // Result success is false at invocation.
                 callback(err, self.result);
+            });
+    };
+
+    RunDeployment.prototype.getContractPaths = function (nodes) {
+        var self = this,
+                path,
+                node,
+                //Using an array for the multiple contracts extention
+                contracts = [];
+    
+            for (path in nodes) {
+                node = nodes[path];
+                if (self.isMetaTypeOf(node, self.META.Contract)) {
+                    contracts.push({'name': self.core.getAttribute(node, 'name'), 'path': path});
+                }
+            }
+            return contracts;
+    };
+
+    RunDeployment.prototype.getContractFile = function (contractNode) {
+        var self = this,
+            fileContent,
+            i;
+
+        return utils.getModelOfContract(self.core, contractNode)
+            .then(function (contractModel) {
+                fileContent = ejs.render(ejsCache.contractType.complete, contractModel);
+
+                // var parseResult = solidityParser.checkWholeFile(fileContent);
+                // if (parseResult) {
+                //     self.logger.debug(parseResult.line);
+                //     self.logger.debug(parseResult.message);
+                //     parseResult.node = contractNode;
+                //     violations.push(parseResult);
+                // }
+                return fileContent;
             });
     };
 
