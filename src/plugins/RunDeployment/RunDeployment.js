@@ -10,11 +10,21 @@
 define([
     'plugin/PluginConfig',
     'text!./metadata.json',
-    'plugin/PluginBase'
+    'plugin/PluginBase',
+    'q',
+    'common/util/ejs',
+    'scsrc/util/utils',
+    'scsrc/templates/ejsCache',
+    'scsrc/parsers/solidityExtra'
 ], function (
     PluginConfig,
     pluginMetadata,
-    PluginBase) {
+    PluginBase,
+    Q,
+    ejs,
+    utils,
+    ejsCache,
+    solidityParser) {
     'use strict';
 
     pluginMetadata = JSON.parse(pluginMetadata);
@@ -54,12 +64,9 @@ define([
      */
     RunDeployment.prototype.main = function (callback) {
         // Use this to access core, project, result, logger etc from PluginBase.
-
-        // Using the logger.
-        this.logger.debug('This is a debug message.');
-        this.logger.info('This is an info message.');
-        this.logger.warn('This is a warning message.');
-        this.logger.error('This is an error message.');
+        var self = this,
+        nodes,
+        artifact;
 
         // Using the coreAPI to make changes.
         // this.core.setAttribute(nodeObject, 'name', 'My new obj');
@@ -68,9 +75,10 @@ define([
 
         // This will save the changes. If you don't want to save;
         // exclude self.save and call callback directly from this scope.
-        this.core.loadNodeMap(self.rootNode)
+        self.loadNodeMap(self.rootNode)
             .then(function (nodes) {
                 self.logger.info(Object.keys(nodes));
+                console.log(nodes);
                 self.result.setSuccess(true);
                 callback(null, self.result);
             })
