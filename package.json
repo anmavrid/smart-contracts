@@ -25,7 +25,8 @@
   },
   "dependencies": {
     "nodemon": "^1.19.1",
-    "webgme": "^2.23.0"
+    "webgme": "^2.38.0",
+    "webgme-cli": "^2.8.3"
   },
   "license": "MIT"
 }

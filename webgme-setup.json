@@ -20,6 +20,10 @@
       "VerifyContract": {
         "src": "src/plugins/VerifyContract",
         "test": "test/plugins/VerifyContract"
+      },
+      "RunDeployment": {
+        "src": "src/plugins/RunDeployment",
+        "test": "test/plugins/RunDeployment"
       }
     },
     "decorators": {

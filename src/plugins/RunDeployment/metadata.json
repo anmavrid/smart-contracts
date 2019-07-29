@@ -1,0 +1,15 @@
+{
+  "id": "RunDeployment",
+  "name": "RunDeployment",
+  "version": "0.1.0",
+  "description": "Run Deployment of contracts",
+  "icon": {
+    "class": "glyphicon glyphicon-cog",
+    "src": ""
+  },
+  "disableServerSideExecution": false,
+  "disableBrowserSideExecution": false,
+  "dependencies": [],
+  "writeAccessRequired": false,
+  "configStructure": []
+}
