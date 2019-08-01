@@ -1,0 +1,1 @@
+node runsol.js %1

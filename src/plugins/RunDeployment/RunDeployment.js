@@ -25,130 +25,171 @@ define([
     utils,
     ejsCache,
     solidityParser) {
-    'use strict';
+        'use strict';
 
-    pluginMetadata = JSON.parse(pluginMetadata);
+        pluginMetadata = JSON.parse(pluginMetadata);
 
-    /**
-     * Initializes a new instance of RunDeployment.
-     * @class
-     * @augments {PluginBase}
-     * @classdesc This class represents the plugin RunDeployment.
-     * @constructor
-     */
-    function RunDeployment() {
-        // Call base class' constructor.
-        PluginBase.call(this);
-        this.pluginMetadata = pluginMetadata;
-    }
+        /**
+         * Initializes a new instance of RunDeployment.
+         * @class
+         * @augments {PluginBase}
+         * @classdesc This class represents the plugin RunDeployment.
+         * @constructor
+         */
+        function RunDeployment() {
+            // Call base class' constructor.
+            PluginBase.call(this);
+            this.pluginMetadata = pluginMetadata;
+        }
 
-    /**
-     * Metadata associated with the plugin. Contains id, name, version, description, icon, configStructure etc.
-     * This is also available at the instance at this.pluginMetadata.
-     * @type {object}
-     */
-    RunDeployment.metadata = pluginMetadata;
+        /**
+         * Metadata associated with the plugin. Contains id, name, version, description, icon, configStructure etc.
+         * This is also available at the instance at this.pluginMetadata.
+         * @type {object}
+         */
+        RunDeployment.metadata = pluginMetadata;
 
-    // Prototypical inheritance from PluginBase.
-    RunDeployment.prototype = Object.create(PluginBase.prototype);
-    RunDeployment.prototype.constructor = RunDeployment;
+        // Prototypical inheritance from PluginBase.
+        RunDeployment.prototype = Object.create(PluginBase.prototype);
+        RunDeployment.prototype.constructor = RunDeployment;
 
-    /**
-     * Main function for the plugin to execute. This will perform the execution.
-     * Notes:
-     * - Always log with the provided logger.[error,warning,info,debug].
-     * - Do NOT put any user interaction logic UI, etc. inside this method.
-     * - callback always has to be called even if error happened.
-     *
-     * @param {function(Error|null, plugin.PluginResult)} callback - the result callback
-     */
-    RunDeployment.prototype.main = function (callback) {
-        // Use this to access core, project, result, logger etc from PluginBase.
-        var self = this,
-        nodes,
-        artifact,
-        childPath,
-        child,
-        childName;
+        /**
+         * Main function for the plugin to execute. This will perform the execution.
+         * Notes:
+         * - Always log with the provided logger.[error,warning,info,debug].
+         * - Do NOT put any user interaction logic UI, etc. inside this method.
+         * - callback always has to be called even if error happened.
+         *
+         * @param {function(Error|null, plugin.PluginResult)} callback - the result callback
+         */
+        RunDeployment.prototype.main = function (callback) {
+            // Use this to access core, project, result, logger etc from PluginBase.
+            var self = this,
+                nodes,
+                artifact,
+                contractsToDeploy = [],
+                promises = [];
 
-        // Using the coreAPI to make changes.
-        // this.core.setAttribute(nodeObject, 'name', 'My new obj');
-        // this.core.setRegistry(nodeObject, 'position', {x: 70, y: 70});
+            // Using the coreAPI to make changes.
+            // this.core.setAttribute(nodeObject, 'name', 'My new obj');
+            // this.core.setRegistry(nodeObject, 'position', {x: 70, y: 70});
 
 
-        // This will save the changes. If you don't want to save;
-        // exclude self.save and call callback directly from this scope.
-        self.loadNodeMap(self.rootNode)
-            .then(function (nodes) {
-                // self.logger.info(Object.keys(nodes));
-                // console.log(nodes);
-                // self.result.setSuccess(true);
-                // callback(null, self.result);
+            // This will save the changes. If you don't want to save;
+            // exclude self.save and call callback directly from this scope.
+            self.loadNodeMap(self.rootNode)
+                .then(function (nodes) {
+                    self.getContractsToDeploy(nodes, self.activeNode).then(result => {
+                        result.forEach(res => {
+                            self.deployContract(res);
+                        });
+                    });
+                    self.result.setSuccess(true);
+                    callback(null, self.result);
+                })
+                .catch(function (err) {
+                    // (3)
+                    self.logger.error(err.stack);
+                    // Result success is false at invocation.
+                    callback(err, self.result);
+                });
+        };
 
-                //Get the deployment node information
-                var currentNode = self.activeNode;
-                var allcontracts = self.getContractPaths(nodes);
-                for (childPath of self.core.getChildrenPaths(currentNode)) {
-                    child = nodes[childPath];
-                    childName = self.core.getAttribute(child, "name");
-
-                    if(self.isMetaTypeOf(child, self.META.ContractType)){
-                        console.log(childName);
-                        var contract = allcontracts.find(item => item.name == childName);
-                        if(contract == undefined)
-                            throw new Error('No contract with the name is defined.');
-                        else {
-                            console.log(contract);
-                            console.log(self.getContractFile(nodes[contract.path]));
-
-                        }
-                    }
-                }
-                console.log(currentNode);
-            })
-            .catch(function (err) {
-                // (3)
-                self.logger.error(err.stack);
-                // Result success is false at invocation.
-                callback(err, self.result);
-            });
-    };
-
-    RunDeployment.prototype.getContractPaths = function (nodes) {
-        var self = this,
+        RunDeployment.prototype.getContractPaths = function (nodes) {
+            var self = this,
                 path,
                 node,
                 //Using an array for the multiple contracts extention
                 contracts = [];
-    
+
             for (path in nodes) {
                 node = nodes[path];
                 if (self.isMetaTypeOf(node, self.META.Contract)) {
-                    contracts.push({'name': self.core.getAttribute(node, 'name'), 'path': path});
+                    contracts.push({ 'name': self.core.getAttribute(node, 'name'), 'path': path });
                 }
             }
             return contracts;
-    };
+        };
 
-    RunDeployment.prototype.getContractFile = function (contractNode) {
-        var self = this,
-            fileContent,
-            i;
+        RunDeployment.prototype.getContractFile = function (contractNode) {
+            var self = this,
+                fileContent,
+                i;
 
-        return utils.getModelOfContract(self.core, contractNode)
-            .then(function (contractModel) {
-                fileContent = ejs.render(ejsCache.contractType.complete, contractModel);
+            return utils.getModelOfContract(self.core, contractNode)
+                .then(function (contractModel) {
+                    fileContent = ejs.render(ejsCache.contractType.complete, contractModel);
 
-                // var parseResult = solidityParser.checkWholeFile(fileContent);
-                // if (parseResult) {
-                //     self.logger.debug(parseResult.line);
-                //     self.logger.debug(parseResult.message);
-                //     parseResult.node = contractNode;
-                //     violations.push(parseResult);
-                // }
-                return fileContent;
+                    // var parseResult = solidityParser.checkWholeFile(fileContent);
+                    // if (parseResult) {
+                    //     self.logger.debug(parseResult.line);
+                    //     self.logger.debug(parseResult.message);
+                    //     parseResult.node = contractNode;
+                    //     violations.push(parseResult);
+                    // }
+                    return fileContent;
+                });
+        };
+
+        RunDeployment.prototype.getContractsToDeploy = function (nodes, currentNode) {
+            //Get the deployment node information
+            var self = this,
+                promises = [],
+                childPath,
+                child,
+                childName,
+                allContracts = [],
+                contractsToDeploy = [];
+            allContracts = self.getContractPaths(nodes);
+            for (childPath of self.core.getChildrenPaths(currentNode)) {
+                child = nodes[childPath];
+                childName = self.core.getAttribute(child, "name");
+                if (self.isMetaTypeOf(child, self.META.ContractType)) {
+                    var contract = allContracts.find(item => item.name == childName);
+                    if (contract == undefined)
+                        throw new Error('No contract with the name is defined.');
+                    else {
+                        contractsToDeploy.push({
+                            'name': contract.name,
+                            'path': contract.path,
+                            'code': null,
+                            'address': null
+                        });
+                        promises.push(RunDeployment.prototype.getContractFile.call(self, nodes[contract.path]));
+                    }
+                }
+            };
+
+            return Q.all(promises)
+                .then(function (result) {
+                    //contracts are retreived
+                    if (result.length > 0) {
+                        for (var i = 0; i < result.length; i++) {
+                            contractsToDeploy[i].code = result[i];
+                        }
+                        return contractsToDeploy;
+                    }
+                });
+        };
+
+        RunDeployment.prototype.deployContract = function (contract) {
+            var fs,
+                exec,
+                deferred = Q.defer();
+
+            fs = require('fs');
+
+            //Get contract code
+            fs.writeFile('./src/solidityscripts/contracts/test.sol', contract.code.replace(/,\s+}/g, '\n}'));
+            exec = require('child_process').execFile;
+            exec('node', ['./src/solidityscripts/runsol.js', contract.name], (error, stdout, stderr) => {
+                if (error) {
+                    throw error;
+                }
+                deferred.resolve(stdout);
             });
-    };
+            return deferred.promise;
+        };
 
-    return RunDeployment;
-});
+        return RunDeployment;
+    });

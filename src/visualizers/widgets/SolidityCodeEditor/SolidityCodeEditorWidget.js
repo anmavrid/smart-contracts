@@ -255,7 +255,6 @@ define(['q',
             this.editor.refresh();
             this._wholeDocument.setCursor(oldCursorPosition);
             this.editor.scrollTo(oldScrollInfo.left, oldScrollInfo.top);
-            if (this._fsmGenerated) this.updateFunctionBody();
         };
 
         SolidityCodeEditorWidget.prototype._setSegmentReadOnly = function (segmentName, readOnly) {
@@ -393,12 +392,12 @@ define(['q',
 
                     //Moving internal function code
                     if (i != functionDefinitionList.length - 1) {
-                        var body = codeContent.substring(codeContent.indexOf(functionDefinitionList[i]) + functionDefinitionList[i].length + 1, codeContent.indexOf(functionDefinitionList[i + 1]));
-                        body = body.trim().substring(0, body.length - 2);
+                        var body = codeContent.trim().substring(codeContent.trim().indexOf(functionDefinitionList[i]) + functionDefinitionList[i].length + 1, codeContent.trim().indexOf(functionDefinitionList[i + 1]));
+                        body = body.trim().substring(0, body.trim().length - 1);
                         fName.code = body;
                     } else {
-                        var body = codeContent.substring(codeContent.indexOf(functionDefinitionList[i]) + functionDefinitionList[i].length + 1, codeContent.length - 1);
-                        body = body.trim().substring(0, body.length - 2);
+                        var body = codeContent.trim().substring(codeContent.trim().indexOf(functionDefinitionList[i]) + functionDefinitionList[i].length + 1, codeContent.trim().length - 1);
+                        body = body.trim().substring(0, body.trim().length - 1);
                         fName.code = body;
                     }
 
