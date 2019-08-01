@@ -80,8 +80,8 @@ define([
             self.loadNodeMap(self.rootNode)
                 .then(function (nodes) {
                     self.getContractsToDeploy(nodes, self.activeNode).then(result => {
-                        result.forEach(res => {
-                            self.deployContract(res);
+                        self.deployAllContracts(result).then(deployedAdd => {
+                            console.log(deployedAdd);
                         });
                     });
                     self.result.setSuccess(true);
@@ -172,23 +172,35 @@ define([
                 });
         };
 
+        RunDeployment.prototype.deployAllContracts = function(contracts) {
+            var self = this,
+                promises = [];
+            contracts.forEach(cn => {
+                promises.push(RunDeployment.prototype.deployContract.call(self, cn));
+            });
+
+            return Q.all(promises)
+                .then(function (result) {
+                    return result;
+                });
+        };
+
         RunDeployment.prototype.deployContract = function (contract) {
             var fs,
-                exec,
-                deferred = Q.defer();
+                exec;
 
             fs = require('fs');
-
             //Get contract code
-            fs.writeFile('./src/solidityscripts/contracts/test.sol', contract.code.replace(/,\s+}/g, '\n}'));
+            fs.writeFile('./src/solidityscripts/contracts/test.sol', contract.code.replace(/,\s+}/g, '\n}'), function(err, result) {
+                if(err) console.log('error', err);
+              });
             exec = require('child_process').execFile;
             exec('node', ['./src/solidityscripts/runsol.js', contract.name], (error, stdout, stderr) => {
                 if (error) {
                     throw error;
                 }
-                deferred.resolve(stdout);
+                return stdout;
             });
-            return deferred.promise;
         };
 
         return RunDeployment;

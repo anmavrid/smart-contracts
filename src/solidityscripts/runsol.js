@@ -4,7 +4,7 @@ const Web3 = require('web3');
 
 //Connecting to web3 provider
 // Connect to local Ethereum node
-const web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:7545"));
+const web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 
 //Reading solidity file
 const input = fs.readFileSync('./src/solidityscripts/contracts/test.sol').toString();
@@ -27,7 +27,9 @@ const contractInstance = contract.new({
     }
     // If we have an address property, the contract was deployed
     if (res.address) {
-        fs.writeFile('./src/solidityscripts/contracts/output.txt', process.argv[2] + ':' + res.address);
-        console.log(res.address);
+        fs.appendFile('./src/solidityscripts/contracts/output.txt', process.argv[2] + ':' + res.address, function(err, result) {
+            if(err) console.log('error', err);
+          });
+        return res.address;
     }
 });
