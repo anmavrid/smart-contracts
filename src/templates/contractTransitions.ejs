@@ -1,5 +1,5 @@
 //Transitions <%for(var i = 0;i < transitions.length; i += 1) {%>
-function <%- transitions[i].name %> (<%- transitions[i].input %>) public
+function <%- transitions[i].name %> (<%- transitions[i].input %>) 
 <%if (transitions[i].tags != '') {%> <%- transitions[i].tags %> <% } %> <%if (transitions[i].output != '') {%> returns (<%- transitions[i].output %>) <% } %>
 {
     require(state == States.<%- transitions[i].src %>);

@@ -386,7 +386,7 @@ define(['q',
 
                     mNames.forEach(mn => {
                         if (functionDefinitionList[i].indexOf(mn.name) !== -1) {
-                            fName.modifiers.push(mn.condition);
+                            fName.modifiers.push(mn.name);
                         }
                     });
 
@@ -418,6 +418,10 @@ define(['q',
             var stateDef = 'enum States';
 
             definitions = codeContent.substring(codeContent.indexOf(defaultdef) + defaultdef.length + 1, codeContent.indexOf(stateDef));
+            
+            //Loading modifiers
+            definitions += codeContent.substring(codeContent.indexOf('modifier'), codeContent.indexOf('function'));
+
             return definitions;
         };
 

@@ -1,6 +1,6 @@
 
 //Transitions <%for(var i = 0;i < transitions.length; i += 1) {%>
-function <%- transitions[i].name%> (<%-transitions[i].input%><% if(counter) { %> <% if(transitions[i].input) { %>, uint nextTransitionNumber<% } %><% if(!transitions[i].input) { %>uint nextTransitionNumber<% } %><% } %>) public
+function <%- transitions[i].name%> (<%-transitions[i].input%><% if(counter) { %> <% if(transitions[i].input) { %>, uint nextTransitionNumber<% } %><% if(!transitions[i].input) { %>uint nextTransitionNumber<% } %><% } %>) 
 <% if (locking) { %> locking<% } %><% if (counter) { %> transitionCounting(nextTransitionNumber)<% } %><% if (timedTransitions) { %> timedTransitions<% } %><% if (accessControl && transitions[i].tags.includes("admin")) { %> onlyAdmin<% } %><% if (events && transitions[i].tags.includes("event")) { %> event<%-transitions[i].name%><% } %><%if (transitions[i].tags != '') {%> <%- transitions[i].tags %> <% } %> <%if (transitions[i].output != '') {%> returns (<%- transitions[i].output %>) <% } %>
 {
     require(state == States.<%- transitions[i].src %>);

@@ -1,4 +1,4 @@
-public function <%- name %> (<%- input %>)
+ function <%- name %> (<%- input %>)
 <% if (locking) { %> locking<% } %><% if (counter) { %> transitionCounting(nextTransitionNumber)<% } %>
 <%if (tags != '') {%> <%- tags %> <% } %> <%if (output != '') {%> returns (<%- output %>) <% } %>
 {
