@@ -67,8 +67,7 @@ define([
             var self = this,
                 nodes,
                 artifact,
-                contractsToDeploy = [],
-                promises = [];
+                fs = require('fs');
 
             // Using the coreAPI to make changes.
             // this.core.setAttribute(nodeObject, 'name', 'My new obj');
@@ -81,11 +80,16 @@ define([
                 .then(function (nodes) {
                     self.getContractsToDeploy(nodes, self.activeNode).then(result => {
                         self.deployAllContracts(result).then(deployedAdd => {
-                            console.log(deployedAdd);
+                            fs.readFile('./src/solidityscripts/contracts/output.txt', 'utf8', function (err, contents) {
+                                fs.writeFile('./src/solidityscripts/contracts/output.txt', '', function (err, result) {
+                                    if (err) console.log('error', err);
+                                    self.result.setSuccess(true);
+                                    callback(null, self.result);
+                                });
+                            });
                         });
                     });
-                    self.result.setSuccess(true);
-                    callback(null, self.result);
+
                 })
                 .catch(function (err) {
                     // (3)
@@ -172,7 +176,7 @@ define([
                 });
         };
 
-        RunDeployment.prototype.deployAllContracts = function(contracts) {
+        RunDeployment.prototype.deployAllContracts = function (contracts) {
             var self = this,
                 promises = [];
             contracts.forEach(cn => {
@@ -187,20 +191,24 @@ define([
 
         RunDeployment.prototype.deployContract = function (contract) {
             var fs,
-                exec;
+                exec,
+                deferred = Q.defer();
 
             fs = require('fs');
-            //Get contract code
-            fs.writeFile('./src/solidityscripts/contracts/test.sol', contract.code.replace(/,\s+}/g, '\n}'), function(err, result) {
-                if(err) console.log('error', err);
-              });
             exec = require('child_process').execFile;
-            exec('node', ['./src/solidityscripts/runsol.js', contract.name], (error, stdout, stderr) => {
-                if (error) {
-                    throw error;
-                }
-                return stdout;
+            //Get contract code
+            fs.writeFile('./src/solidityscripts/contracts/' + contract.name + '.sol', contract.code.replace(/,\s+}/g, '\n}'), function (err, result) {
+                if (err) console.log('error', err);
+                exec('node', ['./src/solidityscripts/runsol.js', contract.name], (error, stdout, stderr) => {
+                    if (error) {
+                        deferred.reject();
+                        throw error;
+                    }
+                    deferred.resolve(stdout);
+                });
             });
+
+            return deferred.promise;
         };
 
         return RunDeployment;

@@ -36,3 +36,4 @@ blob-local-storage/
 src/bower_components/
 package-lock.json
 verificationTools/nuXmv
+*.sol
