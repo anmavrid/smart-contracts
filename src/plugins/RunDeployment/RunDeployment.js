@@ -81,6 +81,7 @@ define([
                     self.getContractsToDeploy(nodes, self.activeNode).then(result => {
                         self.deployAllContracts(result).then(deployedAdd => {
                             fs.readFile('./src/solidityscripts/contracts/output.txt', 'utf8', function (err, contents) {
+                                console.log(contents);
                                 fs.writeFile('./src/solidityscripts/contracts/output.txt', '', function (err, result) {
                                     if (err) console.log('error', err);
                                     self.result.setSuccess(true);
@@ -169,6 +170,8 @@ define([
                     //contracts are retreived
                     if (result.length > 0) {
                         for (var i = 0; i < result.length; i++) {
+                            result[i] = result[i].replace(/,\s+}/g, '\n}').replace(/invalidJumpLabel/g, '\'\'');
+                            result[i] = result[i].replace(/(?:\/\/Guards)([\s\S]*?)(?:\/\/State change)/g, '');
                             contractsToDeploy[i].code = result[i];
                         }
                         return contractsToDeploy;
@@ -196,8 +199,13 @@ define([
 
             fs = require('fs');
             exec = require('child_process').execFile;
+        
             //Get contract code
-            fs.writeFile('./src/solidityscripts/contracts/' + contract.name + '.sol', contract.code.replace(/,\s+}/g, '\n}'), function (err, result) {
+            
+            
+            
+
+            fs.writeFile('./src/solidityscripts/contracts/' + contract.name + '.sol', contract.code, function (err, result) {
                 if (err) console.log('error', err);
                 exec('node', ['./src/solidityscripts/runsol.js', contract.name], (error, stdout, stderr) => {
                     if (error) {

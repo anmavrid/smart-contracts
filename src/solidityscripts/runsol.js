@@ -24,15 +24,16 @@ fs.readFile('./src/solidityscripts/contracts/' + process.argv[2] + '.sol', 'utf8
         data: '0x' + bytecode,
         from: web3.eth.coinbase,
         gas: 6721975
-    }, (err, res) => {
-        if (err) {
-            console.log(err);
+    }, (errr, res) => {
+        if (errr) {
+            console.log(errr);
             return;
         }
         // If we have an address property, the contract was deployed
         if (res.address) {
-            fs.appendFile('./src/solidityscripts/contracts/output.txt', '\n' + process.argv[2] + ':' + res.address, function(err, result) {
-                if(err) console.log('error', err);
+            console.log(res.address);
+            fs.appendFile('./src/solidityscripts/contracts/output.txt', '\n' + process.argv[2] + ':' + res.address, function(errrr, result) {
+                if(errrr) console.log('error', errrr);
             });
             return res.address;
         }
