@@ -420,7 +420,10 @@ define(['q',
             definitions = codeContent.substring(codeContent.indexOf(defaultdef) + defaultdef.length + 1, codeContent.indexOf(stateDef));
             
             //Loading modifiers
-            definitions += codeContent.substring(codeContent.indexOf('modifier'), codeContent.indexOf('function'));
+
+            if(codeContent.indexOf('modifier') != -1){
+                definitions += codeContent.substring(codeContent.indexOf('modifier'), codeContent.indexOf('function'));
+            }
 
             return definitions;
         };

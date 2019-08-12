@@ -4,7 +4,7 @@ const Web3 = require('web3');
 
 //Connecting to web3 provider
 // Connect to local Ethereum node
-const web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:7545"));
+const web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 
 //Reading solidity file
 fs.readFile('./src/solidityscripts/contracts/' + process.argv[2] + '.sol', 'utf8', function (err, contents) {
