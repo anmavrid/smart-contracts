@@ -267,7 +267,7 @@ define([
                 });
             }
 
-            if (!self.core.getAttribute(child, 'tags').match(/^(payable|admin|event|\s|)+$/)){
+            if (!self.core.getAttribute(child, 'tags').match(/^(payable|admin|event|public|view|\s|)+$/)){
               nameAndViolations.violations.push({
                   node: child,
                   message: 'Transition [' + childName + '] has invalid tags. Tags can only be any combination of "payable", "admin", and "event".'
