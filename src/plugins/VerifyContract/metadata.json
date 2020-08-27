@@ -46,6 +46,15 @@
       "valueType": "string",
       "readOnly": false,
       "writeAccessRequired": true
+    },
+    {
+      "name": "templateFive",
+      "displayName": "Type 5: new property",
+      "description": "Specify actions separated by '#'. Please omit ';', when writing an action if the action is a statement, e.g., write 'p=10' instead of 'p=10;'. To add or clauses use '|'. To check many properties of this type, separate properties by ';'.",
+      "value": "",
+      "valueType": "string",
+      "readOnly": false,
+      "writeAccessRequired": true
     }
  ]
 }
