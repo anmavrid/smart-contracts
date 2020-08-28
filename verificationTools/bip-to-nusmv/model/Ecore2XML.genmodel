@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/org.eclipse.emf.mapping.ecore2xml/src"
+    editDirectory="/org.eclipse.emf.mapping.ecore2xml.ui/src" editorDirectory="/org.eclipse.emf.mapping.ecore2xml.ui/src"
+    modelPluginID="org.eclipse.emf.mapping.ecore2xml" modelName="Ecore2XML" modelPluginClass=""
+    editPluginClass="org.eclipse.emf.mapping.ecore2xml.ui.Ecore2XMLUIPlugin" editorPluginClass="org.eclipse.emf.mapping.ecore2xml.ui.Ecore2XMLUIPlugin"
+    nonNLSMarkers="true" testsDirectory="" testSuiteClass="" importerID="org.eclipse.emf.importer.rose"
+    complianceLevel="5.0" language="en" usedGenPackages="../../org.eclipse.emf.ecore/model/Ecore.genmodel#//ecore">
+  <foreignModel>Ecore2XML.mdl</foreignModel>
+  <foreignModel>VABASE_PLUGINS_PATH</foreignModel>
+  <foreignModel>../..</foreignModel>
+  <genPackages prefix="Ecore2XML" basePackage="org.eclipse.emf.mapping" resource="XMI"
+      disposableProviderFactory="true" contentTypeIdentifier="org.eclipse.emf.mapping.ecore2xml"
+      ecorePackage="Ecore2XML.ecore#/">
+    <genClasses ecoreClass="Ecore2XML.ecore#//XMLInfo">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ecore2XML.ecore#//XMLInfo/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ecore2XML.ecore#//XMLInfo/targetNamespace"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ecore2XML.ecore#//XMLInfo/xMLRepresentation"/>
+    </genClasses>
+    <genClasses ecoreClass="Ecore2XML.ecore#//XMLMap">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ecore2XML.ecore#//XMLMap/iDAttributeName"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ecore2XML.ecore#//XMLMap/ecoreToXMLInfo"/>
+      <genFeatures notify="false" createChild="false" ecoreFeature="ecore:EReference Ecore2XML.ecore#//XMLMap/noNamespacePackage"/>
+    </genClasses>
+    <genClasses ecoreClass="Ecore2XML.ecore#//ENamedElementToXMLInfoMapEntry">
+      <genFeatures createChild="false" ecoreFeature="ecore:EReference Ecore2XML.ecore#//ENamedElementToXMLInfoMapEntry/key"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ecore2XML.ecore#//ENamedElementToXMLInfoMapEntry/value"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

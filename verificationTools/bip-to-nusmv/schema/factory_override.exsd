@@ -1,0 +1,147 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.eclipse.emf.ecore">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="org.eclipse.emf.ecore" id="factory_override" name="Ecore Factory Override Registry"/>
+      </appInfo>
+      <documentation>
+         This extension point is used to register an overriding Ecore factory implementation against a namespace URI (Uniform Resource Identifier) in EMF&apos;s global package registry, &lt;samp&gt;EPackage.Registry.INSTANCE&lt;/samp&gt;. When the corresponding Ecore package is initialized, the package registry is consulted for the registered factory implementation to override the default that would otherwise be used.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <complexType>
+         <sequence>
+            <element ref="factory" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  A fully qualified identifier of the target extension point.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  An optional identifier of the extension instance.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  An optional name of the extension instance.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="factory">
+      <annotation>
+         <appInfo>
+            <meta.element labelAttribute="class"/>
+         </appInfo>
+      </annotation>
+      <complexType>
+         <attribute name="uri" type="string" use="required">
+            <annotation>
+               <documentation>
+                  A URI that uniquely identifies an Ecore package for which this factory in an override.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  A fully qualified Java classname of an overriding factory implementation.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn="org.eclipse.emf.ecore.EFactory"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="since"/>
+      </appInfo>
+      <documentation>
+         2.2.0
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="examples"/>
+      </appInfo>
+      <documentation>
+         Following is an example of how an overriding factory implementation can be registered: 
+&lt;pre&gt;
+  &lt;extension point=&quot;org.eclipse.emf.ecore.factory_override&quot; &gt;
+     &lt;factory uri=&quot;http://www.eclipse.org/xsd/2002/XSD&quot; class=&quot;org.eclipse.xsd.impl.XSDFactoryImpl&quot;/&gt; 
+  &lt;/extension&gt;
+&lt;/pre&gt;
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="apiInfo"/>
+      </appInfo>
+      <documentation>
+         The value of the class attribute must represent a factory implementation that extends &lt;samp&gt;org.eclipse.emf.ecore.EFactory&lt;/samp&gt; and appropriately implements the factory interface of the package being overriden.
+&lt;p&gt;
+An EMF factory can also be registered from the source code for standalone execution with the &lt;samp&gt;EPackage.Registry.INSTANCE&lt;/samp&gt; as follows:
+&lt;/p&gt;
+&lt;pre&gt;
+  EPackage.Registry.INSTANCE.put
+    (&quot;http://www.eclipse.org/xsd/2002/XSD&quot;, 
+      new EPackage.Descriptor()
+      {
+        public EPackage getEPackage()
+        {
+          return null;
+          // Or, if you want this to behave like a preregistered package, return the instance being overriden
+          // return XSDPackage.eINSTANCE
+          // Or, if there might be a descriptor in the registry already, we might fetch it first, and delegate to that.
+        }
+
+        public EFactory getEFactory()
+        {
+          return 
+            new XSDFactoryImpl()
+            {
+              // overrides
+            };
+        }
+      });
+&lt;/pre&gt;
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="implementation"/>
+      </appInfo>
+      <documentation>
+         
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="copyright"/>
+      </appInfo>
+      <documentation>
+         Copyright (c) 2005 IBM Corporation and others.&lt;br&gt;
+All rights reserved. This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0 which accompanies this distribution, and is available at &lt;a 
+href=&quot;http://www.eclipse.org/legal/epl-v10.html&quot;&gt;http://www.eclipse.org/legal/epl-v10.html&lt;/a&gt;
+      </documentation>
+   </annotation>
+
+</schema>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/org.eclipse.emf.ecore/src"
+    editDirectory="" editorDirectory="" modelPluginID="org.eclipse.emf.ecore" modelName="XML Types for XML Schema"
+    updateClasspath="false" testsDirectory="" importerID="org.eclipse.xsd.ecore.importer"
+    minimalReflectiveMethods="false" complianceLevel="5.0" language="en">
+  <foreignModel>XMLType.xsd</foreignModel>
+  <genPackages prefix="XMLType" basePackage="org.eclipse.emf.ecore.xml" resource="Basic"
+      disposableProviderFactory="true" adapterFactory="false" dataTypeConverters="true"
+      ecorePackage="XMLType.ecore#/">
+    <genAnnotations source="http://www.eclipse.org/emf/2002/GenModel/exporter/org.eclipse.xsd.ecore.exporter">
+      <genAnnotations source=" http://www.w3.org/2001/XMLSchema.xsd"/>
+    </genAnnotations>
+    <genDataTypes ecoreDataType="XMLType.ecore#//AnySimpleType"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//AnyURI"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//Base64Binary"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//Boolean"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//BooleanObject"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//Byte"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//ByteObject"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//Date"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//DateTime"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//Decimal"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//Double"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//DoubleObject"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//Duration"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//ENTITIES"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//ENTITIESBase"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//ENTITY"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//Float"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//FloatObject"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//GDay"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//GMonth"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//GMonthDay"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//GYear"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//GYearMonth"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//HexBinary"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//ID"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//IDREF"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//IDREFS"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//IDREFSBase"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//Int"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//Integer"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//IntObject"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//Language"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//Long"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//LongObject"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//Name"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//NCName"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//NegativeInteger"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//NMTOKEN"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//NMTOKENS"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//NMTOKENSBase"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//NonNegativeInteger"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//NonPositiveInteger"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//NormalizedString"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//NOTATION"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//PositiveInteger"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//QName"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//Short"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//ShortObject"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//String"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//Time"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//Token"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//UnsignedByte"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//UnsignedByteObject"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//UnsignedInt"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//UnsignedIntObject"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//UnsignedLong"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//UnsignedShort"/>
+    <genDataTypes ecoreDataType="XMLType.ecore#//UnsignedShortObject"/>
+    <genClasses ecoreClass="XMLType.ecore#//AnyType">
+      <genFeatures property="None" children="true" createChild="false" ecoreFeature="ecore:EAttribute XMLType.ecore#//AnyType/mixed"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EAttribute XMLType.ecore#//AnyType/any"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EAttribute XMLType.ecore#//AnyType/anyAttribute"/>
+    </genClasses>
+    <genClasses ecoreClass="XMLType.ecore#//ProcessingInstruction">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute XMLType.ecore#//ProcessingInstruction/data"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute XMLType.ecore#//ProcessingInstruction/target"/>
+    </genClasses>
+    <genClasses ecoreClass="XMLType.ecore#//SimpleAnyType">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute XMLType.ecore#//SimpleAnyType/rawValue"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute XMLType.ecore#//SimpleAnyType/value"/>
+      <genFeatures notify="false" createChild="false" ecoreFeature="ecore:EReference XMLType.ecore#//SimpleAnyType/instanceType"/>
+    </genClasses>
+    <genClasses ecoreClass="XMLType.ecore#//XMLTypeDocumentRoot">
+      <genFeatures property="None" children="true" createChild="false" ecoreFeature="ecore:EAttribute XMLType.ecore#//XMLTypeDocumentRoot/mixed"/>
+      <genFeatures property="None" notify="false" createChild="true" ecoreFeature="ecore:EReference XMLType.ecore#//XMLTypeDocumentRoot/xMLNSPrefixMap"/>
+      <genFeatures property="None" notify="false" createChild="true" ecoreFeature="ecore:EReference XMLType.ecore#//XMLTypeDocumentRoot/xSISchemaLocation"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute XMLType.ecore#//XMLTypeDocumentRoot/cDATA"/>
+      <genFeatures createChild="true" ecoreFeature="ecore:EAttribute XMLType.ecore#//XMLTypeDocumentRoot/comment"/>
+      <genFeatures property="None" createChild="true" ecoreFeature="ecore:EReference XMLType.ecore#//XMLTypeDocumentRoot/processingInstruction"/>
+      <genFeatures createChild="true" ecoreFeature="ecore:EAttribute XMLType.ecore#//XMLTypeDocumentRoot/text"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

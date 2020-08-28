@@ -1,0 +1,33 @@
+debug=no
+
+ifeq ($(debug), yes)
+  CFLAGS=-g -fno-default-inline -fno-inline -Wall -O0 -Wno-unused
+else
+  CFLAGS=-O2 -finline-functions -Wall -Wno-unused
+endif
+
+CUDD_HOME=/home/bozga/soft/cudd-2.4.0
+
+ifeq ($(symbolic), yes)
+CUDD_LIB=-L$(CUDD_HOME)/bin/iX86 -lcudd-bdd
+CUDD_INCLUDE=-I$(CUDD_HOME)/include
+else
+CUDD_LIB=
+CUDD_INCLUDE=
+endif
+
+BIP_LIB=$(BIP2_HOME)/lib/mono
+BIP_INCLUDE=$(BIP2_HOME)/include/mono
+
+.SUFFIXES:
+.SUFFIXES: .C .h .o .x
+
+$(DEST) : $(OBJS)
+	g++ $(CFLAGS) -o $@ $(OBJS) -L$(BIP_LIB) -lcompo $(CUDD_LIB) -Wl,-rpath=$(BIP_LIB)
+
+.C.o:
+	g++ $(CFLAGS) -c -I$(BIP_INCLUDE) $(CUDD_INCLUDE) $(MODEL_INCLUDE) $*.C -o $*.o
+
+
+clean:
+	-rm -f *.o *.x

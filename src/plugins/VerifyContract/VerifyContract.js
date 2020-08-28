@@ -267,7 +267,7 @@ define([
       fs.appendFileSync(path + '/' + model.name + '.smv', fairnessProperties);
       fs.writeFileSync(path + '/' + model.name + 'Prop.txt', propertiesTxt);
 
-      runNusmv = '.' + '/verificationTools/nuXmv -r ' + path + '/' + model.name + '.smv >> ' + path + '/output.txt';
+      runNusmv = '.' + '/verificationTools/nuXmv/bin/nuXmv -r ' + path + '/' + model.name + '.smv >> ' + path + '/output.txt';
 
       fs.writeFileSync(path + '/runNusmv.sh', runNusmv, 'utf8');
       self.sendNotification('Starting the NuSMV verification..');
@@ -407,7 +407,7 @@ define([
         propertiesSMV += clause + "|"
       }
       propertiesSMV = propertiesSMV.slice(0, -1);
-      propertiesSMV += ') cannot happen after (';
+      propertiesSMV += ') can happen only after (';
       for (clause of property[1]) {
         propertiesSMV += clause + "|"
       }

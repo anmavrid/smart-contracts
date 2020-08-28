@@ -1,0 +1,676 @@
+
+(object Petal
+    version    	50
+    _written   	"Rose 8.2.0401.2700"
+    charSet    	0)
+
+(object Class_Category "ecore2xml"
+    is_unit    	TRUE
+    is_loaded  	TRUE
+    attributes 	(list Attribute_Set
+	(object Attribute
+	    tool       	"Ecore"
+	    name       	"prefix"
+	    value      	(value Text "Ecore2XML"))
+	(object Attribute
+	    tool       	"Ecore"
+	    name       	"basePackage"
+	    value      	(value Text "org.eclipse.emf.mapping"))
+	(object Attribute
+	    tool       	"Ecore"
+	    name       	"nsPrefix"
+	    value      	(value Text "ecore2xml"))
+	(object Attribute
+	    tool       	"Ecore"
+	    name       	"nsURI"
+	    value      	(value Text "http://www.eclipse.org/emf/2005/Ecore2XML")))
+    quid       	"3D9E0D68011C"
+    exportControl 	"Public"
+    logical_models 	(list unit_reference_list
+	(object Class "XMLInfo"
+	    quid       	"410FDD500118"
+	    class_attributes 	(list class_attribute_list
+		(object ClassAttribute "name"
+		    attributes 	(list Attribute_Set
+			(object Attribute
+			    tool       	"Ecore"
+			    name       	"isVolatile"
+			    value      	TRUE))
+		    quid       	"410FE49E024D"
+		    type       	"EString"
+		    quidu      	"39EB7E000186")
+		(object ClassAttribute "targetNamespace"
+		    attributes 	(list Attribute_Set
+			(object Attribute
+			    tool       	"Ecore"
+			    name       	"isVolatile"
+			    value      	TRUE))
+		    quid       	"410FE4E90346"
+		    type       	"EString"
+		    quidu      	"39EB7E000186")
+		(object ClassAttribute "xmlRepresentation"
+		    attributes 	(list Attribute_Set
+			(object Attribute
+			    tool       	"Ecore"
+			    name       	"isVolatile"
+			    value      	TRUE)
+			(object Attribute
+			    tool       	"Ecore"
+			    name       	"attributeName"
+			    value      	(value Text "xMLRepresentation")))
+		    quid       	"410FE50E037B"
+		    type       	"EInt"
+		    quidu      	"3D0674720115"
+		    initv      	"-1")))
+	(object Class "XMLMap"
+	    quid       	"410FDD59019D"
+	    class_attributes 	(list class_attribute_list
+		(object ClassAttribute "idAttributeName"
+		    attributes 	(list Attribute_Set
+			(object Attribute
+			    tool       	"Ecore"
+			    name       	"attributeName"
+			    value      	(value Text "iDAttributeName"))
+			(object Attribute
+			    tool       	"Ecore"
+			    name       	"isVolatile"
+			    value      	TRUE))
+		    quid       	"4110E4B00248"
+		    type       	"EString"
+		    quidu      	"39EB7E000186")))
+	(object Class "ENamedElementToXMLInfoMapEntry"
+	    quid       	"410FF7790078"
+	    stereotype 	"MapEntry")
+	(object Association "$UNNAMED$0"
+	    quid       	"410FF7C802E8"
+	    roles      	(list role_list
+		(object Role "ecoreToXMLInfo"
+		    attributes 	(list Attribute_Set
+			(object Attribute
+			    tool       	"Ecore"
+			    name       	"isVolatile"
+			    value      	FALSE))
+		    quid       	"410FF7CA0092"
+		    label      	"ecoreToXMLInfo"
+		    supplier   	"Logical View::ecore2xml::ENamedElementToXMLInfoMapEntry"
+		    quidu      	"410FF7790078"
+		    client_cardinality 	(value cardinality "0..n")
+		    Containment 	"By Value"
+		    is_navigable 	TRUE)
+		(object Role "$UNNAMED$1"
+		    quid       	"410FF7CA009C"
+		    supplier   	"Logical View::ecore2xml::XMLMap"
+		    quidu      	"410FDD59019D"
+		    is_aggregate 	TRUE)))
+	(object Association "$UNNAMED$2"
+	    quid       	"410FF85D0134"
+	    roles      	(list role_list
+		(object Role "key"
+		    quid       	"410FF85E02EE"
+		    label      	"key"
+		    supplier   	"Logical View::ecore::ENamedElement"
+		    quidu      	"3B65CCC600FE"
+		    client_cardinality 	(value cardinality "1")
+		    is_navigable 	TRUE)
+		(object Role "$UNNAMED$3"
+		    quid       	"410FF85E02F9"
+		    supplier   	"Logical View::ecore2xml::ENamedElementToXMLInfoMapEntry"
+		    quidu      	"410FF7790078")))
+	(object Association "$UNNAMED$4"
+	    quid       	"410FF86B0301"
+	    roles      	(list role_list
+		(object Role "value"
+		    quid       	"410FF86C02F8"
+		    label      	"value"
+		    supplier   	"Logical View::ecore2xml::XMLInfo"
+		    quidu      	"410FDD500118"
+		    client_cardinality 	(value cardinality "1")
+		    Containment 	"By Value"
+		    is_navigable 	TRUE)
+		(object Role "$UNNAMED$5"
+		    quid       	"410FF86C02FA"
+		    supplier   	"Logical View::ecore2xml::ENamedElementToXMLInfoMapEntry"
+		    quidu      	"410FF7790078"
+		    is_aggregate 	TRUE)))
+	(object Association "$UNNAMED$6"
+	    quid       	"4110E42203CB"
+	    roles      	(list role_list
+		(object Role "noNamespacePackage"
+		    attributes 	(list Attribute_Set
+			(object Attribute
+			    tool       	"Ecore"
+			    name       	"isVolatile"
+			    value      	TRUE))
+		    quid       	"4110E42400AD"
+		    label      	"noNamespacePackage"
+		    supplier   	"Logical View::ecore::EPackage"
+		    quidu      	"3905C3F7000A"
+		    client_cardinality 	(value cardinality "0..1")
+		    is_navigable 	TRUE)
+		(object Role "$UNNAMED$7"
+		    quid       	"4110E42400B7"
+		    supplier   	"Logical View::ecore2xml::XMLMap"
+		    quidu      	"410FDD59019D"))))
+    logical_presentations 	(list unit_reference_list
+	(object ClassDiagram "Ecore to XML Hierarchy"
+	    quid       	"3D9E0D780290"
+	    title      	"Ecore to XML Hierarchy"
+	    zoom       	100
+	    max_height 	28350
+	    max_width  	21600
+	    origin_x   	0
+	    origin_y   	0
+	    items      	(list diagram_item_list
+		(object ClassView "Class" "Logical View::ecore::ENamedElement" @1
+		    ShowCompartmentStereotypes 	TRUE
+		    IncludeAttribute 	TRUE
+		    IncludeOperation 	TRUE
+		    location   	(1376, 208)
+		    font       	(object Font
+			size       	10
+			face       	"Arial"
+			bold       	FALSE
+			italics    	TRUE
+			underline  	FALSE
+			strike     	FALSE
+			color      	0
+			default_color 	TRUE)
+		    label      	(object ItemLabel
+			Parent_View 	@1
+			location   	(1202, 104)
+			fill_color 	13434879
+			nlines     	1
+			max_width  	348
+			justify    	0
+			label      	"ENamedElement")
+		    icon_style 	"Icon"
+		    line_color 	3342489
+		    fill_color 	13434879
+		    quidu      	"3B65CCC600FE"
+		    width      	366
+		    height     	232
+		    annotation 	8
+		    autoResize 	TRUE)
+		(object ClassView "Class" "Logical View::ecore2xml::XMLInfo" @2
+		    ShowCompartmentStereotypes 	TRUE
+		    IncludeAttribute 	TRUE
+		    IncludeOperation 	TRUE
+		    location   	(1376, 1280)
+		    font       	(object Font
+			size       	10
+			face       	"Arial"
+			bold       	FALSE
+			italics    	FALSE
+			underline  	FALSE
+			strike     	FALSE
+			color      	0
+			default_color 	TRUE)
+		    label      	(object ItemLabel
+			Parent_View 	@2
+			location   	(1084, 1149)
+			fill_color 	13434879
+			nlines     	1
+			max_width  	584
+			justify    	0
+			label      	"XMLInfo")
+		    icon_style 	"Icon"
+		    line_color 	3342489
+		    fill_color 	13434879
+		    quidu      	"410FDD500118"
+		    width      	602
+		    height     	286
+		    annotation 	8
+		    autoResize 	TRUE)
+		(object ClassView "Class" "Logical View::ecore2xml::ENamedElementToXMLInfoMapEntry" @3
+		    ShowCompartmentStereotypes 	TRUE
+		    IncludeAttribute 	TRUE
+		    IncludeOperation 	TRUE
+		    location   	(1376, 720)
+		    font       	(object Font
+			size       	10
+			face       	"Arial"
+			bold       	FALSE
+			italics    	FALSE
+			underline  	FALSE
+			strike     	FALSE
+			color      	0
+			default_color 	TRUE)
+		    label      	(object ItemLabel
+			Parent_View 	@3
+			location   	(1025, 691)
+			fill_color 	13434879
+			nlines     	1
+			max_width  	702
+			justify    	0
+			label      	"ENamedElementToXMLInfoMapEntry")
+		    stereotype 	(object ItemLabel
+			Parent_View 	@3
+			location   	(1025, 641)
+			fill_color 	13434879
+			anchor     	10
+			nlines     	1
+			max_width  	702
+			justify    	0
+			label      	"<<MapEntry>>")
+		    icon_style 	"Icon"
+		    line_color 	3342489
+		    fill_color 	13434879
+		    quidu      	"410FF7790078"
+		    width      	720
+		    height     	182
+		    annotation 	8
+		    autoResize 	TRUE)
+		(object AssociationViewNew "$UNNAMED$2" @4
+		    location   	(1376, 476)
+		    font       	(object Font
+			size       	10
+			face       	"Arial"
+			bold       	FALSE
+			italics    	FALSE
+			underline  	FALSE
+			strike     	FALSE
+			color      	0
+			default_color 	TRUE)
+		    stereotype 	TRUE
+		    line_color 	3342489
+		    quidu      	"410FF85D0134"
+		    roleview_list 	(list RoleViews
+			(object RoleView "key" @5
+			    Parent_View 	@4
+			    location   	(304, -260)
+			    font       	(object Font
+				size       	10
+				face       	"Arial"
+				bold       	FALSE
+				italics    	FALSE
+				underline  	FALSE
+				strike     	FALSE
+				color      	0
+				default_color 	TRUE)
+			    label      	(object SegLabel @6
+				Parent_View 	@5
+				location   	(1305, 370)
+				font       	(object Font
+				    size       	10
+				    face       	"Arial"
+				    bold       	FALSE
+				    italics    	FALSE
+				    underline  	FALSE
+				    strike     	FALSE
+				    color      	0
+				    default_color 	TRUE)
+				anchor     	1
+				anchor_loc 	1
+				nlines     	1
+				max_width  	91
+				justify    	0
+				label      	"+key"
+				pctDist    	0.697368
+				height     	72
+				orientation 	0)
+			    stereotype 	TRUE
+			    line_color 	3342489
+			    quidu      	"410FF85E02EE"
+			    client     	@4
+			    supplier   	@1
+			    line_style 	0
+			    label      	(object SegLabel @7
+				Parent_View 	@5
+				location   	(1430, 370)
+				font       	(object Font
+				    size       	10
+				    face       	"Arial"
+				    bold       	FALSE
+				    italics    	FALSE
+				    underline  	FALSE
+				    strike     	FALSE
+				    color      	0
+				    default_color 	TRUE)
+				anchor     	2
+				anchor_loc 	1
+				nlines     	1
+				max_width  	15
+				justify    	0
+				label      	"1"
+				pctDist    	0.697368
+				height     	54
+				orientation 	1))
+			(object RoleView "$UNNAMED$3" @8
+			    Parent_View 	@4
+			    location   	(304, -260)
+			    font       	(object Font
+				size       	10
+				face       	"Arial"
+				bold       	FALSE
+				italics    	FALSE
+				underline  	FALSE
+				strike     	FALSE
+				color      	0
+				default_color 	TRUE)
+			    stereotype 	TRUE
+			    line_color 	3342489
+			    quidu      	"410FF85E02F9"
+			    client     	@4
+			    supplier   	@3
+			    line_style 	0)))
+		(object AssociationViewNew "$UNNAMED$4" @9
+		    location   	(1376, 973)
+		    font       	(object Font
+			size       	10
+			face       	"Arial"
+			bold       	FALSE
+			italics    	FALSE
+			underline  	FALSE
+			strike     	FALSE
+			color      	0
+			default_color 	TRUE)
+		    stereotype 	TRUE
+		    line_color 	3342489
+		    quidu      	"410FF86B0301"
+		    roleview_list 	(list RoleViews
+			(object RoleView "value" @10
+			    Parent_View 	@9
+			    location   	(304, 237)
+			    font       	(object Font
+				size       	10
+				face       	"Arial"
+				bold       	FALSE
+				italics    	FALSE
+				underline  	FALSE
+				strike     	FALSE
+				color      	0
+				default_color 	TRUE)
+			    label      	(object SegLabel @11
+				Parent_View 	@10
+				location   	(1288, 1086)
+				font       	(object Font
+				    size       	10
+				    face       	"Arial"
+				    bold       	FALSE
+				    italics    	FALSE
+				    underline  	FALSE
+				    strike     	FALSE
+				    color      	0
+				    default_color 	TRUE)
+				anchor     	1
+				anchor_loc 	1
+				nlines     	1
+				max_width  	132
+				justify    	0
+				label      	"+value"
+				pctDist    	0.699386
+				height     	89
+				orientation 	1)
+			    stereotype 	TRUE
+			    line_color 	3342489
+			    quidu      	"410FF86C02F8"
+			    client     	@9
+			    supplier   	@2
+			    line_style 	0
+			    label      	(object SegLabel @12
+				Parent_View 	@10
+				location   	(1430, 1088)
+				font       	(object Font
+				    size       	10
+				    face       	"Arial"
+				    bold       	FALSE
+				    italics    	FALSE
+				    underline  	FALSE
+				    strike     	FALSE
+				    color      	0
+				    default_color 	TRUE)
+				anchor     	2
+				anchor_loc 	1
+				nlines     	1
+				max_width  	15
+				justify    	0
+				label      	"1"
+				pctDist    	0.705521
+				height     	54
+				orientation 	0))
+			(object RoleView "$UNNAMED$5" @13
+			    Parent_View 	@9
+			    location   	(304, 237)
+			    stereotype 	TRUE
+			    line_color 	3342489
+			    quidu      	"410FF86C02FA"
+			    client     	@9
+			    supplier   	@3
+			    line_style 	0)))
+		(object ClassView "Class" "Logical View::ecore::EPackage" @14
+		    ShowCompartmentStereotypes 	TRUE
+		    IncludeAttribute 	TRUE
+		    IncludeOperation 	TRUE
+		    location   	(336, 1264)
+		    font       	(object Font
+			size       	10
+			face       	"Arial"
+			bold       	FALSE
+			italics    	FALSE
+			underline  	FALSE
+			strike     	FALSE
+			color      	0
+			default_color 	TRUE)
+		    label      	(object ItemLabel
+			Parent_View 	@14
+			location   	(164, 1110)
+			fill_color 	13434879
+			nlines     	1
+			max_width  	344
+			justify    	0
+			label      	"EPackage")
+		    icon_style 	"Icon"
+		    line_color 	3342489
+		    fill_color 	13434879
+		    quidu      	"3905C3F7000A"
+		    width      	362
+		    height     	332
+		    annotation 	8
+		    autoResize 	TRUE)
+		(object ClassView "Class" "Logical View::ecore2xml::XMLMap" @15
+		    ShowCompartmentStereotypes 	TRUE
+		    IncludeAttribute 	TRUE
+		    IncludeOperation 	TRUE
+		    location   	(336, 720)
+		    font       	(object Font
+			size       	10
+			face       	"Arial"
+			bold       	FALSE
+			italics    	FALSE
+			underline  	FALSE
+			strike     	FALSE
+			color      	0
+			default_color 	TRUE)
+		    label      	(object ItemLabel
+			Parent_View 	@15
+			location   	(78, 639)
+			fill_color 	13434879
+			nlines     	1
+			max_width  	516
+			justify    	0
+			label      	"XMLMap")
+		    icon_style 	"Icon"
+		    line_color 	3342489
+		    fill_color 	13434879
+		    quidu      	"410FDD59019D"
+		    width      	534
+		    height     	186
+		    annotation 	8
+		    autoResize 	TRUE)
+		(object AssociationViewNew "$UNNAMED$0" @16
+		    location   	(809, 720)
+		    font       	(object Font
+			size       	10
+			face       	"Arial"
+			bold       	FALSE
+			italics    	FALSE
+			underline  	FALSE
+			strike     	FALSE
+			color      	0
+			default_color 	TRUE)
+		    stereotype 	TRUE
+		    line_color 	3342489
+		    quidu      	"410FF7C802E8"
+		    roleview_list 	(list RoleViews
+			(object RoleView "ecoreToXMLInfo" @17
+			    Parent_View 	@16
+			    location   	(617, -16)
+			    font       	(object Font
+				size       	10
+				face       	"Arial"
+				bold       	FALSE
+				italics    	FALSE
+				underline  	FALSE
+				strike     	FALSE
+				color      	0
+				default_color 	TRUE)
+			    label      	(object SegLabel @18
+				Parent_View 	@17
+				location   	(836, 664)
+				font       	(object Font
+				    size       	10
+				    face       	"Arial"
+				    bold       	FALSE
+				    italics    	FALSE
+				    underline  	FALSE
+				    strike     	FALSE
+				    color      	0
+				    default_color 	TRUE)
+				anchor     	1
+				anchor_loc 	1
+				nlines     	1
+				max_width  	326
+				justify    	0
+				label      	"+ecoreToXMLInfo"
+				pctDist    	0.131068
+				height     	56
+				orientation 	0)
+			    stereotype 	TRUE
+			    line_color 	3342489
+			    quidu      	"410FF7CA0092"
+			    client     	@16
+			    supplier   	@3
+			    line_style 	0
+			    label      	(object SegLabel @19
+				Parent_View 	@17
+				location   	(953, 773)
+				font       	(object Font
+				    size       	10
+				    face       	"Arial"
+				    bold       	FALSE
+				    italics    	FALSE
+				    underline  	FALSE
+				    strike     	FALSE
+				    color      	0
+				    default_color 	TRUE)
+				anchor     	2
+				anchor_loc 	1
+				nlines     	1
+				max_width  	15
+				justify    	0
+				label      	"0..n"
+				pctDist    	0.699029
+				height     	53
+				orientation 	1))
+			(object RoleView "$UNNAMED$1" @20
+			    Parent_View 	@16
+			    location   	(617, -16)
+			    font       	(object Font
+				size       	10
+				face       	"Arial"
+				bold       	FALSE
+				italics    	FALSE
+				underline  	FALSE
+				strike     	FALSE
+				color      	0
+				default_color 	TRUE)
+			    stereotype 	TRUE
+			    line_color 	3342489
+			    quidu      	"410FF7CA009C"
+			    client     	@16
+			    supplier   	@15
+			    line_style 	0)))
+		(object AssociationViewNew "$UNNAMED$6" @21
+		    location   	(336, 955)
+		    font       	(object Font
+			size       	10
+			face       	"Arial"
+			bold       	FALSE
+			italics    	FALSE
+			underline  	FALSE
+			strike     	FALSE
+			color      	0
+			default_color 	TRUE)
+		    stereotype 	TRUE
+		    line_color 	3342489
+		    quidu      	"4110E42203CB"
+		    roleview_list 	(list RoleViews
+			(object RoleView "noNamespacePackage" @22
+			    Parent_View 	@21
+			    location   	(144, 219)
+			    font       	(object Font
+				size       	10
+				face       	"Arial"
+				bold       	FALSE
+				italics    	FALSE
+				underline  	FALSE
+				strike     	FALSE
+				color      	0
+				default_color 	TRUE)
+			    label      	(object SegLabel @23
+				Parent_View 	@22
+				location   	(582, 1035)
+				font       	(object Font
+				    size       	10
+				    face       	"Arial"
+				    bold       	FALSE
+				    italics    	FALSE
+				    underline  	FALSE
+				    strike     	FALSE
+				    color      	0
+				    default_color 	TRUE)
+				anchor     	1
+				anchor_loc 	1
+				nlines     	1
+				max_width  	444
+				justify    	0
+				label      	"+noNamespacePackage"
+				pctDist    	0.566879
+				height     	246
+				orientation 	0)
+			    stereotype 	TRUE
+			    line_color 	3342489
+			    quidu      	"4110E42400AD"
+			    client     	@21
+			    supplier   	@14
+			    line_style 	0
+			    label      	(object SegLabel @24
+				Parent_View 	@22
+				location   	(263, 1050)
+				font       	(object Font
+				    size       	10
+				    face       	"Arial"
+				    bold       	FALSE
+				    italics    	FALSE
+				    underline  	FALSE
+				    strike     	FALSE
+				    color      	0
+				    default_color 	TRUE)
+				anchor     	2
+				anchor_loc 	1
+				nlines     	1
+				max_width  	15
+				justify    	0
+				label      	"0..1"
+				pctDist    	0.668790
+				height     	74
+				orientation 	1))
+			(object RoleView "$UNNAMED$7" @25
+			    Parent_View 	@21
+			    location   	(144, 219)
+			    stereotype 	TRUE
+			    line_color 	3342489
+			    quidu      	"4110E42400B7"
+			    client     	@21
+			    supplier   	@15
+			    line_style 	0)))))))

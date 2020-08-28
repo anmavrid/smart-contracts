@@ -1,0 +1,597 @@
+package protocol
+
+  port type Sync
+  port type IDMess(int id , int m)
+  port type BufferIDMess(buffer f , int id , int m)
+
+
+  connector type Synchro2(Sync p1, Sync p2)
+    define [p1 p2] 
+    on p1 p2
+      provided true
+  end
+
+
+  connector type SR_IDMess(IDMess p1, IDMess p2)
+    define [p1 p2] 
+    on p1 p2
+      provided true 
+      up {}
+      down { p2.id = p1.id ; p2.m = p1.m ; } 
+  end
+
+
+
+  connector type SR_BufferIDMess(BufferIDMess p1, BufferIDMess p2)
+    define [p1 p2] 
+    on p1 p2
+      provided true 
+      up {}
+      down { p2.f = GetCopyBuffer(p1.f) ; p2.id = p1.id ; p2.m = p1.m ; } 
+  end  
+
+  atomic type ReceiveComponentProtocol
+
+    data buffer BufferId
+    data buffer BufferMess
+    data int id
+    data int message
+    export port IDMess LOCK   ( id , message ) 
+    export port IDMess UNLOCK ( id , message ) 
+    export port IDMess START  ( id , message ) 
+    export port IDMess ACKREF ( id , message ) 
+    export port IDMess recMSG ( id , message )
+    place rec
+    initial to rec do { CreateBuffer(&BufferId) ; CreateBuffer(&BufferMess) ; }
+
+    on recMSG from rec to rec provided true 
+       do { AddElement(&BufferId , id ) ; AddElement(&BufferMess, message) ;
+           id = GetTopElement(BufferId) ; message = GetTopElement(BufferMess) ; }
+
+    on LOCK from rec to rec 
+       provided TopIsLock(BufferMess)
+       do { RemoveTopElement(&BufferId) ; id = GetTopElement(BufferId) ;  RemoveTopElement(&BufferMess) ; message = GetTopElement(BufferMess) ; }
+
+    on UNLOCK from rec to rec 
+       provided TopIsUnlock(BufferMess)
+       do { RemoveTopElement(&BufferId) ; id = GetTopElement(BufferId) ;  RemoveTopElement(&BufferMess) ; message = GetTopElement(BufferMess) ; }
+
+    on START from rec to rec 
+       provided TopIsStart(BufferMess)
+       do { RemoveTopElement(&BufferId) ; id = GetTopElement(BufferId) ;  RemoveTopElement(&BufferMess) ; message = GetTopElement(BufferMess) ; }
+
+    on ACKREF from rec to rec 
+       provided TopIsAckref(BufferMess)
+       do { RemoveTopElement(&BufferId) ; id = GetTopElement(BufferId) ;  RemoveTopElement(&BufferMess) ; message = GetTopElement(BufferMess) ; }
+
+  end
+
+
+
+  atomic type SendComponentProtocol
+
+     data int id 
+     data buffer bufferID
+     data int idsend 
+     data int message
+
+	 /*
+      * To Edit/add automatically : Create Port for each connector
+      */
+     export port IDMess sendConn(id,message) // Edit/Add sendConn
+     export port BufferIDMess recMSG ( bufferID, id , message )
+
+
+     port Sync intern
+
+     place a
+     place b
+     initial to a do {}
+     
+     on recMSG from a to b 
+        provided true  
+        do { idsend = GetTopElement(bufferID) ; }
+
+     /*
+      * To add/Edit automatically : Edit Transition from b to b for each connector labelled by the corresponding port created automatically
+      */
+      
+     on intern from b to b // instead intern put sendC1 port for the connector
+        provided ( idsend == 1) // instead 1 put getIDC1()
+        do { RemoveTopElement(&bufferID); idsend = GetTopElement(bufferID) ;}
+
+     on intern from b to a 
+        provided (BufferIsEmpty(bufferID) == true) 
+        do { }
+  end
+
+
+  atomic type SendDataComponentProtocol
+
+     data buffer bufferID
+     data int idsend
+    
+     /*
+      * To add automatically : Create corresponding variable of the component
+      */
+
+     /*
+      * To add automatically : Create receive port, and port for each connector by the corresponding variables
+      */
+
+     export port Sync intern
+
+     place a
+     place b
+     initial to a do { CreateBuffer(&bufferID) ; }
+
+
+     on intern from a to b // instead intern put PDReceiveGuardVar
+        provided true 
+        do {bufferID = null; idsend = GetTopElement(bufferID); } // instead null put the corresponding function getConnectorSyn(p1guardVar)
+     
+     on intern from b to b // instead intern put the corresponding port sendConnector
+        provided ( idsend == 2) // instead true put the corresponding id of connector
+        do { RemoveTopElement(&bufferID); idsend = GetTopElement(bufferID) ;}
+     /*
+      * To modify automatically : Create Transition from a to b labelled by the port recMSG (ReceiveGuardVar)
+      * Create Transition from b to b for each connector labelled by the corresponding port created automatically
+      */
+
+     on intern from b to a 
+        provided ( BufferIsEmpty(bufferID) == true ) 
+        do {}
+
+  end
+
+
+
+  atomic type ComponentProtocol
+     /*
+      * To add automatically : boolean variable for each port
+      */
+    data int id = -1 // add id automatically
+    data int idsender = -1
+    data int messagesender
+    data int message
+    data buffer IS
+    data buffer bufferID
+    data int locker
+    data buffer locks
+    data buffer unlocks
+    data int n
+
+     /*
+      * To add automatically : port containing boolean variables
+      */
+
+    export port BufferIDMess sendMSG ( bufferID , id , message )
+    export port IDMess       LOCK    ( idsender , messagesender ) 
+    export port IDMess       START   ( idsender , messagesender ) 
+    export port IDMess       UNLOCK  ( idsender , messagesender ) 
+    export port IDMess       ACKREF  ( idsender , messagesender ) 
+    port Sync intern
+    place ACTIVE
+    place LockedLockedSend
+    place OffPart
+    place Waiting
+    place Locked
+    place WaitingLockedSend
+    place SYNC
+    place LockedSYNCSend
+    place LockedWaitingSend
+
+    initial to ACTIVE do { /*id = setId();*/ CreateBuffer(&locks); CreateBuffer(&bufferID); CreateBuffer(&IS); CreateBuffer(&unlocks);}
+    
+     
+     
+     /*
+      * To edit automatically : Edit Transition from from ACTIVE to OffPart labelled by the port Ports
+      */
+    on intern from ACTIVE to OffPart //replace intern by RecPortGuard ( Get Ports )
+       provided true 
+       do {IS = 1 /*getConnectorG1(p1guardVar, p2guardVar)*/;  message = getMessOfferPart(IS) ;  SetEmpty(&bufferID);  bufferID = GetCopyBuffer(IS); printf("Component Protocol GetPorts \n");}
+      
+ 
+    on sendMSG from OffPart to Waiting // Transition 1
+       provided (message == MOffer()) 
+       do {  printf("Component Protocol Transition 1 \n");}
+
+    on sendMSG from OffPart to Locked  // Transition 2
+       provided (message == MParticipate()) 
+       do { locker = GetTopElement(IS); SetEmpty(&locks); SetEmpty(&unlocks); printf("Component Protocol Transition 2 \n");}
+
+    on LOCK from Waiting to WaitingLockedSend // Transition 3
+       provided true 
+       do {locker = idsender ; SetEmpty(&locks); CreateBuffer(&unlocks); SetEmpty(&bufferID); AddUniqueElement(&bufferID,locker); message = MOk(); printf("Component Protocol Transition 3 \n"); }
+
+    on sendMSG from WaitingLockedSend to Locked 
+       provided true 
+       do { }
+
+    on LOCK from Locked to Locked // Transition 4
+       provided true 
+       do { AddUniqueElement(&locks,idsender); printf("Component Protocol Transition 4 \n");}
+
+    on UNLOCK from Locked to LockedLockedSend // Transition 5
+       provided BufferIsEmpty(locks) == false 
+       do {locker = GetTopElement(locks);  SetEmpty(&bufferID); AddUniqueElement(&bufferID,locker); message = MOk(); printf("Component Protocol Transition 5 \n");}
+
+    on sendMSG from LockedLockedSend to Locked 
+       provided true 
+       do {RemoveTopElement(&locks); AddUniqueElement(&unlocks , idsender);}
+
+    on UNLOCK from Locked to LockedWaitingSend  // Transition 6
+       provided BufferIsEmpty(locks) == true 
+       do { message = MOffer();  SetEmpty(&bufferID); bufferID = GetCopyBuffer(unlocks);AddUniqueElement(&bufferID,idsender); printf("Component Protocol Transition 6 \n");}
+    
+    on sendMSG from LockedWaitingSend to Waiting 
+       provided true
+       do { }
+   
+    on START from Locked to LockedSYNCSend // Transition 7 
+       provided true
+       do { SetEmpty(&bufferID); bufferID = GetCopyBuffer(IS);  RemoveSubBuffer(&bufferID, unlocks); RemoveElement(&bufferID,locker); n = BufferSize(bufferID); message = MRefuse(); printf("Component Protocol Transition 7 \n"); }
+ 
+    on sendMSG from LockedSYNCSend to SYNC 
+       provided true 
+       do { }
+
+    on ACKREF from SYNC to SYNC // Transition 10
+       provided true
+       do { n = n - 1; printf("Component Protocol Transition 10 \n");}
+   
+    on LOCK from SYNC to SYNC // Transition 8
+       provided true
+       do { printf("Component Protocol Transition 8 \n"); }
+
+    on UNLOCK from SYNC to SYNC  // Transition 9
+       provided true
+       do { printf("Component Protocol Transition 9 \n");}
+    
+    on intern from SYNC to ACTIVE // Transition 11
+       provided ( n == 0) 
+       do { SetEmpty(&IS); printf("Component Protocol Transition 11 \n"); }
+
+  end
+
+
+
+
+
+
+
+
+  atomic type ReceiveConnectorProtocol
+
+    data buffer BufferId
+    data buffer Buffermess
+    data int id
+    data int message
+
+    export port IDMess OFFER(id,message) 
+    export port IDMess PARTICIPATE(id,message) 
+    export port IDMess REFUSE(id,message) 
+    export port IDMess OK(id,message) 
+    export port IDMess recMSG(id,message)
+
+    place rec
+    initial to rec do { CreateBuffer(&BufferId); CreateBuffer(&Buffermess); }
+
+    on recMSG from rec to rec provided true 
+       do { AddElement(&BufferId , id ) ; AddElement(&Buffermess, message) ;
+       id = GetTopElement(BufferId) ; message = GetTopElement(Buffermess) ; }
+
+    on OFFER from rec to rec 
+       provided TopIsOffer(Buffermess)
+       do { RemoveTopElement(&BufferId) ; id = GetTopElement(BufferId) ; RemoveTopElement(&Buffermess) ; message = GetTopElement(Buffermess) ; }
+
+    on PARTICIPATE from rec to rec 
+       provided TopIsParticipate(Buffermess)
+       do { RemoveTopElement(&BufferId) ; id = GetTopElement(BufferId) ; RemoveTopElement(&Buffermess) ; message = GetTopElement(Buffermess) ; }
+
+    on REFUSE from rec to rec 
+       provided TopIsRefuse(Buffermess)
+       do { RemoveTopElement(&BufferId) ; id = GetTopElement(BufferId) ; RemoveTopElement(&Buffermess) ; message = GetTopElement(Buffermess) ; }
+
+    on OK from rec to rec 
+       provided TopIsOk(Buffermess)
+       do { RemoveTopElement(&BufferId) ; id = GetTopElement(BufferId) ; RemoveTopElement(&Buffermess) ; message = GetTopElement(Buffermess) ; }
+
+  end
+
+
+
+  atomic type SendConnectorProtocol 
+
+     data int id 
+     data buffer bufferID
+     data int idsend 
+     data int message = -1
+     
+     /*
+      * To Edit/add automatically : Create Port for each component (IDMess)
+      */
+     port IDMess sendComp(id,message)
+     export port BufferIDMess recMSG ( bufferID , id , message )
+
+     port Sync intern
+
+     place a
+     place b
+     initial to a do {}
+     
+     on recMSG from a to b 
+        provided true 
+        do { idsend = GetTopElement(bufferID) ;}
+
+     /*
+      * To Edit/add automatically : Create Transition for each component from b to b
+      */
+     on intern from b to b 
+      	provided (BufferIsEmpty(bufferID) == false && idsend == 1/* id of component*/) 
+      	do { RemoveTopElement(&bufferID); idsend = GetTopElement(bufferID) ;}
+
+     on intern from b to a 
+        provided ( BufferIsEmpty(bufferID) == true ) 
+        do {}
+
+  end
+
+
+
+
+
+  atomic type ConnectorProtocol(int Cardinality , int idconn) 
+    data int current
+    data int id
+    data int idsender
+    data int messagesender
+    data int message
+    data int false_refuse
+    data buffer bufferID
+    data buffer shared
+    data buffer locked
+    data buffer waiting
+    data buffer alpha
+    data int n
+
+
+    export port IDMess OK(idsender, messagesender) 
+    export port IDMess REFUSE(idsender, messagesender) 
+    export port IDMess OFFER(idsender, messagesender) 
+    export port IDMess PARTICIPATE(idsender, messagesender) 
+    export port BufferIDMess sendMSG(bufferID , id, message)
+    export port Sync Guard
+    export port Sync START
+    port Sync intern
+
+    place ACCEPTING
+    place LOCKING
+    place ACCEPTINGSend
+    place ACCEPTINGSend1
+    place ACCEPTINGSend2
+    place ACCEPTINGLOCKNG
+    place LOCKINGSend
+    place LOCKINGACCEPTING
+    place LOCKINGACCEPTING1
+    place LOCKINGACCEPTING2
+    place LOCKINGACCEPTING3
+    place LOCKINGACCEPTING4
+
+
+
+    initial to ACCEPTING do {/*id = setId();*/ 
+       false_refuse = -1; 
+       CreateBuffer(&locked); CreateBuffer(&shared); CreateBuffer(&bufferID);CreateBuffer(&alpha);CreateBuffer(&waiting); n=0; id = idconn ;}
+   
+
+    on OK from ACCEPTING to ACCEPTING // Transition 9
+       provided true 
+       do {printf("Connector Protocol Transition 9 \n"); }
+    
+    on OFFER from ACCEPTING to ACCEPTING // Transition 1
+       provided n < Cardinality 
+       do { 
+       if (false_refuse == idsender)  false_refuse=-1 ;
+       n = n + 1 ; AddUniqueElement(&shared,idsender); 
+       printf("Connector Protocol Transition 1 \n");}
+   
+    on PARTICIPATE from ACCEPTING to ACCEPTING // Transition 2
+       provided n < Cardinality 
+       do { n = n + 1 ; AddUniqueElement(&locked,idsender); printf("Connector Protocol Transition 2 \n");}
+
+    on REFUSE from ACCEPTING to ACCEPTINGSend // Transition 3
+       provided true
+       do { if (false_refuse != idsender) n = ComputeN(n) ;  SetEmpty(&bufferID); AddUniqueElement(&bufferID,idsender); message = MAckref(); printf("Connector Protocol Transition 3 \n");}
+
+    on sendMSG from ACCEPTINGSend to ACCEPTING 
+       provided true 
+       do { RemoveElement(&shared,idsender); }
+
+  /*  on intern from ACCEPTING to ACCEPTINGSend1 // Transition 4
+       provided ( n == Cardinality && BufferIsEmpty(shared) == true) 
+       do {message = MStart();   SetEmpty(&bufferID); bufferID = GetCopyBuffer(locked); }
+
+    on sendMSG from ACCEPTINGSend1 to ACCEPTINGSend2 
+       provided true 
+       do { SetEmpty(&locked); SetEmpty(&shared); n=0;}
+
+    on START from ACCEPTINGSend2 to ACCEPTING 
+       provided true 
+       do { }
+    */
+    
+    /* Transition 4 may be to test  */ 
+   	on START from ACCEPTING to ACCEPTINGSend1 // Transition 4
+       provided ( n == Cardinality && BufferIsEmpty(shared) == true) 
+       do {message = MStart();   SetEmpty(&bufferID); bufferID = GetCopyBuffer(locked); printf("Connector Protocol Transition 4 \n");}
+
+    on sendMSG from ACCEPTINGSend1 to ACCEPTING 
+       provided true 
+       do { SetEmpty(&locked); SetEmpty(&shared); n=0; }
+    
+
+    on Guard from ACCEPTING to ACCEPTINGLOCKNG  // Transition 5
+       provided ( n == Cardinality && BufferIsEmpty(shared) == false) 
+       do { current = GetSmallestElement(shared);waiting = GetCopyBuffer(shared) ; RemoveElement(&waiting,current); message = MLock();  SetEmpty(&bufferID); AddUniqueElement(&bufferID, current); printf("Connector Protocol Transition 5 \n");  }
+
+    on sendMSG from ACCEPTINGLOCKNG to LOCKING 
+       provided true 
+       do {}
+
+    on OK from LOCKING to LOCKINGSend // Transition 6
+       provided (BufferIsEmpty(waiting) == false)
+       do { AddUniqueElement(&locked,current); current = GetSmallestElement(waiting); RemoveElement(&waiting,current); message=MLock();  SetEmpty(&bufferID); AddUniqueElement(&bufferID, current); printf("Connector Protocol Transition 6 \n");}
+
+    on sendMSG from  LOCKINGSend to LOCKING 
+       provided true 
+       do {}
+
+    on REFUSE from LOCKING to LOCKINGACCEPTING // Transition 8
+       provided true 
+       do { if (idsender != current)  false_refuse = current ; alpha = GetIntersect(locked,shared); AddUniqueElement(&alpha,current); AddUniqueElement(&alpha,idsender); message = MUnlock();  SetEmpty(&bufferID); bufferID = GetCopyBuffer(alpha); RemoveElement(&bufferID,idsender); printf("Connector Protocol Transition 8 \n");  }
+
+    on sendMSG from LOCKINGACCEPTING to LOCKINGACCEPTING1 
+       provided true 
+       do { }
+
+    on intern from LOCKINGACCEPTING1 to LOCKINGACCEPTING2 
+       provided true 
+       do { message = MAckref();  SetEmpty(&bufferID); AddUniqueElement(&bufferID,idsender);}
+
+    on sendMSG from LOCKINGACCEPTING2 to ACCEPTING 
+       provided true 
+       do { RemoveSubBuffer(&shared,alpha); RemoveSubBuffer(&locked,alpha); n = n - BufferSize(alpha); SetEmpty(&alpha); }
+
+    on OK from LOCKING to  LOCKINGACCEPTING3 // Transition 7
+       provided (BufferIsEmpty(waiting) == true) 
+       do { AddUniqueElement(&locked , current) ;  SetEmpty(&bufferID);bufferID = GetCopyBuffer(locked); message = MStart(); printf("Connector Protocol Transition 7 \n"); }
+
+    on sendMSG from LOCKINGACCEPTING3 to LOCKINGACCEPTING4 
+       provided true 
+       do { SetEmpty(&locked) ; SetEmpty(&waiting); SetEmpty(&shared); n=0; }
+
+    on START from LOCKINGACCEPTING4 to ACCEPTING 
+       provided true 
+       do { }
+
+  end
+
+
+
+
+  compound type DistributedConnector
+
+    /*
+     * To add automatically : Connector protocol component with the corresponding cardinality : Protocol , Send Connector Protocol : Send, Connector is a specific petri net
+     */
+     component ReceiveConnectorProtocol Receive
+
+
+     /*
+      * To add automatically : 5 connectors, OFFER, PARTICIPATE, REFUSE, OK, sendMSG recMSG
+      */
+      
+     /*	connector SR_IDMess conn_offer(Receive.OFFER,Protocol.OFFER)
+      *	connector SR_IDMess conn_participate(Receive.PARTICIPATE,Protocol.PARTICIPATE)
+      *	connector SR_IDMess conn_refuse(Receive.REFUSE,Protocol.REFUSE)
+      *	connector SR_IDMess conn_ok(Receive.OK,Protocol.OK)
+      *	connector SR_BufferIDMess conn_msg(Protocol.sendMSG,Send.recMSG) 
+	  */
+	  
+	 /*
+      * To add automatically : 2 connectors between connector and protocol to connect START and Guard
+      */
+     
+     /* connector Synchro2 conn1(Protocol.START,C1.START)
+      *	connector Synchro2 conn2(Protocol.Guard,C1.Guard)
+      */
+      
+    /*
+     * To add automatically : export port (IDMess) for each component from the protocol to send
+     * export ports for the connector specific petri net to rely to the corresponding port in the component
+     * export ports to receive data for each port for the connector
+     */
+
+  end
+  
+  
+    compound type DistriubtedComponent
+
+     /*
+      * To add automatically : component ,  component protocol : Protocol  , send component protocol : Send , send data component protocol SendData
+      */
+     component ReceiveComponentProtocol Receive
+
+     /*
+      * To add automatically : 5 connectors, LOCK, UNLOCK, START, ACKREF, sendMSG recMSG
+      */
+
+	 /*	connector SR_IDMess conn_lock      ( Receive.LOCK , Protocol.LOCK )
+   	  *	connector SR_IDMess conn_unlock    ( Receive.UNLOCK , Protocol.UNLOCK )
+      *	connector SR_IDMess conn_start     ( Receive.START , Protocol.START )
+      *	connector SR_IDMess conn_ackref    ( Receive.ACKREF , Protocol.ACKREF )
+      *	connector SR_BufferIDMess conn_msg ( Protocol.sendMSG , Send.recMSG ) 
+      */
+
+     /*
+      * To add automatically : connector for boolean variable, connector for data
+      */
+
+     /*
+      * To add automatically : for each connector export 2 ports: 1 for message (IDMess) other for data , initial port of component
+      */
+
+  end
+  
+  atomic type ConnectorTypeBehavior(int Cardinality)
+   //data int n = 0
+   
+ 	 /*
+ 	  * Add Variable for connector & variable for ports
+ 	  */
+ 	  
+ 	 /*
+ 	  * Add Ports correspond to the port of the connector with the corresponding variables
+ 	  */
+ 	  
+   export port Sync Guard
+   export port Sync START
+   port Sync intern
+   
+   place A0
+ //  place A1
+   place B1
+   place C1
+   initial to A0 do {}
+    
+     /*
+ 	  * Add/Replace intern by the corresponding Ports -- for each port new transition
+ 	  */
+   on intern from A0 to A0 provided true do { }
+  // on intern from A0 to A1 provided ( n == Cardinality ) do {}
+   on Guard from A0 to A0 provided true do {} // Replace true by the corresponding guard of the connector
+   on START from A0 to B1 /* Add list of Place */ provided true do { /* up(); down(); after doing replacement */} // Replace the true by the corresponding guard
+
+     /* Generated Automatically Corresponding to cardinality
+      * on Synp1 from B1 to C1 provided true do {}
+      * on G1p1  from B2 to C2 provided true do {}
+      * on G2p1  from B3 to C3 provided true do {}
+      * on intern from C1,C2,C3 to A0 provided true do {}
+      */
+   on intern from C1 to A0 provided true do { /*n = 0 ;*/} // to edit
+end
+
+  connector type SR_IDMessage(IDMess p1, IDMess p2)
+    define [p1' p2] 
+    on p1 p2
+      provided true 
+      up {}
+      down { p2.id = p1.id ; p2.m = p1.m ; } 
+    on p1 
+	  provided false
+  end
+
+
+end

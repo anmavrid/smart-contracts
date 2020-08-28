@@ -1,0 +1,129 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.eclipse.emf.ecore">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="org.eclipse.emf.ecore" id="uri_mapping" name="URI Converter Mapping Registry"/>
+      </appInfo>
+      <documentation>
+         This extension point is used to define mappings to be applied by the default URI converter in normalizing URIs.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <complexType>
+         <sequence>
+            <element ref="mapping" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  A fully qualified identifier of the target extension point.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  An optional identifier of the extension instance.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  An optional name of the extension instance.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="mapping">
+      <annotation>
+         <appInfo>
+            <meta.element labelAttribute="source"/>
+         </appInfo>
+      </annotation>
+      <complexType>
+         <attribute name="source" type="string" use="required">
+            <annotation>
+               <documentation>
+                  A source URI that, if matched, should be replaced by a target.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="target" type="string" use="required">
+            <annotation>
+               <documentation>
+                  A target URI to which the source is mapped.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="since"/>
+      </appInfo>
+      <documentation>
+         1.0.0
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="examples"/>
+      </appInfo>
+      <documentation>
+         Following is an example of how a URI mapping can be registered: 
+&lt;pre&gt;
+  &lt;extension point=&quot;org.eclipse.emf.ecore.uri_mapping&quot; &gt;
+    &lt;mapping source=&quot;//special/&quot; target=&quot;special/&quot;/&gt;
+  &lt;/extension&gt;
+&lt;/pre&gt;
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="apiInfo"/>
+      </appInfo>
+      <documentation>
+         If the target is relative, it is resolved against the plugin&apos;s installed location, returning in a URI of the form:
+&lt;pre&gt;
+  platform:/plugin/plugin-name_1.2.3/...
+&lt;/pre&gt;
+&lt;p&gt;
+A folder to folder mapping, i.e., where both source and target end in /, will remap entire subtrees, not just instances that match exactly.
+&lt;/p&gt;
+&lt;p&gt;URI mappings can also be defined from the source code with the &lt;samp&gt;org.eclipse.emf.ecore.resource.URIConverter.URI_MAP&lt;/samp&gt; as follows:
+&lt;/p&gt;
+&lt;pre&gt;
+  URIConverter.URI_MAP.put(&quot;//special/&quot;, &quot;special/&quot;);
+&lt;/pre&gt;
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="implementation"/>
+      </appInfo>
+      <documentation>
+         
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="copyright"/>
+      </appInfo>
+      <documentation>
+         Copyright (c) 2002, 2004 IBM Corporation and others.&lt;br&gt;
+All rights reserved. This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0 which accompanies this distribution, and is available at &lt;a 
+href=&quot;http://www.eclipse.org/legal/epl-v10.html&quot;&gt;http://www.eclipse.org/legal/epl-v10.html&lt;/a&gt;
+      </documentation>
+   </annotation>
+
+</schema>

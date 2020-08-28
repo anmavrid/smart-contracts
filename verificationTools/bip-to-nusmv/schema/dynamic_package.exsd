@@ -1,0 +1,111 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.eclipse.emf.ecore">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="org.eclipse.emf.ecore" id="dynamic_package" name="Ecore Package Registry for Dynamic Packages"/>
+      </appInfo>
+      <documentation>
+         This extension point is used to register an Ecore resource against a namespace URI (Uniform Resource Identifier) in EMF&apos;s global package registry, &lt;samp&gt;EPackage.Registry.INSTANCE&lt;/samp&gt;. The location URI may contain a fragment that specifies the location of a particlar package within the resource; if the fragment is absent, &quot;#/&quot; is assumed. When a model instance is loaded from its serialized form, this registry may be consulted in order to obtain the correct metamodel that is to be instantiated.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <complexType>
+         <sequence>
+            <element ref="resource" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  A fully qualified identifier of the target extension point.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  An optional identifier of the extension instance.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  An optional name of the extension instance.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="resource">
+      <complexType>
+         <attribute name="uri" type="string" use="required">
+            <annotation>
+               <documentation>
+                  A URI that uniquely identifies an Ecore package.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="location" type="anyURI">
+            <annotation>
+               <documentation>
+                  An absolute or plugin relative URI of the Ecore resource for the package.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="since"/>
+      </appInfo>
+      <documentation>
+         2.4.0
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="examples"/>
+      </appInfo>
+      <documentation>
+         Following is an example of how a dynamic package can be registered: 
+&lt;pre&gt;
+  &lt;extension point=&quot;org.eclipse.emf.ecore.dynamic_package&quot; &gt;
+     &lt;resource uri=&quot;http://www.example.org/Example&quot; location=&quot;model/Example.ecore#/&quot;/&gt; 
+  &lt;/extension&gt;
+&lt;/pre&gt;
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="apiInfo"/>
+      </appInfo>
+      <documentation>
+         The value of the location attribute must represent an Ecore Resource.
+&lt;p&gt;
+An EMF package can also be registered from the source code with the &lt;samp&gt;EPackage.Registry.INSTANCE&lt;/samp&gt; as follows:
+&lt;/p&gt;
+&lt;pre&gt;
+  EPackage.Registry.INSTANCE.put(companyPackage.getNsURI(), companyPackage); 
+&lt;/pre&gt;
+      </documentation>
+   </annotation>
+
+
+   <annotation>
+      <appInfo>
+         <meta.section type="copyright"/>
+      </appInfo>
+      <documentation>
+         Copyright (c) 2008 IBM Corporation and others.&lt;br&gt;
+All rights reserved. This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0 which accompanies this distribution, and is available at &lt;a 
+href=&quot;http://www.eclipse.org/legal/epl-v10.html&quot;&gt;http://www.eclipse.org/legal/epl-v10.html&lt;/a&gt;
+      </documentation>
+   </annotation>
+
+</schema>

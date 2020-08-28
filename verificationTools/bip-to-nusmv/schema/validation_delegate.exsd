@@ -1,0 +1,124 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.eclipse.emf.ecore" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="org.eclipse.emf.ecore" id="validation_delegate" name="Validation Delegate Registry"/>
+      </appInfo>
+      <documentation>
+         This extension point is used to define a delegate that evaluates validation expressions whose type is identified by a URI. The global EMF validation delegate registry, &lt;samp&gt;EValidator.ValidationDelegate.Factory.Registry.INSTANCE&lt;/samp&gt;, is used to record the registration.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appInfo>
+            <meta.element />
+         </appInfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="delegate" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  A fully qualified identifier of the target extension point.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  An optional identifier of the extension instance.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  An optional name of the extension instance.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="delegate">
+      <annotation>
+         <appInfo>
+            <meta.element labelAttribute="id"/>
+         </appInfo>
+      </annotation>
+      <complexType>
+         <attribute name="uri" type="string" use="required">
+            <annotation>
+               <documentation>
+                  A URI identifying the type of validation expressions that can be evaluated by the delegate.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The fully qualified name of a Java class implementing &lt;samp&gt;org.eclipse.emf.ecore.EValidator.ValidationDelegate&lt;/samp&gt;.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn="org.eclipse.emf.ecore.EValidator.ValidationDelegate"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="since"/>
+      </appInfo>
+      <documentation>
+         2.6.0
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="examples"/>
+      </appInfo>
+      <documentation>
+         Following is an example of how a validation delegate can be registered: 
+&lt;pre&gt;
+  &lt;extension point=&quot;org.eclipse.emf.ecore.validation_delegate&quot; &gt;
+    &lt;delegate uri=&quot;http://www.eclipse.org/emf/2002/Ecore/OCL&quot; class=&quot;org.eclipse.ocl.ecore.delegate.OCLValidationDelegate&quot;/&gt; 
+  &lt;/extension&gt;
+&lt;/pre&gt;
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="apiInfo"/>
+      </appInfo>
+      <documentation>
+         The value of the class attribute must represent a class that implements &lt;samp&gt;org.eclipse.emf.ecore.EValidator.ValidationDelegate&lt;/samp&gt; and has a no argument contructor.
+&lt;p&gt;
+A validation delegate can be also registered from the source code with the &lt;samp&gt;EValidator.ValidationDelegate.Registry.INSTANCE&lt;/samp&gt; as follows:
+&lt;/p&gt;
+&lt;pre&gt;
+  EValidator.ValidationDelegate.Registry.INSTANCE.put(&quot;http://www.eclipse.org/emf/2002/Ecore/OCL&quot;, new OCLValidationDelegate());
+&lt;/pre&gt;
+      </documentation>
+   </annotation>
+
+
+   <annotation>
+      <appInfo>
+         <meta.section type="copyright"/>
+      </appInfo>
+      <documentation>
+         Copyright (c) 2009 Kenn Hussey and others.&lt;br&gt;
+All rights reserved. This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0 which accompanies this distribution, and is available at &lt;a 
+href=&quot;http://www.eclipse.org/legal/epl-v10.html&quot;&gt;http://www.eclipse.org/legal/epl-v10.html&lt;/a&gt;
+      </documentation>
+   </annotation>
+
+</schema>

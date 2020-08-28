@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <package
+            uri="http://www.eclipse.org/emf/2005/Ecore2XML"
+            class="org.eclipse.emf.mapping.ecore2xml.Ecore2XMLPackage"
+            genModel="model/Ecore2XML.genmodel"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.extension_parser">
+      <parser
+            type="ecore2xml"
+            class="org.eclipse.emf.mapping.ecore2xml.util.Ecore2XMLResourceFactoryImpl"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.content_parser">
+      <parser
+            contentTypeIdentifier="org.eclipse.emf.mapping.ecore2xml"
+            class="org.eclipse.emf.mapping.ecore2xml.util.Ecore2XMLResourceFactoryImpl"/>
+   </extension>
+
+   <extension point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.emf.ecore.xmi"
+            file-extensions="ecore2xml"
+            id="org.eclipse.emf.mapping.ecore2xml"
+            name="%_UI_Ecore2XML_content_type"
+            priority="normal">
+         <describer class="org.eclipse.emf.ecore.xmi.impl.RootXMLContentHandlerImpl$Describer">
+            <parameter name="namespace" value="http://www.eclipse.org/emf/2005/Ecore2XML"/>
+            <parameter name="kind" value="xmi"/>
+         </describer>
+      </content-type>
+   </extension>
+
+   <extension point="org.eclipse.team.core.fileTypes">
+      <fileTypes extension="ecore2xml" type="text"/>
+   </extension>
+</plugin>
