@@ -1,16 +1,62 @@
 define([], function () {
     'use strict';
-    var ERC20Properties = function () {
+    var ERC777Properties = function () {
     };
 
-    ERC20Properties.prototype.constructor = ERC20Properties;
-    ERC20Properties.prototype.generateERC20TransferShouldThrowWeakProperty = function (templateOne, model, bipTransitionsToSMVNames, actionNamesToTransitionNames) {
+    ERC777Properties.prototype.constructor = ERC777Properties;
+    ERC777Properties.prototype.generateGlobalPExistence = function (templateOne, model, bipTransitionsToSMVNames, actionNamesToTransitionNames) {
         var self = this,
             properties = [],
             property, clause,
             propertiesSMV = '';
 
-        properties = ERC20Properties.prototype.parseProperties.call(self, model, templateOne);
+        properties = ERC777Properties.prototype.parseProperties.call(self, model, templateOne);
+        for (property of properties) {
+            propertiesSMV += '-- EF ( ';
+            for (clause of property[0]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ')\n';
+
+            propertiesSMV += 'CTLSPEC EF ( ';
+            for (clause of property[0]) {
+                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ')\n\n';
+        }
+        return propertiesSMV;
+    };
+
+    /* Get the textual properties specified by the user in Template One */
+    ERC777Properties.prototype.generateGlobalPExistenceText = function (templateOne, model, bipTransitionsToSMVNames, actionNamesToTransitionNames) {
+        var self = this,
+            properties = [],
+            property, clause,
+            propertiesSMV = '';
+
+        properties = ERC777Properties.prototype.parseProperties.call(self, model, templateOne);
+        for (property of properties) {
+            propertiesSMV += '';
+            for (clause of property[0]) {
+                propertiesSMV += clause + "|"
+            }
+
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += 'should happen \n';
+
+        }
+        return propertiesSMV;
+    };
+
+    ERC777Properties.prototype.generateERC20TransferShouldThrowStrongProperty = function (templateOne, model, bipTransitionsToSMVNames, actionNamesToTransitionNames) {
+        var self = this,
+            properties = [],
+            property, clause,
+            propertiesSMV = '';
+
+        properties = ERC777Properties.prototype.parseProperties.call(self, model, templateOne);
         for (property of properties) {
             propertiesSMV += '-- AG ( ';
             for (clause of property[1]) {
@@ -22,7 +68,12 @@ define([], function () {
                 propertiesSMV += clause + "|"
             }
             propertiesSMV = propertiesSMV.slice(0, -1);
-            propertiesSMV += ') -> !E [ !(';
+            propertiesSMV += ')) -> A [ !(';
+            for (clause of property[2]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') U (';
             for (clause of property[0]) {
                 propertiesSMV += clause + "|"
             }
@@ -32,22 +83,7 @@ define([], function () {
                 propertiesSMV += clause + "|"
             }
             propertiesSMV = propertiesSMV.slice(0, -1);
-            propertiesSMV += ')) U (';
-            for (clause of property[2]) {
-                propertiesSMV += clause + "|"
-            }
-            propertiesSMV = propertiesSMV.slice(0, -1);
-            propertiesSMV += ' & !(';
-            for (clause of property[0]) {
-                propertiesSMV += clause + "|"
-            }
-            propertiesSMV = propertiesSMV.slice(0, -1);
-            propertiesSMV += ' & !(';
-            for (clause of property[2]) {
-                propertiesSMV += clause + "|"
-            }
-            propertiesSMV = propertiesSMV.slice(0, -1);
-            propertiesSMV += ')))])\n';
+            propertiesSMV += '))]\n';
 
             propertiesSMV += 'CTLSPEC AG ( ';
             for (clause of property[1]) {
@@ -59,81 +95,6 @@ define([], function () {
                 propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
             }
             propertiesSMV = propertiesSMV.slice(0, -1);
-            propertiesSMV += ') -> !E [ !(';
-            for (clause of property[0]) {
-                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
-            }
-            propertiesSMV = propertiesSMV.slice(0, -1);
-            propertiesSMV += ' & !(';
-            for (clause of property[2]) {
-                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
-            }
-            propertiesSMV = propertiesSMV.slice(0, -1);
-            propertiesSMV += ')) U (';
-            for (clause of property[2]) {
-                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
-            }
-            propertiesSMV = propertiesSMV.slice(0, -1);
-            propertiesSMV += ' & !(';
-            for (clause of property[0]) {
-                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
-            }
-            propertiesSMV = propertiesSMV.slice(0, -1);
-            propertiesSMV += ' & !(';
-            for (clause of property[2]) {
-                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
-            }
-            propertiesSMV = propertiesSMV.slice(0, -1);
-            propertiesSMV += ')))])\n\n';
-        }
-        return propertiesSMV;
-    };
-
-    ERC20Properties.prototype.generateERC20TransferShouldThrowStrongProperty = function (templateOne, model, bipTransitionsToSMVNames, actionNamesToTransitionNames) {
-        var self = this,
-            properties = [],
-            property, clause,
-            propertiesSMV = '';
-
-        properties = ERC20Properties.prototype.parseProperties.call(self, model, templateOne);
-        for (property of properties) {
-            propertiesSMV += '-- AG (( ';
-            for (clause of property[1]) {
-                propertiesSMV += clause + "|"
-            }
-            propertiesSMV = propertiesSMV.slice(0, -1);
-            propertiesSMV += ' & !(';
-            for (clause of property[2]) {
-                propertiesSMV += clause + "|"
-            }
-            propertiesSMV = propertiesSMV.slice(0, -1);
-            propertiesSMV += ')) -> A [ !(';
-            for (clause of property[2]) {
-                propertiesSMV += clause + "|"
-            }
-            propertiesSMV = propertiesSMV.slice(0, -1);
-            propertiesSMV += ') U (';
-            for (clause of property[0]) {
-                propertiesSMV += clause + "|"
-            }
-            propertiesSMV = propertiesSMV.slice(0, -1);
-            propertiesSMV += ' & !(';
-            for (clause of property[2]) {
-                propertiesSMV += clause + "|"
-            }
-            propertiesSMV = propertiesSMV.slice(0, -1);
-            propertiesSMV += '))])\n';
-
-            propertiesSMV += 'CTLSPEC AG( ( ';
-            for (clause of property[1]) {
-                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
-            }
-            propertiesSMV = propertiesSMV.slice(0, -1);
-            propertiesSMV += ' & !(';
-            for (clause of property[2]) {
-                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
-            }
-            propertiesSMV = propertiesSMV.slice(0, -1);
             propertiesSMV += ')) -> A [ !(';
             for (clause of property[2]) {
                 propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
@@ -149,20 +110,20 @@ define([], function () {
                 propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
             }
             propertiesSMV = propertiesSMV.slice(0, -1);
-            propertiesSMV += '))])\n\n';
+            propertiesSMV += '))]\n\n';
         }
         console.log(propertiesSMV.toString());
         return propertiesSMV;
     };
 
     /* Get the textual properties specified by the user in Template One */
-    ERC20Properties.prototype.generateERC20TransferShouldThrowPropertyText = function (templateOne, model, bipTransitionsToSMVNames, actionNamesToTransitionNames) {
+    ERC777Properties.prototype.generateERC20TransferShouldThrowPropertyText = function (templateOne, model, bipTransitionsToSMVNames, actionNamesToTransitionNames) {
         var self = this,
             properties = [],
             property, clause,
             propertiesSMV = '';
 
-        properties = ERC20Properties.prototype.parseProperties.call(self, model, templateOne);
+        properties = ERC777Properties.prototype.parseProperties.call(self, model, templateOne);
         for (property of properties) {
             propertiesSMV += '(';
             for (clause of property[0]) {
@@ -186,7 +147,7 @@ define([], function () {
     };
 
 
-    ERC20Properties.prototype.parseProperties = function (model, properties) {
+    ERC777Properties.prototype.parseProperties = function (model, properties) {
         var self = this,
             parsedProperties, clauses, actions,
             property, clause, action, actionName,
@@ -224,5 +185,5 @@ define([], function () {
         }
         return parsedProperties;
     };
-    return ERC20Properties;
+    return ERC777Properties;
 });

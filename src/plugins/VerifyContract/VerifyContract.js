@@ -16,7 +16,8 @@ define([
   'scsrc/templatesForBIP/ejsCache',
   'scsrc/parsers/solidity',
   'common/util/guid',
-  'scsrc/plugins/VerifyContract/StandardProperties/ERC20Properties'
+  'scsrc/plugins/VerifyContract/StandardProperties/ERC20Properties',
+  'scsrc/plugins/VerifyContract/StandardProperties/ERC777Properties'
 ], function (
   PluginConfig,
   pluginMetadata,
@@ -26,7 +27,8 @@ define([
   ejsCache,
   solidity,
   guid,
-  ERC20Properties) {
+  ERC20Properties,
+  ERC777Properties) {
   'use strict';
 
   pluginMetadata = JSON.parse(pluginMetadata);
@@ -251,12 +253,16 @@ define([
         fairnessProperties += VerifyContract.prototype.generateThirdTemplateFairnessProperties(currentConfig['templateThree'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
         propertiesTxt += VerifyContract.prototype.generateThirdTemplatePropertiesTxt(currentConfig['templateThree'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
       }
+      // if (currentConfig['templateFour'] != '') {
+      //   propertiesSMV += VerifyContract.prototype.generateFourthTemplateProperties(currentConfig['templateFour'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
+      //   propertiesTxt += VerifyContract.prototype.generateFourthTemplatePropertiesTxt(currentConfig['templateFour'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
+      // }
       if (currentConfig['templateFour'] != '') {
-        propertiesSMV += VerifyContract.prototype.generateFourthTemplateProperties(currentConfig['templateFour'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
-        propertiesTxt += VerifyContract.prototype.generateFourthTemplatePropertiesTxt(currentConfig['templateFour'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
+        propertiesSMV += ERC20Properties.prototype.generateERC20TransferShouldThrowWeakProperty(currentConfig['templateFour'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
+        propertiesTxt += ERC20Properties.prototype.generateERC20TransferShouldThrowPropertyText(currentConfig['templateFour'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
       }
       if (currentConfig['templateFive'] != '') {
-        propertiesSMV += ERC20Properties.prototype.generateERC20TransferShouldThrowWeakProperty(currentConfig['templateFive'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
+        propertiesSMV += ERC20Properties.prototype.generateERC20TransferShouldThrowStrongProperty(currentConfig['templateFive'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
         propertiesTxt += ERC20Properties.prototype.generateERC20TransferShouldThrowPropertyText(currentConfig['templateFive'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
       }
       if (currentConfig['templateTwo'] != '' || currentConfig['templateThree'] != '') {

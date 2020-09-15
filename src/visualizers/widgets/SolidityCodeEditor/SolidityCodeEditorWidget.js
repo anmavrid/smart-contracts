@@ -366,6 +366,11 @@ define(['q',
 
             //Get all function names
             var fNames = [];
+
+            // Add a constructor 
+            var constructorCode = codeContent.match(/constructor [^\{}]*/g);
+            console.log(constructorCode);
+
             var functionDefinitionList = codeContent.match(/function [^\{}]*/g);
             if (functionDefinitionList) {
                 for (var i = 0; i < functionDefinitionList.length; i++) {
@@ -419,11 +424,16 @@ define(['q',
 
             definitions = codeContent.substring(codeContent.indexOf(defaultdef) + defaultdef.length + 1, codeContent.indexOf(stateDef));
             
-            //Loading modifiers
+            //Loading constructor and modifiers
+            if(codeContent.indexOf('constructor') != -1){
+                definitions += codeContent.substring(codeContent.indexOf('constructor'), codeContent.indexOf('function'));
+            }
 
             if(codeContent.indexOf('modifier') != -1){
                 definitions += codeContent.substring(codeContent.indexOf('modifier'), codeContent.indexOf('function'));
             }
+
+            
 
             return definitions;
         };
