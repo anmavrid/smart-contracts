@@ -1174,12 +1174,11 @@ function peg$parse(input, options) {
         },
       peg$c438 = "emit",
       peg$c439 = peg$literalExpectation("emit", false),
-      peg$c440 = function(fnname, isanonymous) {
+      peg$c440 = function(fnname) {
         return {
           type: "EmitDeclaration",
           name: fnname.name,
           params: fnname.params,
-          is_anonymous: isanonymous != null,
           start: location().start.offset,
           end: location().end.offset
         }
@@ -12120,36 +12119,15 @@ function peg$parse(input, options) {
     s0 = peg$currPos;
     s1 = peg$parseEmitToken();
     if (s1 !== peg$FAILED) {
-      s2 = peg$parseEOS();
+      s2 = peg$parse__();
       if (s2 !== peg$FAILED) {
-        peg$savedPos = s0;
-        s1 = peg$c405();
-        s0 = s1;
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-    } else {
-      peg$currPos = s0;
-      s0 = peg$FAILED;
-    }
-    if (s0 === peg$FAILED) {
-      s0 = peg$currPos;
-      s1 = peg$parseEmitToken();
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parse__();
-        if (s2 !== peg$FAILED) {
-          s3 = peg$parseExpression();
-          if (s3 !== peg$FAILED) {
-            s4 = peg$parseEOS();
-            if (s4 !== peg$FAILED) {
-              peg$savedPos = s0;
-              s1 = peg$c406(s3);
-              s0 = s1;
-            } else {
-              peg$currPos = s0;
-              s0 = peg$FAILED;
-            }
+        s3 = peg$parseFunctionName();
+        if (s3 !== peg$FAILED) {
+          s4 = peg$parseEOS();
+          if (s4 !== peg$FAILED) {
+            peg$savedPos = s0;
+            s1 = peg$c383(s3);
+            s0 = s1;
           } else {
             peg$currPos = s0;
             s0 = peg$FAILED;
@@ -12162,6 +12140,9 @@ function peg$parse(input, options) {
         peg$currPos = s0;
         s0 = peg$FAILED;
       }
+    } else {
+      peg$currPos = s0;
+      s0 = peg$FAILED;
     }
 
     return s0;
