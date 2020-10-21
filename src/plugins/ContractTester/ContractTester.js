@@ -76,67 +76,61 @@ define([
             base: baseNode
         };
 
-        var newNode = self.core.createNode(params);
-        self.core.setAttribute(newNode, 'name', 'ContractTest3');
-        self.core.setRegistry(newNode, 'position', { x: 70, y: 70 });
-
-        var validChildren = self.core.getValidChildrenMetaNodes({ node: currentNode });
         // console.log(validChildren);
 
         var all_promises = [];
-        
-        fs.readFile('./contractsForTest/ERC20Contract.sol', 'utf8', function (err, contents) {
-            var fNames = ContractTester.prototype.getAllFunctions(contents);
 
-            //Creating initial state
-            var initialState = self.core.createChild(newNode, validChildren[2]);
-            self.core.setAttribute(initialState, 'name', 'InitialState');
+        fs.readdir('./contractsForTest/', function (err, files) {
+            files.forEach(function (file) {
+                fs.readFile('./contractsForTest/' + file, 'utf8', function (err, contents) {
+                    var newNode = self.core.createNode(params);
+                    self.core.setAttribute(newNode, 'name', file.replace('.sol', ''));
+                    self.core.setRegistry(newNode, 'position', { x: 70, y: 70 });
 
-            var deferred = Q.defer();
-            fNames.forEach(fn => {
+                    var validChildren = self.core.getValidChildrenMetaNodes({ node: currentNode });
 
-                var transition = self.core.createChild(newNode, validChildren[0]);
+                    var fNames = ContractTester.prototype.getAllFunctions(contents);
 
-                self.core.setAttribute(transition, 'name', fn.name);
-                self.core.setAttribute(transition, 'statements', fn.code);
-                self.core.setAttribute(transition, 'input', fn.inputs);
-                self.core.setAttribute(transition, 'output', fn.outputs);
-                self.core.setAttribute(transition, 'tags', fn.tags);
-                self.core.setPointer(transition, 'src', initialState);
-                self.core.setPointer(transition, 'dst', initialState);
-                // if (fn.modifiers.length > 0) {
-                //     self._client.setAttribute(transition, 'guards', fn.modifiers.join(','));
-                // }
-                deferred.resolve(fn);
-                all_promises.push(deferred.promise);
-            });
+                    //Creating initial state
+                    var initialState = self.core.createChild(newNode, validChildren[2]);
+                    self.core.setAttribute(initialState, 'name', 'InitialState');
 
-            Q.all(all_promises)
-                .then(function (result) {
-                    self.save('ContractTester updated model.')
-                        .then(() => {
-                            self.result.setSuccess(true);
-                            callback(null, self.result);
-                        })
-                        .catch((err) => {
-                            // Result success is false at invocation.
-                            self.logger.error(err.stack);
-                            callback(err, self.result);
+                    var deferred = Q.defer();
+                    fNames.forEach(fn => {
+
+                        var transition = self.core.createChild(newNode, validChildren[0]);
+
+                        self.core.setAttribute(transition, 'name', fn.name);
+                        self.core.setAttribute(transition, 'statements', fn.code);
+                        self.core.setAttribute(transition, 'input', fn.inputs);
+                        self.core.setAttribute(transition, 'output', fn.outputs);
+                        self.core.setAttribute(transition, 'tags', fn.tags);
+                        self.core.setPointer(transition, 'src', initialState);
+                        self.core.setPointer(transition, 'dst', initialState);
+                        // if (fn.modifiers.length > 0) {
+                        //     self._client.setAttribute(transition, 'guards', fn.modifiers.join(','));
+                        // }
+                        deferred.resolve(fn);
+                        all_promises.push(deferred.promise);
+                    });
+
+                    Q.all(all_promises)
+                        .then(function (result) {
+                            self.save('ContractTester updated model.')
+                                .then(() => {
+                                    self.result.setSuccess(true);
+                                    callback(null, self.result);
+                                })
+                                .catch((err) => {
+                                    // Result success is false at invocation.
+                                    self.logger.error(err.stack);
+                                    callback(err, self.result);
+                                });
                         });
+
                 });
-
+            });
         });
-
-        // var fileContent;
-
-        // utils.getModelOfContract(self.core, newNode)
-        // .then(function (contractModel) {
-        //     fileContent = ejs.render(ejsCache.contractType.complete, contractModel);
-        //     console.log(fileContent);
-        // });
-
-        // This will save the changes. If you don't want to save;
-        // exclude self.save and call callback directly from this scope.
 
     };
 
