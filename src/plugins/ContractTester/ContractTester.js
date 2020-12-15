@@ -85,7 +85,7 @@ define([
 
         var all_promises = [];
         
-        fs.readFile('./contractsForTest/ERC20Contract.sol', 'utf8', function (err, contents) {
+        fs.readFile('./../casestudy/ERC20Contract.sol', 'utf8', function (err, contents) {
             var fNames = ContractTester.prototype.getAllFunctions(contents);
 
             //Creating initial state
