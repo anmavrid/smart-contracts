@@ -15,7 +15,8 @@ define([
     'common/util/ejs',
     'scsrc/util/utils',
     'scsrc/templates/ejsCache',
-    'scsrc/parsers/solidityExtra'
+    'scsrc/parsers/solidityExtra',
+    'scsrc/parsers/solidityOptimized'
 ], function (
     PluginConfig,
     pluginMetadata,
@@ -24,7 +25,8 @@ define([
     ejs,
     utils,
     ejsCache,
-    solidityParser) {
+    solidityParser,
+    optimizedParser) {
     'use strict';
 
     pluginMetadata = JSON.parse(pluginMetadata);
@@ -111,12 +113,22 @@ define([
             .then(function (contractModel) {
                 fileContent = ejs.render(ejsCache.contractType.complete, contractModel);
 
-                var parseResult = solidityParser.checkWholeFile(fileContent.replace('InitialState,', 'InitialState'));
+                var parseResult = optimizedParser.parse(fileContent.replace('InitialState,', 'InitialState'));
+                
                 return fileContent;
             });
     };
 
-
+    LoopOptimizer.prototype.optimizeLoops = function (fileContent, parseResult) {
+        var self = this;
+        ///  Figure our loops in the code. 
+        ///  Check if the state variables can be replaced 
+             //// 3 cases: 
+                //// Replace state variables in body
+                //// Replace state variables in the loop condition
+                //// Merge loops if they are fusible
+        ///  Modify the code in the loop to add a temp variable
+    };
 
     return LoopOptimizer;
 });
