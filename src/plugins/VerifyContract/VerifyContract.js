@@ -258,8 +258,8 @@ define([
       //   propertiesTxt += VerifyContract.prototype.generateFourthTemplatePropertiesTxt(currentConfig['templateFour'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
       // }
       if (currentConfig['templateFour'] != '') {
-        propertiesSMV += ERC20Properties.prototype.generateERC20TransferShouldThrowWeakProperty(currentConfig['templateFour'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
-        propertiesTxt += ERC20Properties.prototype.generateERC20TransferShouldThrowPropertyText(currentConfig['templateFour'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
+        propertiesSMV += ERC777Properties.prototype.generateGlobalPExistence(currentConfig['templateFour'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
+        propertiesTxt += ERC777Properties.prototype.generateGlobalPExistence(currentConfig['templateFour'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
       }
       if (currentConfig['templateFive'] != '') {
         propertiesSMV += ERC20Properties.prototype.generateERC20TransferShouldThrowStrongProperty(currentConfig['templateFive'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
