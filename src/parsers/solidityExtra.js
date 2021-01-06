@@ -1,4 +1,4 @@
-define(['./solidity'], function (solidity) {
+define(['./solidityOptimized'], function (solidity) {
 
     /**
      * This function checks if the given input is a single function. In addition

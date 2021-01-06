@@ -72,7 +72,6 @@ define([
         self.loadNodeMap(self.activeNode)
            .then(function (nodes_) {
             nodes = nodes_;
-            console.log("Am I loading here?");
             return SolidityCodeGenerator.getGeneratedFiles(self, nodes, self.activeNode);
         })
         .then(function (result) {
@@ -174,12 +173,12 @@ define([
                 fileContent = ejs.render(ejsCache.contractType.complete, contractModel);
 
               var parseResult = solidityParser.checkWholeFile(fileContent);
-                if (parseResult) {
-                    self.logger.debug(parseResult.line);
-                    self.logger.debug(parseResult.message);
-                    parseResult.node = contractNode;
-                    violations.push(parseResult);
-                }
+                // if (parseResult) {
+                //     self.logger.debug(parseResult.line);
+                //     self.logger.debug(parseResult.message);
+                //     parseResult.node = contractNode;
+                //     violations.push(parseResult);
+                // }
                 return fileContent;
             })
             .nodeify(callback);
