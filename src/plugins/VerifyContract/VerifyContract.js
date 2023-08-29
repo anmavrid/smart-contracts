@@ -252,6 +252,10 @@ define([
             propertiesSMV += VerifyContract.prototype.generateFivethTemplateProperties(currentConfig['templateFive'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
             propertiesTxt += VerifyContract.prototype.generateFivethTemplatePropertiesTxt(currentConfig['templateFive'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
           }
+          if (currentConfig['templateSix'] != '') {
+            propertiesSMV += VerifyContract.prototype.generateSixthTemplateProperties(currentConfig['templateSix'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
+            propertiesTxt += VerifyContract.prototype.generateSixthTemplatePropertiesTxt(currentConfig['templateSix'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
+          }
           fs.appendFileSync(path + '/' + model.name+ '.smv', propertiesSMV);
           fs.writeFileSync(path + '/' + model.name+ 'Prop.txt', propertiesTxt);
 
@@ -607,6 +611,52 @@ define([
       }
       propertiesSMV = propertiesSMV.slice(0, -1);
       propertiesSMV += ') can never happen\n';
+    }
+    return propertiesSMV;
+  };
+
+  /* Get the properties specified by the user in Template Six */
+  VerifyContract.prototype.generateSixthTemplateProperties = function (templateSix, model, bipTransitionsToSMVNames, actionNamesToTransitionNames) {
+    var self = this,
+      properties = [],
+      property, clause,
+      propertiesSMV = '';
+
+    properties = VerifyContract.prototype.parseProperties.call(self, model, templateSix);
+    //CTLSPEC AF(property[0]);
+    for (property of properties) {
+      propertiesSMV += '-- Template 6: AF(';
+      for (clause of property[0]) {
+        propertiesSMV += clause + "|"
+      }
+      propertiesSMV = propertiesSMV.slice(0, -1);
+      propertiesSMV += ')\n';
+
+      propertiesSMV += 'CTLSPEC AF(';
+      for (clause of property[0]) {
+        propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+      }
+      propertiesSMV = propertiesSMV.slice(0, -1);
+      propertiesSMV += ')\n\n';
+    }
+    return propertiesSMV;
+  };
+
+  /* Get the properties specified by the user in Template Six */
+  VerifyContract.prototype.generateSixthTemplatePropertiesTxt = function (templateSix, model, bipTransitionsToSMVNames, actionNamesToTransitionNames) {
+    var self = this,
+      properties = [],
+      property, clause,
+      propertiesSMV = '';
+
+    properties = VerifyContract.prototype.parseProperties.call(self, model, templateSix);
+    for (property of properties) {
+      propertiesSMV += '(';
+      for (clause of property[0]) {
+        propertiesSMV += clause + "|"
+      }
+      propertiesSMV = propertiesSMV.slice(0, -1);
+      propertiesSMV += ') will eventually happen\n';
     }
     return propertiesSMV;
   };
