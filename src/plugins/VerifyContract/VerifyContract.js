@@ -248,6 +248,10 @@ define([
             propertiesSMV += VerifyContract.prototype.generateFourthTemplateProperties(currentConfig['templateFour'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
             propertiesTxt += VerifyContract.prototype.generateFourthTemplatePropertiesTxt(currentConfig['templateFour'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
           }
+          if(currentConfig['templateFive']!=''){
+            propertiesSMV += VerifyContract.prototype.generateFivethTemplateProperties(currentConfig['templateFive'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
+            propertiesTxt += VerifyContract.prototype.generateFivethTemplatePropertiesTxt(currentConfig['templateFive'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
+          }
           fs.appendFileSync(path + '/' + model.name+ '.smv', propertiesSMV);
           fs.writeFileSync(path + '/' + model.name+ 'Prop.txt', propertiesTxt);
 
@@ -560,6 +564,52 @@ define([
       }
       return propertiesSMV;
       };
+
+  /* Get the properties specified by the user in Template Five */
+  VerifyContract.prototype.generateFivethTemplateProperties = function (templateFive, model, bipTransitionsToSMVNames, actionNamesToTransitionNames) {
+    var self = this,
+      properties = [],
+      property, clause,
+      propertiesSMV = '';
+
+    properties = VerifyContract.prototype.parseProperties.call(self, model, templateFive);
+    //CTLSPEC AG(!(property[0]));
+    for (property of properties) {
+      propertiesSMV += '-- AG(!(';
+      for (clause of property[0]) {
+        propertiesSMV += clause + "|"
+      }
+      propertiesSMV = propertiesSMV.slice(0, -1);
+      propertiesSMV += '))\n';
+
+      propertiesSMV += 'CTLSPEC AG(!(';
+      for (clause of property[0]) {
+        propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+      }
+      propertiesSMV = propertiesSMV.slice(0, -1);
+      propertiesSMV += '))\n\n';
+    }
+    return propertiesSMV;
+  };
+
+  /* Get the properties specified by the user in Template Five */
+  VerifyContract.prototype.generateFivethTemplatePropertiesTxt = function (templateFive, model, bipTransitionsToSMVNames, actionNamesToTransitionNames) {
+    var self = this,
+      properties = [],
+      property, clause,
+      propertiesSMV = '';
+
+    properties = VerifyContract.prototype.parseProperties.call(self, model, templateFive);
+    for (property of properties) {
+      propertiesSMV += '(';
+      for (clause of property[0]) {
+        propertiesSMV += clause + "|"
+      }
+      propertiesSMV = propertiesSMV.slice(0, -1);
+      propertiesSMV += ') can never happen\n';
+    }
+    return propertiesSMV;
+  };
 
   VerifyContract.prototype.actionNamesToTransitions = function (transitions, actionNamesToTransitionNames){
     var self = this,
