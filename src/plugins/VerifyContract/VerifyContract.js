@@ -232,7 +232,7 @@ define([
           //   console.log(transition['actionName']);
           // }
           actionNamesToTransitionNames = VerifyContract.prototype.actionNamesToTransitions(model['transitions'], actionNamesToTransitionNames);
-          if (currentConfig['templateTwo'] != '' || currentConfig['templateThree']!=''){
+      if (currentConfig['templateThree'] != '') {
             fairnessProperties = 'FAIRNESS ( ';
           }
           if (currentConfig['templateOne']!=''){
@@ -241,7 +241,6 @@ define([
           }
           if(currentConfig['templateTwo']!=''){
             propertiesSMV += VerifyContract.prototype.generateSecondTemplateProperties(currentConfig['templateTwo'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
-            fairnessProperties += VerifyContract.prototype.generateSecondTemplateFairnessProperties(currentConfig['templateTwo'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
             propertiesTxt += VerifyContract.prototype.generateSecondTemplatePropertiesTxt(currentConfig['templateTwo'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
           }
           if(currentConfig['templateThree']!=''){
@@ -253,7 +252,7 @@ define([
             propertiesSMV += VerifyContract.prototype.generateFourthTemplateProperties(currentConfig['templateFour'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
             propertiesTxt += VerifyContract.prototype.generateFourthTemplatePropertiesTxt(currentConfig['templateFour'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
           }
-          if (currentConfig['templateTwo'] != '' || currentConfig['templateThree']!=''){
+          if (currentConfig['templateThree'] != '') {
             fairnessProperties = fairnessProperties.slice(0,-1);
             fairnessProperties += ');';
           }
@@ -351,36 +350,49 @@ define([
   };
 
   /* Get the properties specified by the user in Template Two */
-  VerifyContract.prototype.generateSecondTemplateProperties = function (templateTwo, model, bipTransitionsToSMVNames, actionNamesToTransitionNames){
+  VerifyContract.prototype.generateSecondTemplateProperties = function (templateTwo, model, bipTransitionsToSMVNames, actionNamesToTransitionNames) {
     var self = this,
-        properties = [],
-        property, clause,
-        propertiesSMV = '';
+      properties = [],
+      property, clause,
+      propertiesSMV = '';
+    properties = VerifyContract.prototype.parseProperties.call(self, model, templateTwo);
+    //CTLSPEC ! E[!(property[1]) U (property[0] & !(property[1]))]
+    for (property of properties) {
+      propertiesSMV += '-- !E[(!(';
+      for (clause of property[1]) {
+        propertiesSMV += clause + "|"
+      }
+      propertiesSMV = propertiesSMV.slice(0, -1);
+      propertiesSMV += ')) U ((';
+      for (clause of property[0]) {
+        propertiesSMV += clause + "|"
+      }
+      propertiesSMV = propertiesSMV.slice(0, -1);
+      propertiesSMV += ") & !(";
+      for (clause of property[1]) {
+        propertiesSMV += clause + "|"
+      }
+      propertiesSMV = propertiesSMV.slice(0, -1);
+      propertiesSMV += '))]\n';
+    }
 
-    properties =VerifyContract.prototype.parseProperties.call(self, model, templateTwo);
-    for (property of properties){
-      propertiesSMV += '-- A [ !(';
-      for (clause of property[0]){
+    for (property of properties) {
+      propertiesSMV += 'CTLSPEC !E[(!(';
+      for (clause of property[1]) {
         propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
       }
-        propertiesSMV = propertiesSMV.slice(0,-1);
-        propertiesSMV += ') U (';
-        for (clause of property[1]){
-          propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
-        }
-        propertiesSMV = propertiesSMV.slice(0,-1);
-        propertiesSMV += ')]\n';
-        propertiesSMV += 'CTLSPEC A [ !(';
-        for (clause of property[0]){
-          propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
-        }
-          propertiesSMV = propertiesSMV.slice(0,-1);
-          propertiesSMV += ') U (';
-          for (clause of property[1]){
-            propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
-          }
-          propertiesSMV = propertiesSMV.slice(0,-1);
-          propertiesSMV += ')]\n\n';
+      propertiesSMV = propertiesSMV.slice(0, -1);
+      propertiesSMV += ')) U ((';
+      for (clause of property[0]) {
+        propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+      }
+      propertiesSMV = propertiesSMV.slice(0, -1);
+      propertiesSMV += ") & !(";
+      for (clause of property[1]) {
+        propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+      }
+      propertiesSMV = propertiesSMV.slice(0, -1);
+      propertiesSMV += '))]\n\n';
     }
     return propertiesSMV;
   };
@@ -407,22 +419,6 @@ define([
         propertiesSMV += ')\n';
     }
     return propertiesSMV;
-  };
-
-  /* Get the properties specified by the user in Template Two */
-  VerifyContract.prototype.generateSecondTemplateFairnessProperties = function (templateTwo, model, bipTransitionsToSMVNames, actionNamesToTransitionNames){
-    var self = this,
-        properties = [],
-        property, clause,
-        fairnessProperties = '';
-
-    properties =VerifyContract.prototype.parseProperties.call(self, model, templateTwo);
-    for (property of properties){
-      for (clause of property[0]){
-        fairnessProperties += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
-      }
-    }
-    return fairnessProperties;
   };
 
   /* Get the properties specified by the user in Template Three */
