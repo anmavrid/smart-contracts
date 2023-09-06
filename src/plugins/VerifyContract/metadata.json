@@ -32,7 +32,7 @@
     {
       "name": "templateThree",
       "displayName": "Type 3: If <action> happens, <action> can happen only after <action> happens",
-      "description": "Specify actions separated by '#'. Please omit ';', when writing an action if the action is a statement, e.g., write 'p=10' instead of 'p=10;'.  To add or clauses use '|'. To check many properties of this type, separate properties by ';'.",
+      "description": "Specify actions separated by '#'. Please omit ';', when writing an action if the action is a statement, e.g., write 'p=10' instead of 'p=10;'. To add or clauses use '|'. To check many properties of this type, separate properties by ';'.",
       "value": "",
       "valueType": "string",
       "readOnly": false,
@@ -41,6 +41,24 @@
     {
       "name": "templateFour",
       "displayName": "Type 4: <action> will eventually happen after <action> happens",
+      "description": "Specify actions separated by '#'. Please omit ';', when writing an action if the action is a statement, e.g., write 'p=10' instead of 'p=10;'. To add or clauses use '|'. To check many properties of this type, separate properties by ';'.",
+      "value": "",
+      "valueType": "string",
+      "readOnly": false,
+      "writeAccessRequired": true
+    },
+    {
+      "name": "templateFive",
+      "displayName": "Type 5: <action> can never happen",
+      "description": "Specify actions separated by '#'. Please omit ';', when writing an action if the action is a statement, e.g., write 'p=10' instead of 'p=10;'. To add or clauses use '|'. To check many properties of this type, separate properties by ';'.",
+      "value": "",
+      "valueType": "string",
+      "readOnly": false,
+      "writeAccessRequired": true
+    },
+    {
+      "name": "templateSix",
+      "displayName": "Type 6: <action> will eventually happen",
       "description": "Specify actions separated by '#'. Please omit ';', when writing an action if the action is a statement, e.g., write 'p=10' instead of 'p=10;'. To add or clauses use '|'. To check many properties of this type, separate properties by ';'.",
       "value": "",
       "valueType": "string",
