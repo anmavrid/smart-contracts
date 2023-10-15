@@ -272,6 +272,10 @@ define([
             propertiesSMV += VerifyContract.prototype.generateTenthTemplateProperties(currentConfig['templateTen'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
             propertiesTxt += VerifyContract.prototype.generateTenthTemplatePropertiesTxt(currentConfig['templateTen'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
           }
+          if (currentConfig['templateEleven'] != '') {
+            propertiesSMV += VerifyContract.prototype.generateEleventhTemplateProperties(currentConfig['templateEleven'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
+            propertiesTxt += VerifyContract.prototype.generateEleventhTemplatePropertiesTxt(currentConfig['templateEleven'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
+          }
           fs.appendFileSync(path + '/' + model.name+ '.smv', propertiesSMV);
           fs.writeFileSync(path + '/' + model.name+ 'Prop.txt', propertiesTxt);
 
@@ -1010,6 +1014,72 @@ define([
             }
             propertiesSMV = propertiesSMV.slice(0, -1);
             propertiesSMV += ') always happens\n';
+        }
+        return propertiesSMV;
+    };
+
+    /* Get the properties specified by the user in Template Eleven */
+    VerifyContract.prototype.generateEleventhTemplateProperties = function (templateEleven, model, bipTransitionsToSMVNames, actionNamesToTransitionNames) {
+        var self = this,
+            properties = [],
+            property, clause,
+            propertiesSMV = '';
+
+        properties = VerifyContract.prototype.parseProperties.call(self, model, templateEleven);
+        //CTLSPEC AG((q) -> AG(p))
+        // After q, always the case that p happens
+        // q, p
+        for (property of properties) {
+            propertiesSMV += '-- Template 11: CTLSPEC AG((';
+            for (clause of property[0]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') -> AG(';
+            for (clause of property[1]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += '))\n';
+            // --------------
+            propertiesSMV += 'CTLSPEC AG((';
+            for (clause of property[0]) {
+                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') -> AG(';
+            for (clause of property[1]) {
+                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += '))\n\n';
+        }
+        return propertiesSMV;
+    };
+
+    /* Get the properties specified by the user in Template Eleven */
+    VerifyContract.prototype.generateEleventhTemplatePropertiesTxt = function (templateEleven, model, bipTransitionsToSMVNames, actionNamesToTransitionNames) {
+        var self = this,
+            properties = [],
+            property, clause,
+            propertiesSMV = '';
+
+        properties = VerifyContract.prototype.parseProperties.call(self, model, templateEleven);
+        // After (q), always the case that (p) happens
+
+        for (property of properties) {
+            propertiesSMV += 'Template 11: After (';
+            for (clause of property[0]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += '), always the case that (';
+            for (clause of property[1]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') happens\n';
+
         }
         return propertiesSMV;
     };
