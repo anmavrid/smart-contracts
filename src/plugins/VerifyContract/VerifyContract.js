@@ -280,6 +280,10 @@ define([
             propertiesSMV += VerifyContract.prototype.generateTwelfthTemplateProperties(currentConfig['templateTwelve'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
             propertiesTxt += VerifyContract.prototype.generateTwelfthTemplatePropertiesTxt(currentConfig['templateTwelve'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
           }
+          if (currentConfig['templateThirteen'] != '') {
+            propertiesSMV += VerifyContract.prototype.generateThirteenthTemplateProperties(currentConfig['templateThirteen'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
+            propertiesTxt += VerifyContract.prototype.generateThirteenthTemplatePropertiesTxt(currentConfig['templateThirteen'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
+          }
           fs.appendFileSync(path + '/' + model.name+ '.smv', propertiesSMV);
           fs.writeFileSync(path + '/' + model.name+ 'Prop.txt', propertiesTxt);
 
@@ -1193,6 +1197,125 @@ define([
             }
             propertiesSMV = propertiesSMV.slice(0, -1);
             propertiesSMV += ') happens\n';
+        }
+        return propertiesSMV;
+    };
+
+    /* Get the properties specified by the user in Template Thirteen */
+    VerifyContract.prototype.generateThirteenthTemplateProperties = function (templateThirteen, model, bipTransitionsToSMVNames, actionNamesToTransitionNames) {
+        var self = this,
+            properties = [],
+            property, clause,
+            propertiesSMV = '';
+
+        properties = VerifyContract.prototype.parseProperties.call(self, model, templateThirteen);
+        //CTLSPEC AG((q) & !(r) -> (!E[!((p) & !(r)) U ((r) & !((p) & !(r)))]))
+        // p will eventually happen between q and r
+        // p, q, r
+        for (property of properties) {
+            propertiesSMV += '-- Template 13: CTLSPEC AG((';
+            for (clause of property[1]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') & !(';
+            for (clause of property[2]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') -> (!E[!((';
+            for (clause of property[0]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') & !(';
+            for (clause of property[2]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ')) U ((';
+            for (clause of property[2]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') & !((';
+            for (clause of property[0]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') & !(';
+            for (clause of property[2]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ')))]))\n';
+            // ---------------
+            propertiesSMV += 'CTLSPEC AG((';
+            for (clause of property[1]) {
+                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') & !(';
+            for (clause of property[2]) {
+                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') -> (!E[!((';
+            for (clause of property[0]) {
+                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') & !(';
+            for (clause of property[2]) {
+                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ')) U ((';
+            for (clause of property[2]) {
+                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') & !((';
+            for (clause of property[0]) {
+                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') & !(';
+            for (clause of property[2]) {
+                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ')))]))\n\n';
+        }
+        return propertiesSMV;
+    };
+
+    /* Get the properties specified by the user in Template Thirteen */
+    VerifyContract.prototype.generateThirteenthTemplatePropertiesTxt = function (templateThirteen, model, bipTransitionsToSMVNames, actionNamesToTransitionNames) {
+        var self = this,
+            properties = [],
+            property, clause,
+            propertiesSMV = '';
+
+        properties = VerifyContract.prototype.parseProperties.call(self, model, templateThirteen);
+        for (property of properties) {
+            // (p) will eventually happen between (q) and (r)
+            propertiesSMV += 'Template 13: (';
+            for (clause of property[0]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') will eventually happen between (';
+            for (clause of property[1]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') and (';
+            for (clause of property[2]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ')\n';
         }
         return propertiesSMV;
     };
