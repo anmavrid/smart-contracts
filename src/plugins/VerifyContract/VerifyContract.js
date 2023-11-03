@@ -292,6 +292,10 @@ define([
             propertiesSMV += VerifyContract.prototype.generateFifteenthTemplateProperties(currentConfig['templateFifteen'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
             propertiesTxt += VerifyContract.prototype.generateFifteenthTemplatePropertiesTxt(currentConfig['templateFifteen'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
           }
+          if (currentConfig['templateSixteen'] != '') {
+            propertiesSMV += VerifyContract.prototype.generateSixteenthTemplateProperties(currentConfig['templateSixteen'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
+            propertiesTxt += VerifyContract.prototype.generateSixteenthTemplatePropertiesTxt(currentConfig['templateSixteen'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
+          }
           fs.appendFileSync(path + '/' + model.name+ '.smv', propertiesSMV);
           fs.writeFileSync(path + '/' + model.name+ 'Prop.txt', propertiesTxt);
 
@@ -1534,6 +1538,85 @@ define([
             }
             propertiesSMV = propertiesSMV.slice(0, -1);
             propertiesSMV += ') happens then in response (';
+            for (clause of property[2]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') eventually happens\n';
+        }
+        return propertiesSMV;
+    };
+
+    /* Get the properties specified by the user in Template Sixteen */
+    VerifyContract.prototype.generateSixteenthTemplateProperties = function (templateSixteen, model, bipTransitionsToSMVNames, actionNamesToTransitionNames) {
+        var self = this,
+            properties = [],
+            property, clause,
+            propertiesSMV = '';
+
+        properties = VerifyContract.prototype.parseProperties.call(self, model, templateSixteen);
+        //CTLSPEC AG((p) -> AF((q) & AX(AF(r))))
+        // if p happens then in response q eventually happens, followed by r eventually happens
+        // p, q, r
+        for (property of properties) {
+            propertiesSMV += '-- Template 16: CTLSPEC AG((';
+            for (clause of property[0]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') -> AF((';
+            for (clause of property[1]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') & AX(AF(';
+            for (clause of property[2]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += '))))\n';
+            // -------
+            propertiesSMV += 'CTLSPEC AG((';
+            for (clause of property[0]) {
+                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') -> AF((';
+            for (clause of property[1]) {
+                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') & AX(AF(';
+            for (clause of property[2]) {
+                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += '))))\n\n';
+        }
+        return propertiesSMV;
+    };
+
+    /* Get the properties specified by the user in Template Sixteen */
+    VerifyContract.prototype.generateSixteenthTemplatePropertiesTxt = function (templateSixteen, model, bipTransitionsToSMVNames, actionNamesToTransitionNames) {
+        var self = this,
+            properties = [],
+            property, clause,
+            propertiesSMV = '';
+
+        properties = VerifyContract.prototype.parseProperties.call(self, model, templateSixteen);
+        for (property of properties) {
+            // If (p) happens then in response (q) eventually happens, followed by (r) eventually happens
+            propertiesSMV += 'Template 16: If (';
+            for (clause of property[0]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') happens then in response (';
+            for (clause of property[1]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') eventually happens, followed by (';
             for (clause of property[2]) {
                 propertiesSMV += clause + "|"
             }
