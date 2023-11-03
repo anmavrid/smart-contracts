@@ -260,6 +260,10 @@ define([
             propertiesSMV += VerifyContract.prototype.generateSeventhTemplateProperties(currentConfig['templateSeven'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
             propertiesTxt += VerifyContract.prototype.generateSeventhTemplatePropertiesTxt(currentConfig['templateSeven'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
           }
+          if (currentConfig['templateEight'] != '') {
+            propertiesSMV += VerifyContract.prototype.generateEightthTemplateProperties(currentConfig['templateEight'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
+            propertiesTxt += VerifyContract.prototype.generateEightthTemplatePropertiesTxt(currentConfig['templateEight'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
+          }
           fs.appendFileSync(path + '/' + model.name+ '.smv', propertiesSMV);
           fs.writeFileSync(path + '/' + model.name+ 'Prop.txt', propertiesTxt);
 
@@ -739,6 +743,116 @@ define([
             propertiesSMV = propertiesSMV.slice(0, -1);
             propertiesSMV += ') can never happen before (';
             for (clause of property[1]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ')\n';
+        }
+        return propertiesSMV;
+    };
+
+    /* Get the properties specified by the user in Template Eight */
+    VerifyContract.prototype.generateEightthTemplateProperties = function (templateEight, model, bipTransitionsToSMVNames, actionNamesToTransitionNames) {
+        var self = this,
+            properties = [],
+            property, clause,
+            propertiesSMV = '';
+
+        properties = VerifyContract.prototype.parseProperties.call(self, model, templateEight);
+        //CTLSPEC AG((q) & !(r) -> (!E[!(r) U (!(r) & !(!(p) | AG(!(r))))]))
+        // p, q, r
+        for (property of properties) {
+            propertiesSMV += '-- Template 8: CTLSPEC AG((';
+            for (clause of property[1]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') & !(';
+            for (clause of property[2]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ") -> (!E[!(";
+
+            for (clause of property[2]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ") U (!(";
+            for (clause of property[2]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ") & !(!(";
+            for (clause of property[0]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ") | AG(!(";
+            for (clause of property[2]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += "))))]))\n";
+            // ---------------------------------------------------
+            propertiesSMV += 'CTLSPEC AG((';
+            for (clause of property[1]) {
+                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') & !(';
+            for (clause of property[2]) {
+                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ") -> (!E[!(";
+
+            for (clause of property[2]) {
+                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ") U (!(";
+            for (clause of property[2]) {
+                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ") & !(!(";
+            for (clause of property[0]) {
+                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ") | AG(!(";
+            for (clause of property[2]) {
+                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += "))))]))\n\n";
+        }
+        return propertiesSMV;
+    };
+
+    /* Get the properties specified by the user in Template Eight */
+    VerifyContract.prototype.generateEightthTemplatePropertiesTxt = function (templateEight, model, bipTransitionsToSMVNames, actionNamesToTransitionNames) {
+        var self = this,
+            properties = [],
+            property, clause,
+            propertiesSMV = '';
+
+        properties = VerifyContract.prototype.parseProperties.call(self, model, templateEight);
+        // p never happens between q and r
+        for (property of properties) {
+            propertiesSMV += 'Template 8: (';
+            for (clause of property[0]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') never happens between (';
+            for (clause of property[1]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') and (';
+            for (clause of property[2]) {
                 propertiesSMV += clause + "|"
             }
             propertiesSMV = propertiesSMV.slice(0, -1);
