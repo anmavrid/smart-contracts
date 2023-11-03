@@ -337,7 +337,7 @@ define([
 
     properties =VerifyContract.prototype.parseProperties.call(self, model, templateOne);
     for (property of properties){
-      propertiesSMV += '-- AG ( ';
+        propertiesSMV += '-- Template 1: CTLSPEC AG ( ';
       for (clause of property[1]){
         propertiesSMV += clause + "|"
       }
@@ -372,12 +372,12 @@ define([
 
     properties =VerifyContract.prototype.parseProperties.call(self, model, templateOne);
     for (property of properties){
-      propertiesSMV += '(';
+      propertiesSMV += 'Template 1: (';
       for (clause of property[0]){
         propertiesSMV += clause + "|"
       }
         propertiesSMV = propertiesSMV.slice(0,-1);
-        propertiesSMV += ') can happen only after (';
+        propertiesSMV += ') can never happen after (';
         for (clause of property[1]){
           propertiesSMV += clause + "|"
         }
@@ -395,9 +395,9 @@ define([
       property, clause,
       propertiesSMV = '';
     properties = VerifyContract.prototype.parseProperties.call(self, model, templateTwo);
-    //CTLSPEC ! E[!(property[1]) U (property[0] & !(property[1]))]
+    //CTLSPEC !E[!(property[1]) U (property[0] & !(property[1]))]
     for (property of properties) {
-      propertiesSMV += '-- !E[(!(';
+        propertiesSMV += '-- Template 2: CTLSPEC !E[(!(';
       for (clause of property[1]) {
         propertiesSMV += clause + "|"
       }
@@ -445,7 +445,7 @@ define([
 
     properties =VerifyContract.prototype.parseProperties.call(self, model, templateTwo);
     for (property of properties){
-      propertiesSMV += '(';
+        propertiesSMV += 'Template 2: (';
       for (clause of property[0]){
         propertiesSMV += clause + "|"
       }
@@ -469,7 +469,7 @@ define([
     properties = VerifyContract.prototype.parseProperties.call(self, model, templateThree);
     // CTLSPEC AG ((property[0]) -> AX (!E[(!(property[2])) U ((property[1]) & !(property[2]))]))
     for (property of properties) {
-      propertiesSMV += '-- AG ((';
+        propertiesSMV += '-- Template 3: CTLSPEC AG ((';
       for (clause of property[0]) {
         propertiesSMV += clause + "|"
       }
@@ -528,7 +528,7 @@ define([
 
         properties =VerifyContract.prototype.parseProperties.call(self, model, templateThree);
         for (property of properties){
-          propertiesSMV += 'If (';
+            propertiesSMV += 'Template 3: If (';
           for (clause of property[0]){
             propertiesSMV += clause + "|"
           }
@@ -559,7 +559,7 @@ define([
 
     properties =VerifyContract.prototype.parseProperties.call(self, model, templateFour);
     for (property of properties){
-      propertiesSMV += '-- AG ((';
+        propertiesSMV += '-- Template 4: CTLSPEC AG ((';
       for (clause of property[1]){
         propertiesSMV += clause + "|"
       }
@@ -594,7 +594,7 @@ define([
 
       properties =VerifyContract.prototype.parseProperties.call(self, model, templateFour);
       for (property of properties){
-        propertiesSMV += '(';
+          propertiesSMV += 'Template 4: (';
         for (clause of property[0]){
           propertiesSMV += clause + "|"
         }
@@ -619,7 +619,7 @@ define([
     properties = VerifyContract.prototype.parseProperties.call(self, model, templateFive);
     //CTLSPEC AG(!(property[0]));
     for (property of properties) {
-      propertiesSMV += '-- AG(!(';
+        propertiesSMV += '-- Template 5: CTLSPEC AG(!(';
       for (clause of property[0]) {
         propertiesSMV += clause + "|"
       }
@@ -645,7 +645,7 @@ define([
 
     properties = VerifyContract.prototype.parseProperties.call(self, model, templateFive);
     for (property of properties) {
-      propertiesSMV += '(';
+        propertiesSMV += 'Template 5: (';
       for (clause of property[0]) {
         propertiesSMV += clause + "|"
       }
@@ -665,7 +665,7 @@ define([
     properties = VerifyContract.prototype.parseProperties.call(self, model, templateSix);
     //CTLSPEC AF(property[0]);
     for (property of properties) {
-      propertiesSMV += '-- Template 6: AF(';
+      propertiesSMV += '-- Template 6: CTLSPEC AF(';
       for (clause of property[0]) {
         propertiesSMV += clause + "|"
       }
@@ -691,7 +691,7 @@ define([
 
     properties = VerifyContract.prototype.parseProperties.call(self, model, templateSix);
     for (property of properties) {
-      propertiesSMV += '(';
+        propertiesSMV += 'Template 6: (';
       for (clause of property[0]) {
         propertiesSMV += clause + "|"
       }
