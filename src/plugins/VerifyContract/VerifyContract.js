@@ -264,6 +264,10 @@ define([
             propertiesSMV += VerifyContract.prototype.generateEightthTemplateProperties(currentConfig['templateEight'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
             propertiesTxt += VerifyContract.prototype.generateEightthTemplatePropertiesTxt(currentConfig['templateEight'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
           }
+          if (currentConfig['templateNine'] != '') {
+            propertiesSMV += VerifyContract.prototype.generateNinthTemplateProperties(currentConfig['templateNine'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
+            propertiesTxt += VerifyContract.prototype.generateNinthTemplatePropertiesTxt(currentConfig['templateNine'], model, bipTransitionsToSMVNames, actionNamesToTransitionNames);
+          }
           fs.appendFileSync(path + '/' + model.name+ '.smv', propertiesSMV);
           fs.writeFileSync(path + '/' + model.name+ 'Prop.txt', propertiesTxt);
 
@@ -857,6 +861,104 @@ define([
             }
             propertiesSMV = propertiesSMV.slice(0, -1);
             propertiesSMV += ')\n';
+        }
+        return propertiesSMV;
+    };
+
+    /* Get the properties specified by the user in Template Nine */
+    VerifyContract.prototype.generateNinthTemplateProperties = function (templateNine, model, bipTransitionsToSMVNames, actionNamesToTransitionNames) {
+        var self = this,
+            properties = [],
+            property, clause,
+            propertiesSMV = '';
+
+        properties = VerifyContract.prototype.parseProperties.call(self, model, templateNine);
+        //CTLSPEC AG((q) & !(r) -> (!E[!(r) U ((p) & !(r))]))
+        // q r p
+        for (property of properties) {
+            propertiesSMV += '-- Template 9: CTLSPEC AG((';
+            for (clause of property[0]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') & !(';
+            for (clause of property[1]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') -> (!E[!(';
+            for (clause of property[1]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') U ((';
+            for (clause of property[2]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') & !(';
+            for (clause of property[1]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += '))]))\n';
+            // --------------------------------
+            propertiesSMV += 'CTLSPEC AG((';
+            for (clause of property[0]) {
+                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') & !(';
+            for (clause of property[1]) {
+                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') -> (!E[!(';
+            for (clause of property[1]) {
+                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') U ((';
+            for (clause of property[2]) {
+                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') & !(';
+            for (clause of property[1]) {
+                propertiesSMV += bipTransitionsToSMVNames[actionNamesToTransitionNames[clause]] + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += '))]))\n\n';
+        }
+        return propertiesSMV;
+    };
+
+    /* Get the properties specified by the user in Template Nine */
+    VerifyContract.prototype.generateNinthTemplatePropertiesTxt = function (templateNine, model, bipTransitionsToSMVNames, actionNamesToTransitionNames) {
+        var self = this,
+            properties = [],
+            property, clause,
+            propertiesSMV = '';
+
+        properties = VerifyContract.prototype.parseProperties.call(self, model, templateNine);
+        // After q until r, p never happens
+        for (property of properties) {
+            propertiesSMV += 'Template 9: After (';
+            for (clause of property[0]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') until (';
+            for (clause of property[1]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += '), (';
+            for (clause of property[2]) {
+                propertiesSMV += clause + "|"
+            }
+            propertiesSMV = propertiesSMV.slice(0, -1);
+            propertiesSMV += ') never happens\n';
         }
         return propertiesSMV;
     };
